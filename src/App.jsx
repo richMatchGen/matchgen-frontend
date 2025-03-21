@@ -1,25 +1,18 @@
 import { useEffect, useState } from "react";
 import { fetchMatches } from "./api";
 
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+
 function App() {
-    const [matches, setMatches] = useState([]);
-
-    useEffect(() => {
-        fetchMatches().then(data => setMatches(data));
-    }, []);
-
-    return (
-        <div>
-            <h1>MatchGen - Upcoming Matches</h1>
-            <ul>
-                {matches.map(match => (
-                    <li key={match.id}>
-                        {match.home_team} vs {match.away_team} on {match.match_date}
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<h1>Dashboard (Protected)</h1>} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;

@@ -8,23 +8,49 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post(
+      const response = await axios.post(
         "https://matchgen-backend-production.up.railway.app/api/users/login/",
         { email, password }
       );
-      localStorage.setItem("token", res.data.access);
+      
+      // Store token in localStorage for authentication
+      localStorage.setItem("token", response.data.access);
       alert("Login successful!");
+      window.location.href = "/dashboard"; // Redirect after login
     } catch (error) {
-      alert("Invalid credentials");
+      alert("Invalid email or password");
     }
   };
 
   return (
-    <Container>
-      <Typography variant="h4">Login</Typography>
-      <TextField label="Email" onChange={(e) => setEmail(e.target.value)} />
-      <TextField label="Password" type="password" onChange={(e) => setPassword(e.target.value)} />
-      <Button onClick={handleLogin}>Login</Button>
+    <Container maxWidth="sm" style={{ marginTop: "50px" }}>
+      <Typography variant="h4" align="center">Login</Typography>
+      <TextField 
+        fullWidth 
+        label="Email" 
+        variant="outlined" 
+        margin="normal" 
+        value={email} 
+        onChange={(e) => setEmail(e.target.value)} 
+      />
+      <TextField 
+        fullWidth 
+        label="Password" 
+        type="password" 
+        variant="outlined" 
+        margin="normal" 
+        value={password} 
+        onChange={(e) => setPassword(e.target.value)} 
+      />
+      <Button 
+        fullWidth 
+        variant="contained" 
+        color="primary" 
+        onClick={handleLogin}
+        style={{ marginTop: "20px" }}
+      >
+        Login
+      </Button>
     </Container>
   );
 };
