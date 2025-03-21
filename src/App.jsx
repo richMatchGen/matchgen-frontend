@@ -7,7 +7,7 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} /> {/* ✅ New route */}
+      <Route path="/register" element={<Signup />} />
       <Route path="/dashboard" element={<h1>Dashboard (Protected)</h1>} />
 
     </Routes>
