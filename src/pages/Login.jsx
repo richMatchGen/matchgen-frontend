@@ -51,6 +51,9 @@ const Login = () => {
       >
         Login
       </Button>
+      <a href="https://matchgen-backend-production.up.railway.app/auth/login/google-oauth2/">
+  <button>Sign in with Google</button>
+</a>
     </Container>
   );
 };
