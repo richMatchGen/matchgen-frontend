@@ -1,30 +1,35 @@
 import React, { useState } from "react";
 import { TextField, Button, Container, Typography } from "@mui/material";
 import axios from "axios";
+import useAuth from "../hooks/useAuth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useAuth(); // ✅ use login from hook
 
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/users/login/",
+        "https://matchgen-backend-production.up.railway.app/api/users/token/",
         { email, password }
       );
-      
-      // Store token in localStorage for authentication
-      localStorage.setItem("token", response.data.access);
+
+      const { access, refresh } = response.data;
+
+      login({ access, refresh }); // ✅ replaces localStorage.setItem
       alert("Login successful!");
-      window.location.href = "/dashboard"; // Redirect after login
+      window.location.href = "/dashboard";
     } catch (error) {
       alert("Invalid email or password");
+      console.error(error);
     }
   };
 
   return (
     <Container maxWidth="sm" style={{ marginTop: "50px" }}>
       <Typography variant="h4" align="center">Login</Typography>
+
       <TextField 
         fullWidth 
         label="Email" 
@@ -51,9 +56,14 @@ const Login = () => {
       >
         Login
       </Button>
-      <a href="https://matchgen-backend-production.up.railway.app/auth/login/google-oauth2/">
-  <button>Sign in with Google</button>
-</a>
+
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <a href="https://matchgen-backend-production.up.railway.app/auth/login/google-oauth2/">
+          <Button variant="outlined" color="secondary">
+            Sign in with Google
+          </Button>
+        </a>
+      </div>
     </Container>
   );
 };
