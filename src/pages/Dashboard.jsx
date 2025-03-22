@@ -4,15 +4,15 @@ import useAuth from "../hooks/useAuth";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth(); // ✅ Call hooks at the top level, not inside useEffect
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    const { logout } = useAuth();
 
     if (!token) {
       navigate("/login"); // force redirect if not logged in
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div>
