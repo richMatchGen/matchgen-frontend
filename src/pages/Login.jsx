@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Container, Typography } from "@mui/material";
 import axios from "axios";
-import useAuth from "../hooks/useAuth";
+import useAuth from "./hooks/useAuth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
