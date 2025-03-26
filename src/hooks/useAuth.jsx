@@ -3,21 +3,21 @@ import axios from "axios";
 
 const useAuth = () => {
   const [auth, setAuth] = useState({
-    token: localStorage.getItem("token"),
-    refresh: localStorage.getItem("refresh"),
+    token: localStorage.getItem("accessToken"),
+    refresh: localStorage.getItem("refreshToken"),
   });
 
   // Refresh token every 4 minutes
   useEffect(() => {
     const refreshToken = async () => {
-      const refresh = localStorage.getItem("refresh");
+      const refresh = localStorage.getItem("refreshToken");
       if (refresh) {
         try {
           const res = await axios.post(
             "https://matchgen-backend-production.up.railway.app/api/token/refresh/",
             { refresh }
           );
-          localStorage.setItem("token", res.data.access);
+          localStorage.setItem("accessToken", res.data.access);
           setAuth((prev) => ({ ...prev, token: res.data.access }));
         } catch (err) {
           console.error("Token refresh failed:", err);
@@ -31,14 +31,14 @@ const useAuth = () => {
   }, []);
 
   const login = ({ access, refresh }) => {
-    localStorage.setItem("token", access);
-    localStorage.setItem("refresh", refresh);
+    localStorage.setItem("accessToken", access);
+    localStorage.setItem("refreshToken", refresh);
     setAuth({ token: access, refresh });
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refresh");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     setAuth({ token: null, refresh: null });
     window.location.href = "/login";
   };
