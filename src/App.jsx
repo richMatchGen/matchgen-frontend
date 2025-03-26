@@ -4,7 +4,7 @@ import Login from "./pages/Login";
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import useAuth from "./hooks/useAuth"; // 👈
-import EditClub from './pages/EditClub';
+// import EditClub from './pages/editclub';
 import CreateClub from './pages/createclub';
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/clubs/createclub" element={<PrivateRoute><CreateClub /></PrivateRoute>} />
-      <Route path="/clubs/:id/edit" element={<PrivateRoute><EditClub /></PrivateRoute>} />
+      {/* <Route path="/clubs/:id/edit" element={<PrivateRoute><EditClub /></PrivateRoute>} /> */}
       </Routes>
     </>
   );
