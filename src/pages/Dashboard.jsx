@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
@@ -6,50 +6,56 @@ import useAuth from "../hooks/useAuth";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+
   const [user, setUser] = useState(null);
   const [club, setClub] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
+  const fetchData = useCallback(async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
 
-      const headers = { Authorization: `Bearer ${token}` };
+    const headers = { Authorization: `Bearer ${token}` };
 
-      try {
-        const userRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/me/",
-          { headers }
-        );
-        setUser(userRes.data);
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-        if (err.response?.status === 401) logout();
-        else alert("Something went wrong loading user info.");
-        setLoading(false);
-        return;
-      }
+    try {
+      const userRes = await axios.get(
+        "https://matchgen-backend-production.up.railway.app/api/users/me/",
+        { headers }
+      );
+      setUser(userRes.data);
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+      if (err.response?.status === 401) logout();
+      else alert("Error loading user details.");
+      return;
+    }
 
-      try {
-        const clubRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/club/",
-          { headers }
-        );
-        setClub(clubRes.data);
-      } catch (err) {
-        console.warn("No club found or error fetching club:", err);
-        setClub(null);
-      }
+    try {
+      const clubRes = await axios.get(
+        "https://matchgen-backend-production.up.railway.app/api/users/club/",
+        { headers }
+      );
+      setClub(clubRes.data);
+    } catch (err) {
+      console.warn("No club found or error fetching club:", err);
+      setClub(null);
+    }
 
-      setLoading(false);
-    };
-
-    fetchData();
+    setLoading(false);
   }, [navigate, logout]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (isMounted) {
+      fetchData();
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchData]);
 
   if (loading) return <p>Loading your dashboard...</p>;
 
@@ -79,9 +85,7 @@ const Dashboard = () => {
           <p><strong>Sport:</strong> {club.sport}</p>
           {club.logo && <img src={club.logo} alt="Club Logo" width={100} />}
           <br />
-          <button onClick={() => navigate(`/edit-club/${club.id}`)} style={{ marginTop: "1rem" }}>
-            Edit Club
-          </button>
+          <button onClick={() => navigate(`/edit-club/${club.id}`)}>Edit Club</button>
         </>
       ) : (
         <p>
