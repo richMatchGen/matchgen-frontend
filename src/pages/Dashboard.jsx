@@ -84,7 +84,7 @@ const Dashboard = () => {
           <button onClick={() => navigate(`/edit-club/${club.id}`)}>Edit Club</button>
         </>
       ) : (
-        <p>No club found. <button onClick={() => navigate("/create-club")}>Create one</button></p>
+        <p>No club found. <button onClick={() => navigate("/clubs/createclub")}>Create one</button></p>
       )}
 
       <br />
