@@ -24,7 +24,7 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/clubs/createclub" element={<PrivateRoute><CreateClub /></PrivateRoute>} />
-      <Route path="/clubs/:id/edit" element={<PrivateRoute><EditClub /></PrivateRoute>} />
+      <Route path="/edit-club/:clubId" element={<EditClub />} />
       </Routes>
     </>
   );
