@@ -1,44 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useClub from "../hooks/useClub";
 import { TextField, Button, Container, Typography, MenuItem } from "@mui/material";
 import axios from "axios";
 
-// const token = localStorage.getItem("accessToken");
-// console.log("Using token:", token);
-
-
 const EditClub = () => {
-  const { clubId } = useParams();
+  const { clubId } = useParams();                     // ✅ should be inside the component
+  const { club, loading, error } = useClub(clubId);   // ✅ same here
   const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [sport, setSport] = useState("");
   const [logo, setLogo] = useState("");
 
-
   useEffect(() => {
-    const fetchClub = async () => {
-      try {
-        const token = localStorage.getItem("accessToken");
-        console.log("TOKEN", token); // ✅ move this here so it's actually logged
-        console.log("clubID", clubId)
-        const res = await axios.get(
-          `https://matchgen-backend-production.up.railway.app/api/users/club/${clubId}/`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        const club = res.data;
-        setName(club.name);
-        setSport(club.sport);
-        setLogo(club.logo);
-      } catch (err) {
-        console.error("Error fetching club:", err);
-        alert("Could not load club details.");
-      }
-    };
-
-    fetchClub();
-  }, [clubId]);
+    if (club) {
+      setName(club.name);
+      setSport(club.sport);
+      setLogo(club.logo);
+    }
+  }, [club]);
 
   const handleUpdate = async () => {
     try {
@@ -57,6 +38,9 @@ const EditClub = () => {
       alert("Error updating club.");
     }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <Container maxWidth="sm" style={{ marginTop: "40px" }}>
