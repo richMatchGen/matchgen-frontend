@@ -37,9 +37,9 @@ const Dashboard = () => {
       <h1>Welcome to your Dashboard 👋</h1>
       <p>You are logged in!</p>
 
-      {club && (
+      
         <button onClick={() => navigate(`/edit-club/${club.id}`)}>Edit Club</button>
-      )}
+      
 
       <button onClick={logout}>Logout</button>
     </div>
