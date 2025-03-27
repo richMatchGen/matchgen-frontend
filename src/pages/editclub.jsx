@@ -5,7 +5,7 @@ import axios from "axios";
 
 // const token = localStorage.getItem("accessToken");
 // console.log("Using token:", token);
-console.log({ clubId })
+
 
 const EditClub = () => {
   const { clubId } = useParams();
