@@ -20,7 +20,7 @@ const EditClub = () => {
       try {
         const token = localStorage.getItem("accessToken");
         console.log("TOKEN", token); // ✅ move this here so it's actually logged
-  
+        console.log("clubID", clubId)
         const res = await axios.get(
           `https://matchgen-backend-production.up.railway.app/api/users/club/${clubId}/`,
           {
