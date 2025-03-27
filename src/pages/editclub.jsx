@@ -1,43 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { TextField, Button, Container, Typography, MenuItem } from "@mui/material";
 import axios from "axios";
 
-const EditClub = ({ clubId }) => {
+const EditClub = () => {
+  const { clubId } = useParams();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [sport, setSport] = useState("");
   const [logo, setLogo] = useState("");
 
-  const token = localStorage.getItem("accessToken");
-
-  // Load club details
   useEffect(() => {
     const fetchClub = async () => {
       try {
+        const token = localStorage.getItem("accessToken");
         const res = await axios.get(
           `https://matchgen-backend-production.up.railway.app/api/users/club/${clubId}/`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
-        setName(res.data.name);
-        setSport(res.data.sport);
-        setLogo(res.data.logo);
+        const club = res.data;
+        setName(club.name);
+        setSport(club.sport);
+        setLogo(club.logo);
       } catch (err) {
-        console.error("Error fetching club", err);
+        console.error("Error fetching club:", err);
+        alert("Could not load club details.");
       }
     };
 
-    if (clubId) {
-      fetchClub();
-    }
+    fetchClub();
   }, [clubId]);
 
   const handleUpdate = async () => {
     try {
+      const token = localStorage.getItem("accessToken");
       await axios.put(
         `https://matchgen-backend-production.up.railway.app/api/users/club/${clubId}/`,
         { name, sport, logo },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
       alert("Club updated!");
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       alert("Error updating club.");
@@ -80,7 +87,7 @@ const EditClub = ({ clubId }) => {
       />
 
       <Button variant="contained" color="primary" fullWidth onClick={handleUpdate} sx={{ mt: 2 }}>
-        Update Club
+        Save Changes
       </Button>
     </Container>
   );
