@@ -4,7 +4,7 @@ import Login from "./pages/Login";
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import useAuth from "./hooks/useAuth"; // 👈
-// import EditClub from './pages/editclub';
+import EditClub from './pages/editclub';
 import CreateClub from './pages/createclub';
 
 function App() {
