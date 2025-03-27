@@ -5,6 +5,7 @@ import axios from "axios";
 
 // const token = localStorage.getItem("accessToken");
 // console.log("Using token:", token);
+console.log({ clubId })
 
 const EditClub = () => {
   const { clubId } = useParams();
@@ -13,11 +14,13 @@ const EditClub = () => {
   const [sport, setSport] = useState("");
   const [logo, setLogo] = useState("");
 
-  console.log({ clubId })
+
   useEffect(() => {
     const fetchClub = async () => {
       try {
         const token = localStorage.getItem("accessToken");
+        console.log("TOKEN", token); // ✅ move this here so it's actually logged
+  
         const res = await axios.get(
           `https://matchgen-backend-production.up.railway.app/api/users/club/${clubId}/`,
           {
