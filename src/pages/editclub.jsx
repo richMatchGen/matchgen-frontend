@@ -3,12 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { TextField, Button, Container, Typography, MenuItem } from "@mui/material";
 import axios from "axios";
 
+const token = localStorage.getItem("accessToken");
+console.log("Using token:", token);
+
 const EditClub = () => {
   const { clubId } = useParams();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [sport, setSport] = useState("");
   const [logo, setLogo] = useState("");
+
 
   useEffect(() => {
     const fetchClub = async () => {
