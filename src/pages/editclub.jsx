@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { TextField, Button, Container, Typography, MenuItem } from "@mui/material";
 import axios from "axios";
 
-const token = localStorage.getItem("accessToken");
-console.log("Using token:", token);
+// const token = localStorage.getItem("accessToken");
+// console.log("Using token:", token);
 
 const EditClub = () => {
   const { clubId } = useParams();
@@ -13,7 +13,7 @@ const EditClub = () => {
   const [sport, setSport] = useState("");
   const [logo, setLogo] = useState("");
 
-
+  console.log({ clubId })
   useEffect(() => {
     const fetchClub = async () => {
       try {
