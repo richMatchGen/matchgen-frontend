@@ -1,78 +1,86 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { TextField, Button, Container, Typography, MenuItem } from "@mui/material";
 import axios from "axios";
-import { Container, TextField, Button, Typography } from "@mui/material";
-import { useParams } from "react-router-dom";
 
-const EditClub = () => {
-  const { id } = useParams(); // get club ID from route
-  const [club, setClub] = useState({ name: "", logo: "", sport: "" });
+const EditClub = ({ clubId }) => {
+  const [name, setName] = useState("");
+  const [sport, setSport] = useState("");
+  const [logo, setLogo] = useState("");
 
-  const fetchClub = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      const response = await axios.get(
-        `https://matchgen-backend-production.up.railway.app/api/clubs/${id}/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setClub(response.data);
-    } catch (err) {
-      alert("Failed to fetch club data.");
-    }
-  };
+  const token = localStorage.getItem("accessToken");
 
-  const updateClub = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      await axios.patch(
-        `https://matchgen-backend-production.up.railway.app/api/clubs/${id}/`,
-        club,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      alert("Club updated successfully!");
-    } catch (err) {
-      alert("Update failed.");
-      console.error(err);
-    }
-  };
-
+  // Load club details
   useEffect(() => {
-    fetchClub();
-  }, []);
+    const fetchClub = async () => {
+      try {
+        const res = await axios.get(
+          `https://matchgen-backend-production.up.railway.app/api/users/club/${clubId}/`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setName(res.data.name);
+        setSport(res.data.sport);
+        setLogo(res.data.logo);
+      } catch (err) {
+        console.error("Error fetching club", err);
+      }
+    };
+
+    if (clubId) {
+      fetchClub();
+    }
+  }, [clubId]);
+
+  const handleUpdate = async () => {
+    try {
+      await axios.put(
+        `https://matchgen-backend-production.up.railway.app/api/users/club/${clubId}/`,
+        { name, sport, logo },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Club updated!");
+    } catch (err) {
+      console.error(err);
+      alert("Error updating club.");
+    }
+  };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 5 }}>
-      <Typography variant="h4" gutterBottom>Edit Club</Typography>
+    <Container maxWidth="sm" style={{ marginTop: "40px" }}>
+      <Typography variant="h4" align="center">Edit Club</Typography>
+
       <TextField
+        fullWidth
         label="Club Name"
-        fullWidth
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         margin="normal"
-        value={club.name}
-        onChange={(e) => setClub({ ...club, name: e.target.value })}
       />
+
       <TextField
+        fullWidth
         label="Sport"
-        fullWidth
+        value={sport}
+        onChange={(e) => setSport(e.target.value)}
         margin="normal"
-        value={club.sport}
-        onChange={(e) => setClub({ ...club, sport: e.target.value })}
-      />
+        select
+      >
+        <MenuItem value="football">Football</MenuItem>
+        <MenuItem value="rugby">Rugby</MenuItem>
+        <MenuItem value="cricket">Cricket</MenuItem>
+        <MenuItem value="hockey">Hockey</MenuItem>
+        <MenuItem value="other">Other</MenuItem>
+      </TextField>
+
       <TextField
-        label="Logo URL"
         fullWidth
+        label="Logo URL"
+        value={logo}
+        onChange={(e) => setLogo(e.target.value)}
         margin="normal"
-        value={club.logo}
-        onChange={(e) => setClub({ ...club, logo: e.target.value })}
       />
-      <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={updateClub}>
-        Save Changes
+
+      <Button variant="contained" color="primary" fullWidth onClick={handleUpdate} sx={{ mt: 2 }}>
+        Update Club
       </Button>
     </Container>
   );
