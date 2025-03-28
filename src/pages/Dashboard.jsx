@@ -31,6 +31,7 @@ const Dashboard = () => {
       try {
         const clubRes = await axios.get("/api/users/my-club/", { headers });
         setClub(clubRes.data);
+        console.log(clubRes)
       } catch {
         console.warn("User might not have a club yet.");
       } finally {
