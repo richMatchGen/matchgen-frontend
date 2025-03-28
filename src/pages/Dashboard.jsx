@@ -10,7 +10,7 @@ import MainGrid from '../components/MainGrid';
 import SideMenu from '../components/SideMenu';
 import Categories from '../components/Categories';
 import AppTheme from '../themes/AppTheme';
-import { getProfile } from '../services/auth'; // Ensure this function exists
+import { getProfile } from '../hooks/auth'; // Ensure this function exists
 
 
 import {
