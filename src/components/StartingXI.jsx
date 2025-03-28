@@ -11,8 +11,8 @@ import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import axios from "axios";
 
-import { getToken } from "../services/auth";
-import { generateStartingXIGraphic } from "../services/club";
+import { getToken } from "../hooks/auth";
+import { generateStartingXIGraphic } from "../hooks/club";
 
 function not(a, b) {
   return a.filter((value) => !b.includes(value));

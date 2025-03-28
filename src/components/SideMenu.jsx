@@ -11,9 +11,9 @@ import SelectContent from './SelectContent';
 import MenuContent from './MenuContent';
 import CardAlert from './CardAlert';
 import OptionsMenu from './OptionsMenu';
-import { getToken } from "../services/auth";
+import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
-import { getProfile } from '../services/auth'; // Ensure this function exists
+import { getProfile } from '../hooks/auth'; // Ensure this function exists
 
 const drawerWidth = 240;
 

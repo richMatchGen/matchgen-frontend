@@ -13,7 +13,7 @@ import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
-import { getToken } from "../services/auth";
+import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
 
 const mainListItems = [
