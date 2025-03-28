@@ -4,7 +4,7 @@ import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import AppNavbar from '../components/AppNavbar';
+import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
 import MainGrid from '../components/MainGrid';
 import SideMenu from '../components/SideMenu';
