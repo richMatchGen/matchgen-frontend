@@ -29,7 +29,10 @@ const Dashboard = () => {
       }
   
       try {
-        const clubRes = await axios.get("/api/users/my-club/", { headers });
+        const clubRes = await axios.get(
+          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
+          { headers }
+        );
         setClub(clubRes.data);
         console.log(clubRes)
       } catch {
