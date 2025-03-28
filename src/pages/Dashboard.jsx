@@ -16,40 +16,30 @@ const Dashboard = () => {
       navigate("/login");
       return;
     }
-
+  
     const headers = { Authorization: `Bearer ${token}` };
-
-    const fetchUser = async () => {
+  
+    const fetchData = async () => {
       try {
-        const userRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/me/",
-          { headers }
-        );
+        const userRes = await axios.get("/api/users/me/", { headers });
         setUser(userRes.data);
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-        logout(); // Only logout if user fetch fails
+      } catch {
+        logout();
+        return;
       }
-    };
-
-    const fetchClub = async () => {
+  
       try {
-        const clubRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/my-club/,
-          { headers }
-        );
+        const clubRes = await axios.get("/api/users/my-club/", { headers });
         setClub(clubRes.data);
-      } catch (err) {
+      } catch {
         console.warn("User might not have a club yet.");
-        setClub(null); // Don't treat it as fatal
       } finally {
         setLoading(false);
       }
     };
-
-    fetchUser();
-    fetchClub();
-  }, [navigate, logout]);
+  
+    fetchData();
+  }, [navigate]); // ✅ no infinite loop
 
   if (loading) return <p>Loading your dashboard...</p>;
   if (!user) return null; // user fetch failure already handled
