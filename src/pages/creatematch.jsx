@@ -88,7 +88,7 @@ const handleChange = (e) => {
         variant="contained"
         color="primary"
         sx={{ mt: 2 }}
-        onClick={handleSubmit}
+        onClick={handleCreate}
       >
         Create Match
       </Button>
