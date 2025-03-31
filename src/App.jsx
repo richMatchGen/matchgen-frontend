@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import useAuth from "./hooks/useAuth"; // 👈
 import EditClub from './pages/editclub';
 import CreateClub from './pages/createclub';
+import CreateMatch from './pages/creatematch';
 
 function App() {
   const { auth, logout } = useAuth(); // 👈
@@ -24,7 +25,8 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/clubs/createclub" element={<PrivateRoute><CreateClub /></PrivateRoute>} />
-      <Route path="/edit-club/:clubId" element={<EditClub />} />
+        <Route path="/edit-club/:clubId" element={<EditClub />} />
+        <Route path="/fixture/creatematch" element={<PrivateRoute><CreateMatch /></PrivateRoute>} />
       </Routes>
     </>
   );
