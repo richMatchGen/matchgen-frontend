@@ -96,4 +96,4 @@ const handleChange = (e) => {
   );
 };
 
-export default CreateClub;
+export default CreateMatch;
