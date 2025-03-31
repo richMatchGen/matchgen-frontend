@@ -29,7 +29,7 @@ const handleChange = (e) => {
     try {
       const response = await axios.post(
         "https://matchgen-backend-production.up.railway.app/api/content/matches/",
-        { name, sport, logo },
+        form,
         {
           headers: {
             Authorization: `Bearer ${token}`,
