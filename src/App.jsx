@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { Button, Container, Typography, AppBar, Toolbar } from "@mui/material";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/Login";
 import Signup from './pages/Signup';
@@ -14,6 +15,7 @@ function App() {
 
   return (
     <>
+    <Container>
       {/* Optional: Add logout button for testing */}
       {auth.token && <button onClick={logout}>Logout</button>}
 
@@ -30,6 +32,7 @@ function App() {
         <Route path="/fixture/creatematch" element={<PrivateRoute><CreateMatch /></PrivateRoute>} />
         <Route path="/squad/createplayer" element={<PrivateRoute><CreatePlayer /></PrivateRoute>} />
       </Routes>
+      </Container>
     </>
   );
 }
