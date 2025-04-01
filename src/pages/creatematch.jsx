@@ -4,6 +4,7 @@ import axios from "axios";
 
 const CreateMatch= () => {
     const [form, setForm] = useState({
+        club: "",
         match_type: "",
         opponent: "",
         club_logo: "",
@@ -37,8 +38,9 @@ const handleChange = (e) => {
         }
       );
 
-      alert("Club created!");
+      alert("Match created!");
       setForm({
+        club: "",
         match_type: "",
         opponent: "",
         club_logo: "",
