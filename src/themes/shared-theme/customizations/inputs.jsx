@@ -35,27 +35,20 @@ export const inputsCustomizations = {
         textTransform: 'none',
         variants: [
           {
-            props: {
-              size: 'small',
-            },
+            props: { size: 'small' },
             style: {
               height: '2.25rem',
               padding: '8px 12px',
             },
           },
           {
-            props: {
-              size: 'medium',
-            },
+            props: { size: 'medium' },
             style: {
-              height: '2.5rem', // 40px
+              height: '2.5rem',
             },
           },
           {
-            props: {
-              color: 'primary',
-              variant: 'contained',
-            },
+            props: { color: 'primary', variant: 'contained' },
             style: {
               color: 'white',
               backgroundColor: gray[900],
@@ -88,10 +81,7 @@ export const inputsCustomizations = {
             },
           },
           {
-            props: {
-              color: 'secondary',
-              variant: 'contained',
-            },
+            props: { color: 'secondary', variant: 'contained' },
             style: {
               color: 'white',
               backgroundColor: brand[300],
@@ -109,9 +99,7 @@ export const inputsCustomizations = {
             },
           },
           {
-            props: {
-              variant: 'outlined',
-            },
+            props: { variant: 'outlined' },
             style: {
               color: (theme.vars || theme).palette.text.primary,
               border: '1px solid',
@@ -138,10 +126,7 @@ export const inputsCustomizations = {
             },
           },
           {
-            props: {
-              color: 'secondary',
-              variant: 'outlined',
-            },
+            props: { color: 'secondary', variant: 'outlined' },
             style: {
               color: brand[700],
               border: '1px solid',
@@ -156,7 +141,6 @@ export const inputsCustomizations = {
               },
               ...theme.applyStyles('dark', {
                 color: brand[50],
-                border: '1px solid',
                 borderColor: brand[900],
                 backgroundColor: alpha(brand[900], 0.3),
                 '&:hover': {
@@ -170,9 +154,7 @@ export const inputsCustomizations = {
             },
           },
           {
-            props: {
-              variant: 'text',
-            },
+            props: { variant: 'text' },
             style: {
               color: gray[600],
               '&:hover': {
@@ -193,10 +175,7 @@ export const inputsCustomizations = {
             },
           },
           {
-            props: {
-              color: 'secondary',
-              variant: 'text',
-            },
+            props: { color: 'secondary', variant: 'text' },
             style: {
               color: brand[700],
               '&:hover': {
@@ -252,9 +231,7 @@ export const inputsCustomizations = {
         }),
         variants: [
           {
-            props: {
-              size: 'small',
-            },
+            props: { size: 'small' },
             style: {
               width: '2.25rem',
               height: '2.25rem',
@@ -263,9 +240,7 @@ export const inputsCustomizations = {
             },
           },
           {
-            props: {
-              size: 'medium',
-            },
+            props: { size: 'medium' },
             style: {
               width: '2.5rem',
               height: '2.5rem',
@@ -401,17 +376,13 @@ export const inputsCustomizations = {
         }),
         variants: [
           {
-            props: {
-              size: 'small',
-            },
+            props: { size: 'small' },
             style: {
               height: '2.25rem',
             },
           },
           {
-            props: {
-              size: 'medium',
-            },
+            props: { size: 'medium' },
             style: {
               height: '2.5rem',
             },
