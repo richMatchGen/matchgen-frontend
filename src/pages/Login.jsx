@@ -72,8 +72,24 @@ const Login = () => {
         <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
         <Card variant="outlined">
           <SitemarkIcon />
-      <Typography variant="h4" align="center">Login</Typography>
-
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+          >
+            Sign in
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              gap: 2,
+            }}
+          >
       <TextField 
         fullWidth 
         label="Email" 
@@ -101,13 +117,29 @@ const Login = () => {
         Login
       </Button>
 
-      <div style={{ marginTop: "20px", textAlign: "center" }}>
+      {/* <div style={{ marginTop: "20px", textAlign: "center" }}>
         <a href="https://matchgen-backend-production.up.railway.app/auth/login/google-oauth2/">
           <Button variant="outlined" color="secondary">
             Sign in with Google
           </Button>
         </a>
-      </div>
+      </div> */}
+      </Box>
+      <Divider>or</Divider>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+
+            <Typography sx={{ textAlign: 'center' }}>
+              Don&apos;t have an account?{' '}
+              <Link
+                href="/material-ui/getting-started/templates/sign-in/"
+                variant="body2"
+                sx={{ alignSelf: 'center' }}
+              >
+                Sign up
+              </Link>
+            </Typography>
+          </Box>
+
       </Card>
       </SignInContainer>
     </AppTheme>
