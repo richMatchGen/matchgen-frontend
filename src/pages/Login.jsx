@@ -94,6 +94,24 @@ const Login = () => {
         gap: 2,
       }}
     >
+                  <FormControl>
+              <FormLabel htmlFor="email">Email</FormLabel>
+              <TextField
+                error={emailError}
+                helperText={emailErrorMessage}
+                id="email"
+                type="email"
+                name="email"
+                placeholder="your@email.com"
+                autoComplete="email"
+                autoFocus
+                required
+                fullWidth
+                variant="outlined"
+                color={emailError ? 'error' : 'primary'}
+              />
+            </FormControl>
+      
       <TextField
         fullWidth
         label="Email"

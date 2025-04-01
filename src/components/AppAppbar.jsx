@@ -61,7 +61,8 @@ export default function AppAppBar() {
             </Box>
           </Box>
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
-            <Button color="primary" variant="text" size="small">
+          
+            <Button color="primary" variant="text" size="small" onClick={() => navigate("/login")}>
               Sign in
             </Button>
             <Button color="primary" variant="contained" size="small">
