@@ -312,15 +312,11 @@ export const inputsCustomizations = {
   MuiCheckbox: {
     defaultProps: {
       disableRipple: true,
-      icon: React.createElement(CheckBoxOutlineBlankRoundedIcon, {
-        sx: { color: 'hsla(210, 0%, 0%, 0.0)' },
-      }),
-      checkedIcon: React.createElement(CheckRoundedIcon, {
-        sx: { height: 14, width: 14 },
-      }),
-      indeterminateIcon: React.createElement(RemoveRoundedIcon, {
-        sx: { height: 14, width: 14 },
-      }),
+      icon: (
+        <CheckBoxOutlineBlankRoundedIcon sx={{ color: 'hsla(210, 0%, 0%, 0.0)' }} />
+      ),
+      checkedIcon: <CheckRoundedIcon sx={{ height: 14, width: 14 }} />,
+      indeterminateIcon: <RemoveRoundedIcon sx={{ height: 14, width: 14 }} />,
     },
     styleOverrides: {
       root: ({ theme }) => ({
