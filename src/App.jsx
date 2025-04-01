@@ -17,7 +17,7 @@ function App() {
 
   return (
     <>
-    <Container>
+
       {/* Optional: Add logout button for testing */}
       {auth.token && <button onClick={logout}>Logout</button>}
 
@@ -35,7 +35,7 @@ function App() {
         <Route path="/fixture/creatematch" element={<PrivateRoute><CreateMatch /></PrivateRoute>} />
         <Route path="/squad/createplayer" element={<PrivateRoute><CreatePlayer /></PrivateRoute>} />
       </Routes>
-      </Container>
+
     </>
   );
 }
