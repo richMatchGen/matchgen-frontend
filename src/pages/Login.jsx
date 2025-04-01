@@ -15,7 +15,7 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from '../components/forgotpassword';
 import AppTheme from '../themes/AppTheme';
-import ColorModeSelect from '../themes/ColorModeSelect';
+import ColorModeSelect from '../themes/colormodeselect';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 
 const Login = () => {
