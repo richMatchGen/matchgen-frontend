@@ -17,6 +17,7 @@ import ForgotPassword from '../components/forgotpassword';
 import AppTheme from '../themes/AppTheme';
 import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
+import Header from '../components/Header';
 import ColorModeSelect from '../themes/colormodeselect';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 
