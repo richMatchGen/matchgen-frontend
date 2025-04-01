@@ -68,7 +68,8 @@ export const navigationCustomizations = {
         border: '1px solid',
         borderColor: gray[200],
         backgroundColor: (theme.vars || theme).palette.background.paper,
-        boxShadow: `inset 0 1px 0 1px hsla(220, 0%, 100%, 0.6), inset 0 -1px 0 1px hsla(220, 35%, 90%, 0.5)`,
+        boxShadow:
+          'inset 0 1px 0 1px hsla(220, 0%, 100%, 0.6), inset 0 -1px 0 1px hsla(220, 35%, 90%, 0.5)',
         '&:hover': {
           borderColor: gray[300],
           backgroundColor: (theme.vars || theme).palette.background.paper,
@@ -82,21 +83,19 @@ export const navigationCustomizations = {
           display: 'none',
         },
         ...theme.applyStyles('dark', {
-          borderRadius: (theme.vars || theme).shape.borderRadius,
           borderColor: gray[700],
           backgroundColor: (theme.vars || theme).palette.background.paper,
-          boxShadow: `inset 0 1px 0 1px ${alpha(gray[700], 0.15)}, inset 0 -1px 0 1px hsla(220, 0%, 0%, 0.7)`,
+          boxShadow: `inset 0 1px 0 1px ${alpha(
+            gray[700],
+            0.15
+          )}, inset 0 -1px 0 1px hsla(220, 0%, 0%, 0.7)`,
           '&:hover': {
             borderColor: alpha(gray[700], 0.7),
             backgroundColor: (theme.vars || theme).palette.background.paper,
             boxShadow: 'none',
           },
           [`&.${selectClasses.focused}`]: {
-            outlineOffset: 0,
             borderColor: gray[900],
-          },
-          '&:before, &:after': {
-            display: 'none',
           },
         }),
       }),
@@ -104,8 +103,6 @@ export const navigationCustomizations = {
         display: 'flex',
         alignItems: 'center',
         ...theme.applyStyles('dark', {
-          display: 'flex',
-          alignItems: 'center',
           '&:focus-visible': {
             backgroundColor: gray[900],
           },
@@ -245,23 +242,12 @@ export const navigationCustomizations = {
         ...theme.applyStyles('dark', {
           border: `1px solid ${gray[700]}`,
           '&.Mui-active': {
-            border: 'none',
             color: (theme.vars || theme).palette.primary.light,
           },
           '&.Mui-completed': {
-            border: 'none',
             color: (theme.vars || theme).palette.success.light,
           },
         }),
-        variants: [
-          {
-            props: { completed: true },
-            style: {
-              width: 12,
-              height: 12,
-            },
-          },
-        ],
       }),
     },
   },
