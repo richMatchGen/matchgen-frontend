@@ -108,18 +108,20 @@ const Login = () => {
                 required
                 fullWidth
                 variant="outlined"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 // color={emailError ? 'error' : 'primary'}
               />
             </FormControl>
       
-      <TextField
+      {/* <TextField
         fullWidth
         label="Email"
         variant="outlined"
         margin="normal"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-      />
+      /> */}
       <TextField
         fullWidth
         label="Password"
