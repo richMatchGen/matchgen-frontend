@@ -60,7 +60,7 @@ const Login = () => {
       const { access, refresh } = response.data;
 
       login({ access, refresh }); // ✅ replaces localStorage.setItem
-      alert("Login successful!");
+      // alert("Login successful!");
       window.location.href = "/dashboard";
     } catch (error) {
       alert("Invalid email or password");
@@ -114,14 +114,6 @@ const Login = () => {
               />
             </FormControl>
       
-      {/* <TextField
-        fullWidth
-        label="Email"
-        variant="outlined"
-        margin="normal"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      /> */}
                   <FormControl>
               <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
@@ -141,15 +133,7 @@ const Login = () => {
                 // color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-      {/* <TextField
-        fullWidth
-        label="Password"
-        type="password"
-        variant="outlined"
-        margin="normal"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      /> */}
+
       <Button
         fullWidth
         variant="contained"
