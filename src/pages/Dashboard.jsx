@@ -2,6 +2,20 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import Checkbox from '@mui/material/Checkbox';
+import CssBaseline from '@mui/material/CssBaseline';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Divider from '@mui/material/Divider';
+import FormLabel from '@mui/material/FormLabel';
+import FormControl from '@mui/material/FormControl';
+import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
+import MuiCard from '@mui/material/Card';
+import { styled } from '@mui/material/styles';
+import ForgotPassword from '../components/forgotpassword';
+import AppTheme from '../themes/AppTheme';
+import ColorModeSelect from '../themes/colormodeselect';
+import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 
 const Dashboard = () => {
   const navigate = useNavigate();
