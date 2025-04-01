@@ -82,6 +82,7 @@ const Login = () => {
           >
             Sign in
           </Typography>
+          <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
           <Box
             component="form"
             onSubmit={handleLogin}
@@ -93,6 +94,7 @@ const Login = () => {
               gap: 2,
             }}
           >
+            <div className="mt-6 flex flex-col gap-2">
       <TextField 
         fullWidth 
         label="Email" 
@@ -119,7 +121,8 @@ const Login = () => {
       >
         Login
       </Button>
-
+      </div>
+      
       {/* <div style={{ marginTop: "20px", textAlign: "center" }}>
         <a href="https://matchgen-backend-production.up.railway.app/auth/login/google-oauth2/">
           <Button variant="outlined" color="secondary">
@@ -144,7 +147,7 @@ const Login = () => {
               </Link>
             </Typography>
           </Box>
-
+          </div>
       </Card>
       </SignInContainer>
     </AppTheme>
