@@ -122,7 +122,26 @@ const Login = () => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       /> */}
-      <TextField
+                  <FormControl>
+              <FormLabel htmlFor="password">Password</FormLabel>
+              <TextField
+                // error={passwordError}
+                // helperText={passwordErrorMessage}
+                name="password"
+                placeholder="••••••"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                autoFocus
+                required
+                fullWidth
+                variant="outlined"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                // color={passwordError ? 'error' : 'primary'}
+              />
+            </FormControl>
+      {/* <TextField
         fullWidth
         label="Password"
         type="password"
@@ -130,7 +149,7 @@ const Login = () => {
         margin="normal"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-      />
+      /> */}
       <Button
         fullWidth
         variant="contained"
