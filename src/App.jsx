@@ -9,6 +9,8 @@ import EditClub from './pages/editclub';
 import CreateClub from './pages/createclub';
 import CreateMatch from './pages/creatematch';
 import CreatePlayer from './pages/createplayer';
+import LandingPage from "./pages/landingpage";
+
 
 function App() {
   const { auth, logout } = useAuth(); // 👈
@@ -20,6 +22,7 @@ function App() {
       {auth.token && <button onClick={logout}>Logout</button>}
 
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/dashboard" element={
