@@ -27,7 +27,12 @@ const Login = () => {
   };
 
   return (
-    <Container maxWidth="sm" style={{ marginTop: "50px" }}>
+    <AppTheme {...props}>
+      <CssBaseline enableColorScheme />
+      <SignInContainer direction="column" justifyContent="space-between">
+        <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+        <Card variant="outlined">
+          <SitemarkIcon />
       <Typography variant="h4" align="center">Login</Typography>
 
       <TextField 
@@ -64,7 +69,9 @@ const Login = () => {
           </Button>
         </a>
       </div>
-    </Container>
+      </Card>
+      </SignInContainer>
+    </AppTheme>
   );
 };
 
