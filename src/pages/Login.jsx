@@ -81,7 +81,7 @@ const Login = () => {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleLogin}
             noValidate
             sx={{
               display: 'flex',
@@ -125,7 +125,9 @@ const Login = () => {
         </a>
       </div> */}
       </Box>
-      <Divider>or</Divider>
+
+          <Divider>or</Divider>
+
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 
             <Typography sx={{ textAlign: 'center' }}>
