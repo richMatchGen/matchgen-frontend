@@ -7,6 +7,7 @@ import useAuth from "./hooks/useAuth"; // 👈
 import EditClub from './pages/editclub';
 import CreateClub from './pages/createclub';
 import CreateMatch from './pages/creatematch';
+import CreatePlayer from './pages/createplayer';
 
 function App() {
   const { auth, logout } = useAuth(); // 👈
@@ -27,6 +28,7 @@ function App() {
         <Route path="/clubs/createclub" element={<PrivateRoute><CreateClub /></PrivateRoute>} />
         <Route path="/edit-club/:clubId" element={<EditClub />} />
         <Route path="/fixture/creatematch" element={<PrivateRoute><CreateMatch /></PrivateRoute>} />
+        <Route path="/squad/createplayer" element={<PrivateRoute><CreatePlayer /></PrivateRoute>} />
       </Routes>
     </>
   );
