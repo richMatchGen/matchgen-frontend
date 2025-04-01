@@ -68,7 +68,7 @@ const handleChange = (e) => {
         { label: "Club Logo URL", name: "club_logo" },
         { label: "Opponent Logo URL", name: "opponent_logo" },
         { label: "Sponsor Logo URL", name: "sponsor" },
-        { label: "Date", name: "date", type: "datetime-local" },
+        { label: "Date", name: "date", type: "date" },
         { label: "Time Start", name: "time_start" },
         { label: "Venue", name: "venue" },
         { label: "Location", name: "location" },
