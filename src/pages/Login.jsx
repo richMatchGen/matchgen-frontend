@@ -97,8 +97,8 @@ const Login = () => {
                   <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
-                error={emailError}
-                helperText={emailErrorMessage}
+                // error={emailError}
+                // helperText={emailErrorMessage}
                 id="email"
                 type="email"
                 name="email"
@@ -108,7 +108,7 @@ const Login = () => {
                 required
                 fullWidth
                 variant="outlined"
-                color={emailError ? 'error' : 'primary'}
+                // color={emailError ? 'error' : 'primary'}
               />
             </FormControl>
       

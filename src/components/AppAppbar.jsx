@@ -13,6 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ColorModeIconDropdown from '../themes/ColorModeIconDropdown';
 import Sitemark from './Sitemarkicon';
+import { Link } from 'react-router-dom';
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
@@ -30,8 +31,12 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   padding: '8px 12px',
 }));
 
+
+
 export default function AppAppBar() {
   const [open, setOpen] = React.useState(false);
+  const YourComponent = () => {
+    const navigate = useNavigate();
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
@@ -61,10 +66,11 @@ export default function AppAppBar() {
             </Box>
           </Box>
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
-          
-            <Button color="primary" variant="text" size="small" onClick={() => navigate("/login")}>
-              Sign in
-            </Button>
+          <Link to="/login"> 
+          <Button color="primary" variant="text" size="small" >
+      Sign in
+    </Button>
+    </Link>
             <Button color="primary" variant="contained" size="small">
               Sign up
             </Button>
