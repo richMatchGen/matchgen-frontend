@@ -35,8 +35,6 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 
 export default function AppAppBar() {
   const [open, setOpen] = React.useState(false);
-  const YourComponent = () => {
-    const navigate = useNavigate();
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
