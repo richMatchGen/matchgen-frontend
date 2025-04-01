@@ -71,85 +71,69 @@ const Login = () => {
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
-      <SignInContainer direction="column" justifyContent="space-between">
-        <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
-        <Card variant="outlined">
-          <SitemarkIcon />
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-          >
-            Sign in
-          </Typography>
-          <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-          <Box
-            component="form"
-            onSubmit={handleLogin}
-            noValidate
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              gap: 2,
-            }}
-          >
-            <div className="mt-6 flex flex-col gap-2">
-      <TextField 
-        fullWidth 
-        label="Email" 
-        variant="outlined" 
-        margin="normal" 
-        value={email} 
-        onChange={(e) => setEmail(e.target.value)} 
+      <SignInContainer direction="column">
+  <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+  <Card variant="outlined">
+    <SitemarkIcon />
+    <Typography
+      component="h1"
+      variant="h4"
+      sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+    >
+      Sign in
+    </Typography>
+
+    <Box
+      component="form"
+      onSubmit={handleLogin}
+      noValidate
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        gap: 2,
+      }}
+    >
+      <TextField
+        fullWidth
+        label="Email"
+        variant="outlined"
+        margin="normal"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
       />
-      <TextField 
-        fullWidth 
-        label="Password" 
-        type="password" 
-        variant="outlined" 
-        margin="normal" 
-        value={password} 
-        onChange={(e) => setPassword(e.target.value)} 
+      <TextField
+        fullWidth
+        label="Password"
+        type="password"
+        variant="outlined"
+        margin="normal"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
-      <Button 
-        fullWidth 
-        variant="contained" 
-        color="primary" 
+      <Button
+        fullWidth
+        variant="contained"
+        color="primary"
         onClick={handleLogin}
-        style={{ marginTop: "20px" }}
+        sx={{ mt: 2 }}
       >
         Login
       </Button>
-      </div>
-      
-      {/* <div style={{ marginTop: "20px", textAlign: "center" }}>
-        <a href="https://matchgen-backend-production.up.railway.app/auth/login/google-oauth2/">
-          <Button variant="outlined" color="secondary">
-            Sign in with Google
-          </Button>
-        </a>
-      </div> */}
-      </Box>
+    </Box>
 
-          <Divider>or</Divider>
+    <Divider>or</Divider>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-
-            <Typography sx={{ textAlign: 'center' }}>
-              Don&apos;t have an account?{' '}
-              <Link
-                href="/material-ui/getting-started/templates/sign-in/"
-                variant="body2"
-                sx={{ alignSelf: 'center' }}
-              >
-                Sign up
-              </Link>
-            </Typography>
-          </Box>
-          </div>
-      </Card>
-      </SignInContainer>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Typography sx={{ textAlign: 'center' }}>
+        Don&apos;t have an account?{' '}
+        <Link href="/material-ui/getting-started/templates/sign-in/" variant="body2">
+          Sign up
+        </Link>
+      </Typography>
+    </Box>
+  </Card>
+</SignInContainer>
     </AppTheme>
   );
 };
