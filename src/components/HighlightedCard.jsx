@@ -17,7 +17,7 @@ export default function HighlightedCard() {
   React.useEffect(() => {
     const fetchLastMatch = async () => {
       try {
-        const res = await axios.get('https://matchgen-backend-production.up.railway.app/api/matches/last/', {
+        const res = await axios.get('https://matchgen-backend-production.up.railway.app/api/content/matches/last/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },
