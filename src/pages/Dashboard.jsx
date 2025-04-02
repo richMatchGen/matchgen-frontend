@@ -96,7 +96,7 @@ const Dashboard = () => {
             <Header />
             <MainGrid />
           </Stack>
-    {/* <div>
+    <div>
       <h1>Welcome to your Dashboard 👋</h1>
 
       <h2>User Info</h2>
@@ -117,7 +117,7 @@ const Dashboard = () => {
 
       <br />
       {/* <button onClick={logout}>Logout</button> */}
-    {/*</div> */}
+    </div>
 
 
     </Box>
