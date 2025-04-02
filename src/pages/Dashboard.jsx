@@ -31,9 +31,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    console.log(token)
+
     if (!token) {
-      console.log("Notokensodirect")
+
       navigate("/login");
       return;
     }
@@ -55,7 +55,7 @@ const Dashboard = () => {
           { headers }
         );
         setClub(clubRes.data);
-        console.log(clubRes)
+
       } catch {
         console.warn("User might not have a club yet.");
       } finally {
