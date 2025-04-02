@@ -30,7 +30,7 @@ export default function MainGrid({ user }) {
     useEffect(() => {
     const fetchClub = async () => {
       const ClubData  = await getClub();
-      console.log("Fetched Club:", ClubData );
+
       setUserClub(ClubData);
     };
     fetchClub();

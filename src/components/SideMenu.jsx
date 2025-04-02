@@ -39,7 +39,7 @@ export default function SideMenu({ user }) {
     useEffect(() => {
     const fetchUser = async () => {
       const profileData  = await getProfile();
-      console.log("Fetched User:", profileData );
+
       setUserProfile(profileData);
     };
     fetchUser();

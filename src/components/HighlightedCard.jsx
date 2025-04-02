@@ -19,7 +19,7 @@ export default function HighlightedCard() {
       try {
         const res = await axios.get('/api/matches/last/', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('access')}`, // Or however you store your JWT
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },
         });
         setMatch(res.data);
