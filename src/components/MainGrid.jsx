@@ -51,7 +51,7 @@ export default function MainGrid() {
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       {/* cards */}
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        Overview
+        Scores & Fixtures
       </Typography>
       <Grid
         container
@@ -59,11 +59,11 @@ export default function MainGrid() {
         columns={12}
         sx={{ mb: (AppTheme) => AppTheme.spacing(2) }}
       >
-        {data.map((card, index) => (
+        {/* {data.map((card, index) => (
           <Grid key={index} size={{ xs: 12, sm: 6, lg: 3 }}>
             <StatCard {...card} />
           </Grid>
-        ))}
+        ))} */}
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <HighlightedCard />
         </Grid>
