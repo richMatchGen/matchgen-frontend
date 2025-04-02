@@ -8,6 +8,7 @@ import ChartUserByCountry from './ChartUserByCountry';
 import CustomizedTreeView from './CustomizedTreeView';
 import CustomizedDataGrid from './CustomizedDataGrid';
 import HighlightedCard from './HighlightedCard';
+import MatchDayCard from './ResultCard';
 import PageViewsBarChart from './PageViewsBarChart';
 import SessionsChart from './SessionsChart';
 import StatCard from './StatCard';
@@ -68,7 +69,7 @@ export default function MainGrid() {
           <HighlightedCard />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <HighlightedCard />
+          <MatchDayCard />
         </Grid>
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <HighlightedCard />
