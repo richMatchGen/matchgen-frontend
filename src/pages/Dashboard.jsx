@@ -83,6 +83,18 @@ const Dashboard = () => {
             overflow: 'auto',
           })}
         >
+              <Stack
+            spacing={2}
+            sx={{
+              alignItems: 'center',
+              mx: 3,
+              pb: 5,
+              mt: { xs: 8, md: 0 },
+            }}
+          >
+            <Header />
+            {/* <MainGrid /> */}
+          </Stack>
     <div>
       <h1>Welcome to your Dashboard 👋</h1>
 
@@ -105,18 +117,7 @@ const Dashboard = () => {
       <br />
       <button onClick={logout}>Logout</button>
     </div>
-    <Stack
-            spacing={2}
-            sx={{
-              alignItems: 'center',
-              mx: 3,
-              pb: 5,
-              mt: { xs: 8, md: 0 },
-            }}
-          >
-            <Header />
-            {/* <MainGrid /> */}
-          </Stack>
+
 
     </Box>
     </Box>
