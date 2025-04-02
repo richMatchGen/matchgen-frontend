@@ -33,6 +33,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("accessToken");
     console.log(token)
     if (!token) {
+      console.log("Notokensodirect")
       navigate("/login");
       return;
     }
