@@ -23,7 +23,7 @@ export default function HighlightedCard() {
           },
         });
         setMatch(res.data);
-        console.log(res)
+
       } catch (err) {
         console.error('Failed to fetch last match:', err);
       }
