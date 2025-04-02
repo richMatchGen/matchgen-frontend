@@ -43,6 +43,8 @@ export const register = async (username, email, password) => {
 
 export async function getProfile() {
   let token = localStorage.getItem("token") || localStorage.getItem("access");
+  console.log(localStorage.getItem("token")); // null?
+  console.log(localStorage.getItem("access")); // your actual token?
   if (!token) {
     console.error("No authentication token found - getProfile");
     return null;
