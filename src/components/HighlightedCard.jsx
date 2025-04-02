@@ -17,13 +17,13 @@ export default function HighlightedCard() {
   React.useEffect(() => {
     const fetchLastMatch = async () => {
       try {
-        const res = await axios.get('/api/matches/last/', {
+        const res = await axios.get('https://matchgen-backend-production.up.railway.app/api/matches/last/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },
         });
         setMatch(res.data);
-
+        console.log(res)
       } catch (err) {
         console.error('Failed to fetch last match:', err);
       }
