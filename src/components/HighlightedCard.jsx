@@ -4,6 +4,7 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import SportsIcon from '@mui/icons-material/Sports';
 import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
@@ -15,14 +16,14 @@ export default function HighlightedCard() {
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent>
-        <InsightsRoundedIcon />
+        <SportsIcon />
         <Typography
           component="h2"
           variant="subtitle2"
           gutterBottom
           sx={{ fontWeight: '600' }}
         >
-          Explore your data
+          Result
         </Typography>
         <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
           Uncover performance and visitor insights with our data wizardry.
