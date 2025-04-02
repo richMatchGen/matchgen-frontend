@@ -44,7 +44,7 @@ export const register = async (username, email, password) => {
 export async function getProfile() {
   const token = localStorage.getItem("token"); // ✅ Retrieve token from localStorage
   if (!token) {
-    console.error("No authentication token found");
+    console.error("No authentication token found -GetProfile");
     return null;
   }
 

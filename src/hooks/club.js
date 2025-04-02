@@ -5,7 +5,7 @@ const API_URL = "http://127.0.0.1:8000/api/users/";
 export async function getClub() {
   const token = localStorage.getItem("token");
   if (!token) {
-    console.error("No authentication token found");
+    console.error("No authentication token found -GetClub");
     return null;
   }
   try {
