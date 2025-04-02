@@ -52,7 +52,7 @@ export default function MatchDayCard() {
               vs {match.opponent}
             </Typography>
             <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
-              {match.date} — {match.result}
+            {new Date(match.date).toLocaleDateString("en-GB")} — {match.venue}
             </Typography>
           </>
         ) : (
