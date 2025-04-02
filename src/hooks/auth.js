@@ -42,16 +42,16 @@ export const register = async (username, email, password) => {
 
 
 export async function getProfile() {
-  const token = localStorage.getItem("token"); // ✅ Retrieve token from localStorage
+  let token = localStorage.getItem("token") || localStorage.getItem("access");
   if (!token) {
-    console.error("No authentication token found -GetProfile");
+    console.error("No authentication token found - getProfile");
     return null;
   }
 
   try {
     const response = await axios.get(`${API_URL}me/`, {
       headers: {
-        Authorization: `Bearer ${token}`, // ✅ Attach token in headers
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
