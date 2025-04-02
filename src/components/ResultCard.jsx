@@ -16,7 +16,7 @@ export default function MatchDayCard() {
   const [match, setMatch] = React.useState(null);
 
   React.useEffect(() => {
-    const fetchLastMatch = async () => {
+    const fetchMatchDay = async () => {
       try {
         const res = await axios.get('https://matchgen-backend-production.up.railway.app/api/content/matches/matchday/', {
           headers: {
@@ -26,11 +26,11 @@ export default function MatchDayCard() {
         setMatch(res.data);
         console.log(res)
       } catch (err) {
-        console.error('Failed to fetch last match:', err);
+        console.error('Failed to fetch Matchday:', err);
       }
     };
 
-    fetchLastMatch();
+    fetchMatchDay();
   }, []);
 
   return (
