@@ -18,6 +18,7 @@ import AppTheme from '../themes/AppTheme';
 import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
+import MainGrid from "../components/MainGrid";
 import ColorModeSelect from '../themes/colormodeselect';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 
