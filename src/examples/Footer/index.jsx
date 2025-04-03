@@ -6,23 +6,23 @@ import Link from "@mui/material/Link";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import MDBox from "../../ccomponents/MDBox";
+import Typography from "../../components/Typography";
 
 // Material Dashboard 2 React base styles
-import typography from "assets/theme/base/typography";
+// import typography from "../assets/theme/base/typography";
 
 function Footer({ company, links }) {
   const { href, name } = company;
-  const { size } = typography;
+  const { size } = Typography;
 
   const renderLinks = () =>
     links.map((link) => (
       <MDBox key={link.name} component="li" px={2} lineHeight={1}>
         <Link href={link.href} target="_blank">
-          <MDTypography variant="button" fontWeight="regular" color="text">
+          <Typography variant="button" fontWeight="regular" color="text">
             {link.name}
-          </MDTypography>
+          </Typography>
         </Link>
       </MDBox>
     ));
@@ -53,9 +53,9 @@ function Footer({ company, links }) {
         </MDBox>
         by
         <Link href={href} target="_blank">
-          <MDTypography variant="button" fontWeight="medium">
+          <Typography variant="button" fontWeight="medium">
             &nbsp;{name}&nbsp;
-          </MDTypography>
+          </Typography>
         </Link>
         for a better web.
       </MDBox>
