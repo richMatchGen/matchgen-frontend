@@ -33,7 +33,7 @@ import MDBox from "../../../components/MDBox";
 import MDInput from "../../../components/MDInput";
 
 // Material Dashboard 2 React example components
-import Breadcrumbs from "../../../examples/Breadcrumbs";
+import Breadcrumbs from "../../Breadcrumbs";
 import NotificationItem from "../../../examples/Items/NotificationItem";
 
 // Custom styles for DashboardNavbar
