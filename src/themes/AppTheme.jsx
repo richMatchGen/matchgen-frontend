@@ -6,7 +6,8 @@ import { feedbackCustomizations } from './customizations/feedback';
 import { navigationCustomizations } from './customizations/navigation';
 import { surfacesCustomizations } from './customizations/surfaces';
 import { colorSchemes, typography, shadows, shape } from './themePrimitives';
-import linearGradient from "../assets/theme/functions/linearGradient"
+import linearGradient from "../assets/theme/functions/linearGradient";
+import pxToRem from "../assets/theme/functions/pxToRem"; // Include others if needed
 
 export default function AppTheme({ children, disableCustomTheme, themeComponents }) {
   const theme = React.useMemo(() => {
@@ -21,7 +22,10 @@ export default function AppTheme({ children, disableCustomTheme, themeComponents
           typography,
           shadows,
           shape,
-          linearGradient,
+          functions: {
+            linearGradient,
+            pxToRem,
+          },
           components: {
             ...inputsCustomizations,
             ...dataDisplayCustomizations,
