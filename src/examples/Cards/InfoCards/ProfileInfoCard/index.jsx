@@ -11,12 +11,12 @@ import Tooltip from "@mui/material/Tooltip";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import MDBox from "../../../../components/MDBox";
+import Typography from "../../../../components/Typography";
 
 // Material Dashboard 2 React base styles
-import colors from "assets/theme/base/colors";
-import typography from "assets/theme/base/typography";
+import colors from "../../../../assets/theme/base/colors";
+import typography from "../../../../assets/theme/base/typography";
 
 function ProfileInfoCard({ title, description, info, social, action, shadow }) {
   const labels = [];
@@ -41,12 +41,12 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
   // Render the card info items
   const renderItems = labels.map((label, key) => (
     <MDBox key={label} display="flex" py={1} pr={2}>
-      <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
+      <Typography variant="button" fontWeight="bold" textTransform="capitalize">
         {label}: &nbsp;
-      </MDTypography>
-      <MDTypography variant="button" fontWeight="regular" color="text">
+      </Typography>
+      <Typography variant="button" fontWeight="regular" color="text">
         &nbsp;{values[key]}
-      </MDTypography>
+      </Typography>
     </MDBox>
   ));
 
@@ -71,20 +71,20 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
   return (
     <Card sx={{ height: "100%", boxShadow: !shadow && "none" }}>
       <MDBox display="flex" justifyContent="space-between" alignItems="center" pt={2} px={2}>
-        <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
+        <Typography variant="h6" fontWeight="medium" textTransform="capitalize">
           {title}
-        </MDTypography>
-        <MDTypography component={Link} to={action.route} variant="body2" color="secondary">
+        </Typography>
+        <Typography component={Link} to={action.route} variant="body2" color="secondary">
           <Tooltip title={action.tooltip} placement="top">
             <Icon>edit</Icon>
           </Tooltip>
-        </MDTypography>
+        </Typography>
       </MDBox>
       <MDBox p={2}>
         <MDBox mb={2} lineHeight={1}>
-          <MDTypography variant="button" color="text" fontWeight="light">
+          <Typography variant="button" color="text" fontWeight="light">
             {description}
-          </MDTypography>
+          </Typography>
         </MDBox>
         <MDBox opacity={0.3}>
           <Divider />
@@ -92,9 +92,9 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
         <MDBox>
           {renderItems}
           <MDBox display="flex" py={1} pr={2}>
-            <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
+            <Typography variant="button" fontWeight="bold" textTransform="capitalize">
               social: &nbsp;
-            </MDTypography>
+            </Typography>
             {renderSocial}
           </MDBox>
         </MDBox>
