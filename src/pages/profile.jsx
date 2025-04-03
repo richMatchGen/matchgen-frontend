@@ -17,14 +17,14 @@ import DashboardNavbar from "../examples/Navbars/DashboardNavbar";
 import Footer from "../examples/Footer";
 import ProfileInfoCard from "../examples/Cards/InfoCards/ProfileInfoCard";
 import ProfilesList from "../examples/Lists/ProfilesList";
-import DefaultProjectCard from "examples/Cards/ProjectCards/DefaultProjectCard";
+import DefaultProjectCard from "../examples/Cards/ProjectCards/DefaultProjectCard";
 
 // Overview page components
 import Header from "../components/ProfileHeader";
 import PlatformSettings from "../components/PlatformSettings";
 
 // Data
-import profilesListData from "layouts/profile/data/profilesListData";
+import profilesListData from "../layouts/profile/data/profilesListData";
 
 // Images
 import homeDecor1 from "../assets/images/home-decor-1.jpg";
