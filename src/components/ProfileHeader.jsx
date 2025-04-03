@@ -17,7 +17,7 @@ import Typography from "../components/Typography";
 import MDAvatar from "../components/MDAvatar";
 
 // Material Dashboard 2 React base styles
-import breakpoints from "assets/theme/base/breakpoints";
+import breakpoints from "../assets/theme/base/breakpoints";
 
 // Images
 import burceMars from "../assets/images/bruce-mars.jpg";
