@@ -9,7 +9,7 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 
 // Material Dashboard 2 React components
 import MDBox from "../components/MDBox";
-import MDTypography from "../components/Typography";
+import Typography from "../components/Typography";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "../examples/LayoutContainers/DashboardLayout";
@@ -46,7 +46,7 @@ function Overview() {
               {/* </Grid> */} */}
               <Grid item xs={12} md={6} xl={4} sx={{ display: "flex" }}>
                 <Divider orientation="vertical" sx={{ ml: -2, mr: 1 }} />
-                <ProfileInfoCard
+                {/* <ProfileInfoCard
                   title="profile information"
                   description="Hi, I’m Alec Thompson, Decisions: If you can’t decide, the answer is no..."
                   info={{
@@ -56,61 +56,35 @@ function Overview() {
                     location: "USA",
                   }}
                   social={[
-                    { link: "https://www.facebook.com/CreativeTim/", icon: <FacebookIcon />, color: "facebook" },
-                    { link: "https://twitter.com/creativetim", icon: <TwitterIcon />, color: "twitter" },
-                    { link: "https://www.instagram.com/creativetimofficial/", icon: <InstagramIcon />, color: "instagram" },
+                    { link: "https://www.facebook.com/CreativeTim/", icon: <FacebookIcon />},
+                    { link: "https://twitter.com/creativetim", icon: <TwitterIcon />,},
+                    { link: "https://www.instagram.com/creativetimofficial/", icon: <InstagramIcon /> },
                   ]}
                   action={{ route: "", tooltip: "Edit Profile" }}
                   shadow={false}
-                />
+                /> */}
                 <Divider orientation="vertical" sx={{ mx: 0 }} />
               </Grid>
-              <Grid item xs={12} xl={4}>
-                <ProfilesList title="conversations" profiles={profilesListData} shadow={false} />
-              </Grid>
+                        {/* <Grid item xs={12} xl={4}>
+                            <ProfilesList title="conversations" profiles={profilesListData} shadow={false} />
+                        </Grid> */}
             </Grid>
           </MDBox>
     
           <MDBox pt={2} px={2} lineHeight={1.25}>
-            <MDTypography variant="h6" fontWeight="medium">
+            <Typography variant="h6" fontWeight="medium">
               Projects
-            </MDTypography>
+            </Typography>
             <MDBox mb={1}>
-              <MDTypography variant="button" color="text">
+              <Typography variant="button" color="text">
                 Architects design houses
-              </MDTypography>
+              </Typography>
             </MDBox>
           </MDBox>
     
           <MDBox p={2}>
             <Grid container spacing={6}>
-              {[homeDecor1, homeDecor2, homeDecor3, homeDecor4].map((image, index) => (
-                <Grid item xs={12} md={6} xl={3} key={index}>
-                  <DefaultProjectCard
-                    image={image}
-                    label={`project #${index + 1}`}
-                    title={["modern", "scandinavian", "minimalist", "gothic"][index]}
-                    description={[
-                      "As Uber works through a huge amount of internal management turmoil.",
-                      "Music is something that everyone has their own specific opinion about.",
-                      "Different people have different taste, and various types of music.",
-                      "Why would anyone pick blue over pink? Pink is obviously a better color.",
-                    ][index]}
-                    action={{
-                      type: "internal",
-                      route: "/pages/profile/profile-overview",
-                      color: "info",
-                      label: "view project",
-                    }}
-                    authors={[
-                      { image: team1, name: "Elena Morison" },
-                      { image: team2, name: "Ryan Milly" },
-                      { image: team3, name: "Nick Daniel" },
-                      { image: team4, name: "Peterson" },
-                    ]}
-                  />
-                </Grid>
-              ))}
+              
             </Grid>
           </MDBox>
         </MDBox>
