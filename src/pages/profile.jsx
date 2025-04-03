@@ -8,7 +8,7 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import InstagramIcon from "@mui/icons-material/Instagram";
 
 // Material Dashboard 2 React components
-import Box from "../components/Box";
+import MDBox from "../components/MDBox";
 import MDTypography from "../components/Typography";
 
 // Material Dashboard 2 React example components
@@ -40,9 +40,9 @@ function Overview() {
   return (
         <DashboardLayout>
           <DashboardNavbar />
-          <Box mb={2} />
+          <MDBox mb={2} />
           <Header>
-            <Box mt={5} mb={3}>
+            <MDBox mt={5} mb={3}>
               <Grid container spacing={1}>
                 <Grid item xs={12} md={6} xl={4}>
                   <PlatformSettings />
@@ -84,18 +84,18 @@ function Overview() {
                   <ProfilesList title="conversations" profiles={profilesListData} shadow={false} />
                 </Grid>
               </Grid>
-            </Box>
-            <Box pt={2} px={2} lineHeight={1.25}>
+            </MDBox>
+            <MDBox pt={2} px={2} lineHeight={1.25}>
               <MDTypography variant="h6" fontWeight="medium">
                 Projects
               </MDTypography>
-              <Box mb={1}>
+              <MDBox mb={1}>
                 <MDTypography variant="button" color="text">
                   Architects design houses
                 </MDTypography>
-              </Box>
-            </Box>
-            <Box p={2}>
+              </MDBox>
+            </MDBox>
+            <MDBox p={2}>
               <Grid container spacing={6}>
                 <Grid item xs={12} md={6} xl={3}>
                   <DefaultProjectCard
@@ -178,7 +178,7 @@ function Overview() {
                   />
                 </Grid>
               </Grid>
-            </Box>
+            </MDBox>
           </Header>
           <Footer />
           </ DashboardLayout>
