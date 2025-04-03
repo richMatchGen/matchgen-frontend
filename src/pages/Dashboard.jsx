@@ -21,6 +21,7 @@ import Header from '../components/Header';
 import MainGrid from "../components/MainGrid";
 import ColorModeSelect from '../themes/colormodeselect';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
+import Overview from "./profile";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -121,7 +122,7 @@ const Dashboard = () => {
       {/* <button onClick={logout}>Logout</button> */}
     {/* </div> */}
 
-
+<Overview />
     </Box>
     </Box>
     </AppTheme>
