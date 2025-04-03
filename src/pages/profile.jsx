@@ -12,7 +12,7 @@ import Box from "../components/Box";
 import MDTypography from "../components/Typography";
 
 // Material Dashboard 2 React example components
-import DashboardLayout from "../examples/LayoutContainers/DashboardLayout";
+import DashboardLayout from "../examples/LayoutContainers/DashboardLayout/index";
 import DashboardNavbar from "../examples/Navbars/DashboardNavbar";
 import Footer from "../examples/Footer";
 import ProfileInfoCard from "../examples/Cards/InfoCards/ProfileInfoCard";
