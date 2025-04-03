@@ -40,9 +40,9 @@ function Overview() {
   return (
         <DashboardLayout>
           <DashboardNavbar />
-          <MDBox mb={2} />
+          <Box mb={2} />
           <Header>
-            <MDBox mt={5} mb={3}>
+            <Box mt={5} mb={3}>
               <Grid container spacing={1}>
                 <Grid item xs={12} md={6} xl={4}>
                   <PlatformSettings />
@@ -84,18 +84,18 @@ function Overview() {
                   <ProfilesList title="conversations" profiles={profilesListData} shadow={false} />
                 </Grid>
               </Grid>
-            </MDBox>
-            <MDBox pt={2} px={2} lineHeight={1.25}>
+            </Box>
+            <Box pt={2} px={2} lineHeight={1.25}>
               <MDTypography variant="h6" fontWeight="medium">
                 Projects
               </MDTypography>
-              <MDBox mb={1}>
+              <Box mb={1}>
                 <MDTypography variant="button" color="text">
                   Architects design houses
                 </MDTypography>
-              </MDBox>
-            </MDBox>
-            <MDBox p={2}>
+              </Box>
+            </Box>
+            <Box p={2}>
               <Grid container spacing={6}>
                 <Grid item xs={12} md={6} xl={3}>
                   <DefaultProjectCard
@@ -178,7 +178,7 @@ function Overview() {
                   />
                 </Grid>
               </Grid>
-            </MDBox>
+            </Box>
           </Header>
           <Footer />
           </ DashboardLayout>
