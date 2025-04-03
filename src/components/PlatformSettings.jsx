@@ -5,8 +5,8 @@ import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import MDBox from "../components/MDBox";
+import Typography from "../components/Typography";
 
 function PlatformSettings() {
   const [followsMe, setFollowsMe] = useState(true);
@@ -19,23 +19,23 @@ function PlatformSettings() {
   return (
     <Card sx={{ boxShadow: "none" }}>
       <MDBox p={2}>
-        <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
+        <Typography variant="h6" fontWeight="medium" textTransform="capitalize">
           platform settings
-        </MDTypography>
+        </Typography>
       </MDBox>
       <MDBox pt={1} pb={2} px={2} lineHeight={1.25}>
-        <MDTypography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
+        <Typography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
           account
-        </MDTypography>
+        </Typography>
 
         <MDBox display="flex" alignItems="center" mb={0.5} ml={-1.5}>
           <MDBox mt={0.5}>
             <Switch checked={followsMe} onChange={() => setFollowsMe(!followsMe)} />
           </MDBox>
           <MDBox width="80%" ml={0.5}>
-            <MDTypography variant="button" fontWeight="regular" color="text">
+            <Typography variant="button" fontWeight="regular" color="text">
               Email me when someone follows me
-            </MDTypography>
+            </Typography>
           </MDBox>
         </MDBox>
 
@@ -44,9 +44,9 @@ function PlatformSettings() {
             <Switch checked={answersPost} onChange={() => setAnswersPost(!answersPost)} />
           </MDBox>
           <MDBox width="80%" ml={0.5}>
-            <MDTypography variant="button" fontWeight="regular" color="text">
+            <Typography variant="button" fontWeight="regular" color="text">
               Email me when someone answers on my post
-            </MDTypography>
+            </Typography>
           </MDBox>
         </MDBox>
 
@@ -55,16 +55,16 @@ function PlatformSettings() {
             <Switch checked={mentionsMe} onChange={() => setMentionsMe(!mentionsMe)} />
           </MDBox>
           <MDBox width="80%" ml={0.5}>
-            <MDTypography variant="button" fontWeight="regular" color="text">
+            <Typography variant="button" fontWeight="regular" color="text">
               Email me when someone mentions me
-            </MDTypography>
+            </Typography>
           </MDBox>
         </MDBox>
 
         <MDBox mt={3}>
-          <MDTypography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
+          <Typography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
             application
-          </MDTypography>
+          </Typography>
         </MDBox>
 
         <MDBox display="flex" alignItems="center" mb={0.5} ml={-1.5}>
@@ -72,9 +72,9 @@ function PlatformSettings() {
             <Switch checked={newLaunches} onChange={() => setNewLaunches(!newLaunches)} />
           </MDBox>
           <MDBox width="80%" ml={0.5}>
-            <MDTypography variant="button" fontWeight="regular" color="text">
+            <Typography variant="button" fontWeight="regular" color="text">
               New launches and projects
-            </MDTypography>
+            </Typography>
           </MDBox>
         </MDBox>
 
@@ -83,9 +83,9 @@ function PlatformSettings() {
             <Switch checked={productUpdate} onChange={() => setProductUpdate(!productUpdate)} />
           </MDBox>
           <MDBox width="80%" ml={0.5}>
-            <MDTypography variant="button" fontWeight="regular" color="text">
+            <Typography variant="button" fontWeight="regular" color="text">
               Monthly product updates
-            </MDTypography>
+            </Typography>
           </MDBox>
         </MDBox>
 
@@ -94,9 +94,9 @@ function PlatformSettings() {
             <Switch checked={newsletter} onChange={() => setNewsletter(!newsletter)} />
           </MDBox>
           <MDBox width="80%" ml={0.5}>
-            <MDTypography variant="button" fontWeight="regular" color="text">
+            <Typography variant="button" fontWeight="regular" color="text">
               Subscribe to newsletter
-            </MDTypography>
+            </Typography>
           </MDBox>
         </MDBox>
       </MDBox>

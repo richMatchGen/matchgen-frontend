@@ -12,16 +12,16 @@ import Tab from "@mui/material/Tab";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDAvatar from "components/MDAvatar";
+import MDBox from "../components/MDBox";
+import Typography from "../components/Typography";
+import MDAvatar from "../components/MDAvatar";
 
 // Material Dashboard 2 React base styles
 import breakpoints from "assets/theme/base/breakpoints";
 
 // Images
-import burceMars from "assets/images/bruce-mars.jpg";
-import backgroundImage from "assets/images/bg-profile.jpeg";
+import burceMars from "../assets/images/bruce-mars.jpg";
+import backgroundImage from "../assets/images/bg-profile.jpeg";
 
 function Header({ children }) {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
@@ -81,12 +81,12 @@ function Header({ children }) {
           </Grid>
           <Grid item>
             <MDBox height="100%" mt={0.5} lineHeight={1}>
-              <MDTypography variant="h5" fontWeight="medium">
+              <Typography variant="h5" fontWeight="medium">
                 Richard Davis
-              </MDTypography>
-              <MDTypography variant="button" color="text" fontWeight="regular">
+              </Typography>
+              <Typography variant="button" color="text" fontWeight="regular">
                 CEO / Co-Founder
-              </MDTypography>
+              </Typography>
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={4} sx={{ ml: "auto" }}>
