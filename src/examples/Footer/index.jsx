@@ -6,7 +6,7 @@ import Link from "@mui/material/Link";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
-import MDBox from "../../ccomponents/MDBox";
+import MDBox from "../../components/MDBox";
 import Typography from "../../components/Typography";
 
 // Material Dashboard 2 React base styles
