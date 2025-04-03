@@ -8,10 +8,10 @@ import PropTypes from "prop-types";
 import Card from "@mui/material/Card";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDAvatar from "components/MDAvatar";
-import MDButton from "components/MDButton";
+import MDBox from "../../../components/MDBox";
+import Typography from "../../../components/Typography";
+import MDAvatar from "../../../components/MDAvatar";
+import MDButton from "../../../components/MDButton";
 
 function ProfilesList({ title, profiles, shadow }) {
   const renderProfiles = profiles.map(({ image, name, description, action }) => (
@@ -20,12 +20,12 @@ function ProfilesList({ title, profiles, shadow }) {
         <MDAvatar src={image} alt={name} shadow="md" />
       </MDBox>
       <MDBox display="flex" flexDirection="column" alignItems="flex-start" justifyContent="center">
-        <MDTypography variant="button" fontWeight="medium">
+        <Typography variant="button" fontWeight="medium">
           {name}
-        </MDTypography>
-        <MDTypography variant="caption" color="text">
+        </Typography>
+        <Typography variant="caption" color="text">
           {description}
-        </MDTypography>
+        </Typography>
       </MDBox>
       <MDBox ml="auto">
         {action.type === "internal" ? (
@@ -51,9 +51,9 @@ function ProfilesList({ title, profiles, shadow }) {
   return (
     <Card sx={{ height: "100%", boxShadow: !shadow && "none" }}>
       <MDBox pt={2} px={2}>
-        <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
+        <Typography variant="h6" fontWeight="medium" textTransform="capitalize">
           {title}
-        </MDTypography>
+        </Typography>
       </MDBox>
       <MDBox p={2}>
         <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
