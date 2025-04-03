@@ -61,18 +61,18 @@ export default styled(Box)(({ theme, ownerState }) => {
   const validBorderRadius = ["xs", "sm", "md", "lg", "xl", "xxl", "section"];
   const validBoxShadows = ["xs", "sm", "md", "lg", "xl", "xxl", "inset"];
 
-  // background value
-  let backgroundValue = bgColor;
+// background value
+let backgroundValue = bgColor;
 
-  if (variant === "gradient") {
-    backgroundValue = validGradients.includes(bgColor)
-      ? linearGradient(gradients[bgColor].main, gradients[bgColor].state)
-      : white.main;
-  } else if (validColors.includes(bgColor)) {
-    backgroundValue = palette[bgColor] ? palette[bgColor].main : greyColors[bgColor];
-  } else {
-    backgroundValue = bgColor;
-  }
+if (variant === "gradient") {
+  backgroundValue = validGradients.includes(bgColor) && gradients[bgColor]?.main && gradients[bgColor]?.state
+    ? linearGradient(gradients[bgColor].main, gradients[bgColor].state)
+    : white?.main || "#fff";
+} else if (validColors.includes(bgColor)) {
+  backgroundValue = palette[bgColor]?.main || greyColors[bgColor] || bgColor;
+} else {
+  backgroundValue = bgColor;
+}
 
   // color value
   let colorValue = color;
