@@ -10,10 +10,10 @@ import CardMedia from "@mui/material/CardMedia";
 import Tooltip from "@mui/material/Tooltip";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDButton from "components/MDButton";
-import MDAvatar from "components/MDAvatar";
+import MDBox from "../../../../components/MDBox";
+import Typography from "../../../../components/Typography";
+import MDButton from "../../../../components/MDButton";
+import MDAvatar from "../../../../components/MDAvatar";
 
 function DefaultProjectCard({ image, label, title, description, action, authors }) {
   const renderAuthors = authors.map(({ image: media, name }) => (
@@ -61,21 +61,21 @@ function DefaultProjectCard({ image, label, title, description, action, authors 
         />
       </MDBox>
       <MDBox mt={1} mx={0.5}>
-        <MDTypography variant="button" fontWeight="regular" color="text" textTransform="capitalize">
+        <Typography variant="button" fontWeight="regular" color="text" textTransform="capitalize">
           {label}
-        </MDTypography>
+        </Typography>
         <MDBox mb={1}>
           {action.type === "internal" ? (
-            <MDTypography
+            <Typography
               component={Link}
               to={action.route}
               variant="h5"
               textTransform="capitalize"
             >
               {title}
-            </MDTypography>
+            </Typography>
           ) : (
-            <MDTypography
+            <Typography
               component="a"
               href={action.route}
               target="_blank"
@@ -84,13 +84,13 @@ function DefaultProjectCard({ image, label, title, description, action, authors 
               textTransform="capitalize"
             >
               {title}
-            </MDTypography>
+            </Typography>
           )}
         </MDBox>
         <MDBox mb={3} lineHeight={0}>
-          <MDTypography variant="button" fontWeight="light" color="text">
+          <Typography variant="button" fontWeight="light" color="text">
             {description}
-          </MDTypography>
+          </Typography>
         </MDBox>
         <MDBox display="flex" justifyContent="space-between" alignItems="center">
           {action.type === "internal" ? (
