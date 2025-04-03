@@ -10,6 +10,7 @@ import CreateClub from './pages/createclub';
 import CreateMatch from './pages/creatematch';
 import CreatePlayer from './pages/createplayer';
 import LandingPage from "./pages/landingpage";
+import Overview from "./pages/profile";
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
         <Route path="/edit-club/:clubId" element={<EditClub />} />
         <Route path="/fixture/creatematch" element={<PrivateRoute><CreateMatch /></PrivateRoute>} />
         <Route path="/squad/createplayer" element={<PrivateRoute><CreatePlayer /></PrivateRoute>} />
+        <Route path="/profile" element={<Overview />} />
       </Routes>
 
     </>
