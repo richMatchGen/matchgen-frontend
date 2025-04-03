@@ -7,13 +7,17 @@ import CssBaseline from "@mui/material/CssBaseline";
 import AppTheme from './themes/AppTheme';
 import { BrowserRouter } from 'react-router-dom';
 
+import { MaterialUIControllerProvider } from "context";
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AppTheme>
-            <CssBaseline />
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </AppTheme>
+    <MaterialUIControllerProvider>
+      <AppTheme>
+        <CssBaseline />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </AppTheme>
+    </MaterialUIControllerProvider>
   </StrictMode>
 );
