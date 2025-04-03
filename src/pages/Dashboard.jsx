@@ -98,6 +98,7 @@ const Dashboard = () => {
           >
             <Header />
             <MainGrid />
+            <Overview />
           </Stack>
     {/* <div>
       <h1>Welcome to your Dashboard 👋</h1>
@@ -122,7 +123,7 @@ const Dashboard = () => {
       {/* <button onClick={logout}>Logout</button> */}
     {/* </div> */}
 
-<Overview />
+
     </Box>
     </Box>
     </AppTheme>
