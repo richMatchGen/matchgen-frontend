@@ -9,6 +9,7 @@ import { colorSchemes, typography, shadows, shape } from './themePrimitives';
 import linearGradient from "../assets/theme/functions/linearGradient";
 import pxToRem from "../assets/theme/functions/pxToRem"; // Include others if needed
 import borders from '../assets/theme/base/borders';
+import boxShadows from "../assets/theme/base/boxShadows";
 
 export default function AppTheme({ children, disableCustomTheme, themeComponents }) {
   const theme = React.useMemo(() => {
@@ -23,6 +24,7 @@ export default function AppTheme({ children, disableCustomTheme, themeComponents
           typography,
           shadows,
           shape,
+          boxShadows,
           borders,
           functions: {
             linearGradient,
