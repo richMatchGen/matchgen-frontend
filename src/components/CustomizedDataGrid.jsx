@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useEffect } from "react";
 import { DataGrid } from '@mui/x-data-grid';
 import { columns, rows } from '../internals/data/gridData';
-import { addPlayer, getSquad } from "../hooks/useClub";  // ✅ Ensure this is correctly imported
+import { addPlayer, getSquad } from "../hooks/club";  // ✅ Ensure this is correctly imported
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
  
@@ -10,12 +10,13 @@ import { useNavigate } from "react-router-dom";
 export default function CustomizedDataGrid({ user }) {
   const [squad, setSquad] = useState([]);
   const [error, setError] = useState("");
-  const token = getToken();
+  const token = localStorage.getItem("accessToken");
   const [newPlayer, setNewPlayer] = useState({ name: "", position: "" });
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!token) {
+      console.log(token);
       setError("User not authenticated. Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
       return;
