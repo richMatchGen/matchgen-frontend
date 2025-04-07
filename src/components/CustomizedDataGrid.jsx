@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { DataGrid } from '@mui/x-data-grid';
 import { columns, rows } from '../internals/data/gridData';
 import { addPlayer, getSquad } from "../hooks/useClub";  // ✅ Ensure this is correctly imported
-import { getToken } from "../hooks/useAuth";
+import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
  
 
