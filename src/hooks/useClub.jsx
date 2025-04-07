@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
+ 
 const useClub = (clubId) => {
   const [club, setClub] = useState(null);
   const [loading, setLoading] = useState(true);

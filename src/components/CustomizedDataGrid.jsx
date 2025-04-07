@@ -5,7 +5,7 @@ import { columns, rows } from '../internals/data/gridData';
 import { addPlayer, getSquad } from "../hooks/club";  // ✅ Ensure this is correctly imported
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
-
+ 
 
 export default function CustomizedDataGrid({ user }) {
   const [squad, setSquad] = useState([]);
