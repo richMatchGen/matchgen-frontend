@@ -98,7 +98,7 @@ const Dashboard = () => {
           >
             <Header />
             <MainGrid />
-            <Overview />
+
           </Stack>
     {/* <div>
       <h1>Welcome to your Dashboard 👋</h1>
