@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000/api/users/";
+const API_URL = "https://matchgen-backend-production.up.railway.app/api/users/";
 
 export async function getClub() {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   if (!token) {
     console.error("No authentication token found -GetClub");
     return null;
