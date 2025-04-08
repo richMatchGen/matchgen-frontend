@@ -16,6 +16,7 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from '../components/forgotpassword';
 import AppTheme from '../themes/AppTheme';
 import ColorModeSelect from '../themes/colormodeselect';
+import Sitemark from './Sitemarkicon';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -74,7 +75,7 @@ const Login = () => {
       <SignInContainer direction="column">
   <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
   <Card variant="outlined">
-    <SitemarkIcon />
+    <Sitemark />
     <Typography
       component="h1"
       variant="h4"
