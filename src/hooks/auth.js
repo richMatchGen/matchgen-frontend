@@ -23,7 +23,7 @@ export const logout = () => {
   localStorage.removeItem("token"); // ✅ Remove Token on Logout
 };
 
-export const getToken = () => localStorage.getItem("accesstoken");
+export const getToken = () => localStorage.getItem("accessToken");
 
 
 export const register = async (username, email, password) => {
