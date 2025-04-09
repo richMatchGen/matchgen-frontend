@@ -38,7 +38,7 @@ export default function SideMenu({ user }) {
   const [club, setClub] = useState(null);
   
   const token = getToken();
-
+  const headers = { Authorization: `Bearer ${token}` };
 
     useEffect(() => {
     const fetchUser = async () => {
