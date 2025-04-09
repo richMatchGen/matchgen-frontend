@@ -14,6 +14,7 @@ import OptionsMenu from './OptionsMenu';
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { getProfile } from '../hooks/auth'; // Ensure this function exists
+import useClub from "../hooks/useClub";
 import Sitemark from '../components/Sitemarkicon'
 
 const drawerWidth = 240;
@@ -34,6 +35,8 @@ export default function SideMenu({ user }) {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [userProfile, setUserProfile] = useState(null); // ✅ Declare userProfile state
+  const [club, setClub] = useState(null);
+  
   const token = getToken();
 
 
@@ -42,7 +45,26 @@ export default function SideMenu({ user }) {
       const profileData  = await getProfile();
 
       setUserProfile(profileData);
+      
     };
+
+    const fetchClub = async () => {
+      try {
+        const clubRes = await axios.get(
+          "https://matchgen-backend-production.up.railway.app/api/users/club/",
+          { headers }
+        );
+        setClub(clubRes.data);
+      } catch (err) {
+        console.warn("User might not have a club yet.");
+        setClub(null); // Don't treat it as fatal
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+    fetchClub();
     fetchUser();
   }, []);
 
@@ -98,6 +120,7 @@ export default function SideMenu({ user }) {
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
+          {club.name}
             {userProfile?.first_name}
 
           </Typography>
