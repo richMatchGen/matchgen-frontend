@@ -13,6 +13,7 @@ import FixtureCard from './FixtureCard';
 import PageViewsBarChart from './PageViewsBarChart';
 import SessionsChart from './SessionsChart';
 import StatCard from './StatCard';
+import { Link as RouterLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
 const data = [
   {
@@ -53,20 +54,26 @@ export default function MainGrid() {
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       {/* cards */}
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        <Link
-          to="/results"
-          style={{ textDecoration: 'none', color: 'inherit', marginRight: 8 }}
-        >
-          Results
-        </Link>
-        &amp;
-        <Link
-          to="/fixtures"
-          style={{ textDecoration: 'none', color: 'inherit', marginLeft: 8 }}
-        >
-          Fixtures
-        </Link>
-      </Typography>
+      <Link
+        component={RouterLink}
+        to="/results"
+        underline="none"
+        color="inherit"
+        sx={{ marginRight: 1 }}
+      >
+        Results
+      </Link>
+      &amp;
+      <Link
+        component={RouterLink}
+        to="/fixtures"
+        underline="none"
+        color="inherit"
+        sx={{ marginLeft: 1 }}
+      >
+        Fixtures
+      </Link>
+    </Typography>
       <Grid
         container
         spacing={2}
