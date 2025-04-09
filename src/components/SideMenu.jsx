@@ -57,7 +57,8 @@ export default function SideMenu({ user }) {
         setClub(clubRes.data);
       } catch (err) {
         console.warn("User might not have a club yet.");
-        setClub(null); // Don't treat it as fatal
+        console.error("Actual error:", err); // 👈 ADD THIS
+        setClub(null);
       } finally {
         setLoading(false);
       }
