@@ -41,6 +41,8 @@ export default function SideMenu({ user }) {
   
   const token = getToken();
   const headers = { Authorization: `Bearer ${token}` };
+  console.log("Token:", token); // 👈 check this in your console
+
 
     useEffect(() => {
     const fetchUser = async () => {
