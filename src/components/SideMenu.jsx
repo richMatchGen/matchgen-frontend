@@ -78,7 +78,7 @@ export default function SideMenu({ user }) {
         }}
       >
         <MenuContent />
-        <CardAlert />
+        {/* <CardAlert /> */}
       </Box>
       <Stack
         direction="row"
@@ -103,6 +103,7 @@ export default function SideMenu({ user }) {
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {userProfile?.email}
+            
           </Typography>
         </Box>
         <OptionsMenu />

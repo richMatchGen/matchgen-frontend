@@ -68,6 +68,8 @@ export default function FixtureCard() {
           color="primary"
           endIcon={<ChevronRightRoundedIcon />}
           fullWidth={isSmallScreen}
+                    component={Link} 
+                    to='gen/fixture'
         >
           Gen Fixture
         </Button>

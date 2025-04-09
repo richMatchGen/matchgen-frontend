@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import Grid from '@mui/material/Grid2';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -7,8 +8,8 @@ import Copyright from '../internals/Components/Copyright';
 import ChartUserByCountry from './ChartUserByCountry';
 import CustomizedTreeView from './CustomizedTreeView';
 import CustomizedDataGrid from './CustomizedDataGrid';
-import HighlightedCard from './HighlightedCard';
-import MatchDayCard from './ResultCard';
+import HighlightedCard from './ResultCard';
+import MatchDayCard from './MatchdayCard';
 import FixtureCard from './FixtureCard';
 import PageViewsBarChart from './PageViewsBarChart';
 import SessionsChart from './SessionsChart';
@@ -53,8 +54,14 @@ export default function MainGrid() {
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       {/* cards */}
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        Scores & Fixtures
-      </Typography>
+      <Link to="/results" style={{ textDecoration: 'none', color: 'inherit', marginRight: 8 }}>
+        Results
+      </Link>
+      &amp;
+      <Link to="/fixtures" style={{ textDecoration: 'none', color: 'inherit', marginLeft: 8 }}>
+        Fixtures
+      </Link>
+  </Typography>
       <Grid
         container
         spacing={2}
