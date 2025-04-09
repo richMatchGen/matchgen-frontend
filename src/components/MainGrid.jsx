@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import Grid from '@mui/material/Grid2';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -23,14 +23,20 @@ export default function MainGrid() {
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       {/* cards */}
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-      <Link to="/results" style={{ textDecoration: 'none', color: 'inherit', marginRight: 8 }}>
-        Results
-      </Link>
-      &amp;
-      <Link to="/fixtures" style={{ textDecoration: 'none', color: 'inherit', marginLeft: 8 }}>
-        Fixtures
-      </Link>
-  </Typography>
+        <RouterLink
+          to="/results"
+          style={{ textDecoration: 'none', color: 'inherit', marginRight: 8 }}
+        >
+          Results
+        </RouterLink>
+        &amp;
+        <RouterLink
+          to="/fixtures"
+          style={{ textDecoration: 'none', color: 'inherit', marginLeft: 8 }}
+        >
+          Fixtures
+        </RouterLink>
+      </Typography>
       <Grid
         container
         spacing={2}
