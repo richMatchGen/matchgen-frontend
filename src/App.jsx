@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Button, Container, Typography, AppBar, Toolbar } from "@mui/material";
+import Link from '@mui/material/Link';
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/Login";
 import Signup from './pages/Signup';

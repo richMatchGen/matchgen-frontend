@@ -8,7 +8,7 @@ import SportsIcon from '@mui/icons-material/Sports';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import Link from '@mui/material/Link';
 
 export default function HighlightedCard() {
   const theme = useTheme();
