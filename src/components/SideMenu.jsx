@@ -120,7 +120,7 @@ export default function SideMenu({ user }) {
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-          {club.name}
+          {club?.name}
             {userProfile?.first_name}
 
           </Typography>
