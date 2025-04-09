@@ -119,15 +119,13 @@ export default function SideMenu({ user }) {
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
-          <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-          {club?.name}
-            {userProfile?.first_name}
-
-          </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            {userProfile?.email}
-            
-          </Typography>
+        <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
+      {club?.name || "No club"}
+      {userProfile?.first_name ? ` — ${userProfile.first_name}` : ""}
+    </Typography>
+    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+      {userProfile?.email || ""}
+    </Typography>
         </Box>
         <OptionsMenu />
       </Stack>
