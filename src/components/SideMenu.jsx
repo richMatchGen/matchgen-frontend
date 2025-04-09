@@ -14,6 +14,7 @@ import OptionsMenu from './OptionsMenu';
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { getProfile } from '../hooks/auth'; // Ensure this function exists
+import Sitemark from '../components/Sitemarkicon'
 
 const drawerWidth = 240;
 
@@ -65,7 +66,7 @@ export default function SideMenu({ user }) {
           p: 1.5,
         }}
       >
-        <SelectContent />
+       <Sitemark />
       </Box>
       <Divider />
       <Box

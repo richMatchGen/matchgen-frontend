@@ -68,7 +68,7 @@ export default function MatchDayCard() {
           endIcon={<ChevronRightRoundedIcon />}
           fullWidth={isSmallScreen}
         >
-          Get insights
+          Get Matchday
         </Button>
       </CardContent>
     </Card>

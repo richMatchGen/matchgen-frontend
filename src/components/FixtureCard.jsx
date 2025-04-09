@@ -10,6 +10,7 @@ import TodayIcon from '@mui/icons-material/Today';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
+import { Link } from "react-router-dom";
 
 export default function FixtureCard() {
   const theme = useTheme();
@@ -68,7 +69,7 @@ export default function FixtureCard() {
           endIcon={<ChevronRightRoundedIcon />}
           fullWidth={isSmallScreen}
         >
-          Get insights
+          Gen Fixture
         </Button>
       </CardContent>
     </Card>

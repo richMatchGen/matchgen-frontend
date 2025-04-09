@@ -18,15 +18,15 @@ import { useNavigate } from "react-router-dom";
 
 const mainListItems = [
   { text: 'Dashboard', icon: <HomeRoundedIcon />, link: '/dashboard' },
-  { text: 'Gen ✨', icon: <AnalyticsRoundedIcon />, link: '/' },
-  { text: 'Club', icon: <PeopleRoundedIcon />, link: '/squadmanagement' },
-  { text: 'Tasks', icon: <AssignmentRoundedIcon />, link: '/' },
+  { text: 'Gen ✨', icon: <AnalyticsRoundedIcon />, link: '/gen/teamlineup' },
+  { text: 'Club', icon: <PeopleRoundedIcon />, link: '/club' },
+  { text: 'Templates', icon: <AssignmentRoundedIcon />, link: '/gen/templates' },
 ];
 
 const secondaryListItems = [
-  { text: 'Settings', icon: <SettingsRoundedIcon /> },
-  { text: 'About', icon: <InfoRoundedIcon /> },
-  { text: 'Feedback', icon: <HelpRoundedIcon /> },
+  { text: 'Settings', icon: <SettingsRoundedIcon />, link: '/settings' },
+  { text: 'About', icon: <InfoRoundedIcon />, link: '/about' },
+  { text: 'Feedback', icon: <HelpRoundedIcon />, link: '/feedback' },
 ];
 
 export default function MenuContent() {
