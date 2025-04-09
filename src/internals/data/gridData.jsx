@@ -75,13 +75,13 @@ export function renderAvatar(params) {
 }
 
 export const columns = [
-  { field: 'id', headerName: 'ID', width: 70 },
+  // { field: 'id', headerName: 'ID', width: 70 },
   { field: 'name', headerName: 'Player Name', flex: 1, minWidth: 150 },
   { field: 'position', headerName: 'Position', flex: 1, minWidth: 100 },
-  { field: 'status', headerName: 'Status', flex: 0.5, minWidth: 80 },
-  { field: 'matchesPlayed', headerName: 'Matches', flex: 1, minWidth: 100 },
-  { field: 'goals', headerName: 'Goals', flex: 1, minWidth: 80 },
-  { field: 'assists', headerName: 'Assists', flex: 1, minWidth: 80 },
+  { field: 'squad_no', headerName: 'Squad no.', flex: 0.5, minWidth: 80 },
+  { field: 'sponsor', headerName: 'Sponsor', flex: 1, minWidth: 100 },
+  { field: 'player_pic', headerName: 'Player Pic', flex: 1, minWidth: 80 },
+  // { field: 'assists', headerName: 'Assists', flex: 1, minWidth: 80 },
 ];
 
 export const rows = [
