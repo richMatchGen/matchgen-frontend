@@ -4,6 +4,7 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import Divider, { dividerClasses } from '@mui/material/Divider';
 import Link from '@mui/material/Link';
+import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import { useState, useEffect } from "react";
 import { addPlayer } from "../hooks/club";
 import { getToken } from "../hooks/auth";
