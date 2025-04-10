@@ -55,7 +55,7 @@ const handleChange = (e) => {
 
   return (
     <Container maxWidth="sm" style={{ marginTop: "40px" }}>
-      <Typography variant="h4" align="center">Create a Club</Typography>
+      <Typography variant="h4" align="center">Add Player</Typography>
 
       {[
         { label: "name", name: "name" },
@@ -85,7 +85,7 @@ const handleChange = (e) => {
         sx={{ mt: 2 }}
         onClick={handleCreate}
       >
-        Create Match
+        Add Player
       </Button>
     </Container>
   );

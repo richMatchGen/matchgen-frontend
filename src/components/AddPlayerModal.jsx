@@ -2,6 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
+import Divider, { dividerClasses } from '@mui/material/Divider';
 import { useState, useEffect } from "react";
 import { addPlayer } from "../hooks/club";
 import { getToken } from "../hooks/auth";
@@ -78,11 +79,12 @@ export default function NestedModal() {
         aria-describedby="parent-modal-description"
       >
         <Box sx={{ ...style, width: 400 }}>
-          <h2 id="parent-modal-title">Add Player</h2>
+          {/* <h2 id="parent-modal-title">Add Player</h2> */}
           {/* <p id="parent-modal-description">
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
           </p> */}
             <CreatePlayer/>
+            <Divider />
           <ChildModal />
         </Box>
       </Modal>
