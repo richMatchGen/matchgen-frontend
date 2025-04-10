@@ -2,6 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
+import { useState, useEffect } from "react";
 import { addPlayer } from "../hooks/club";
 import { getToken } from "../hooks/auth";
 
