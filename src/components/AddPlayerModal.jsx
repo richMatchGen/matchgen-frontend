@@ -57,6 +57,7 @@ function ChildModal() {
 export default function NestedModal() {
   const [open, setOpen] = React.useState(false);
   const [newPlayer, setNewPlayer] = useState({ name: "", position: "" });
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const token = getToken();
 
   const handleAddPlayer = async () => {
