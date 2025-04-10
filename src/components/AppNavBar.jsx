@@ -12,6 +12,7 @@ import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import SideMenuMobile from './SideMenuMobile';
 import MenuButton from './MenuButton';
 import ColorModeIconDropdown from '../themes/ColorModeIconDropdown';
+import Sitemark from '../components/Sitemarkicon'
 
 const Toolbar = styled(MuiToolbar)({
   width: '100%',
@@ -100,6 +101,8 @@ export function CustomIcon() {
         boxShadow: 'inset 0 2px 5px rgba(255, 255, 255, 0.3)',
       }}
     >
+      {/* <SitemarkIcon /> */}
+             <Sitemark />
       <DashboardRoundedIcon color="inherit" sx={{ fontSize: '1rem' }} />
     </Box>
   );
