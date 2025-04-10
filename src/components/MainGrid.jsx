@@ -54,24 +54,24 @@ export default function MainGrid() {
             <StatCard {...card} />
           </Grid>
         ))} */}
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <HighlightedCard />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <MatchDayCard />
-        </Grid>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <FixtureCard />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <HighlightedCard />
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <SessionsChart />
-       </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-           <PageViewsBarChart />
-        </Grid>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                  <HighlightedCard />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                  <MatchDayCard />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                <FixtureCard />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                <HighlightedCard />
+          </Grid>
+          {/* <Grid size={{ xs: 12, md: 12 }}>
+                <SessionsChart />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <PageViewsBarChart />
+            </Grid> */}
       </Grid>
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Squad
@@ -82,7 +82,7 @@ export default function MainGrid() {
         </Grid>
         <Grid size={{ xs: 12, lg: 3 }}>
           <Stack gap={2} direction={{ xs: 'column', sm: 'row', lg: 'column' }}>
-            {/* <CustomizedTreeView /> */}
+             <CustomizedTreeView /> 
 {/*             <ChartUserByCountry /> */}
           </Stack>
         </Grid>
