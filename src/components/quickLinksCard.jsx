@@ -49,9 +49,10 @@ export default function QuickLinksCard() {
         >
           Quick Links
         </Typography>
+        <Stack spacing={1} direction="column">
           <NestedModal />
           <AddFixtureModal />
-          <AddResultModal />
+          </Stack>
       </CardContent>
     </Card>
   );
