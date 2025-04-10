@@ -33,7 +33,7 @@ function ChildModal() {
 
   return (
     <React.Fragment>
-      <Button onClick={handleOpen}>Open Child Modal</Button>
+      <Link onClick={handleOpen}>Open Child Modal</Link>
       <Modal
         open={open}
         onClose={handleClose}
@@ -84,8 +84,8 @@ export default function NestedModal() {
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
           </p> */}
             <CreatePlayer/>
-            <Divider />
-          <ChildModal />
+            {/* <Divider />
+          <ChildModal /> */}
         </Box>
       </Modal>
     </div>
