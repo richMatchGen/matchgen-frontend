@@ -120,7 +120,7 @@ export default function SideMenu({ user }) {
         <Avatar
           sizes="small"
           alt={club?.name || "No club"}
-          src="/static/images/avatar/7.jpg"
+          src={club?.logo || "/static/images/avatar/7.jpg"}
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
