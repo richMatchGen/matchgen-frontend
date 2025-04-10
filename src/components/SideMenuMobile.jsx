@@ -18,6 +18,8 @@ import { useNavigate } from "react-router-dom";
 import { getProfile } from '../hooks/auth'; // Ensure this function exists
 import useClub from "../hooks/useClub";
 import Sitemark from '../components/Sitemarkicon'
+import axios from 'axios';
+
 
 function SideMenuMobile({ open, toggleDrawer }) {
   const navigate = useNavigate();
