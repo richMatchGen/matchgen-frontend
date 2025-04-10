@@ -90,7 +90,7 @@ export default function AddResultModal() {
                 endIcon={<ChevronRightRoundedIcon />}
                 fullWidth={isSmallScreen}
                 >
-        Create Fixture
+        Create Result
         </Button>
       <Modal
         open={open}

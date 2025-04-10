@@ -91,7 +91,7 @@ export default function AddFixtureModal() {
                 endIcon={<ChevronRightRoundedIcon />}
                 fullWidth={isSmallScreen}
                 >
-        Create Player</Button>
+        Create Fixture</Button>
       <Modal
         open={open}
         onClose={handleClose}
