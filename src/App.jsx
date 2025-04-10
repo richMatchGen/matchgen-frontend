@@ -32,8 +32,8 @@ function App() {
   return (
     <>
 
-      {/* Optional: Add logout button for testing */}
-      {auth.token && <button onClick={logout}>Logout</button>}
+      {/* Optional: Add logout button for testing
+      {auth.token && <button onClick={logout}>Logout</button>} */}
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
