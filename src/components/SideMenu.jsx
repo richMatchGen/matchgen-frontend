@@ -119,7 +119,7 @@ export default function SideMenu({ user }) {
       >
         <Avatar
           sizes="small"
-          alt="Riley Carter"
+          alt={club?.name || "No club"}
           src="/static/images/avatar/7.jpg"
           sx={{ width: 36, height: 36 }}
         />
