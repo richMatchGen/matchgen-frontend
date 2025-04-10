@@ -60,7 +60,7 @@ const handleChange = (e) => {
 
   return (
     <Container maxWidth="sm" style={{ marginTop: "40px" }}>
-      <Typography variant="h4" align="center">Create a Club</Typography>
+      <Typography variant="h4" align="center">Create Match</Typography>
 
       {[
         { label: "Match Type", name: "match_type" },

@@ -11,8 +11,53 @@ import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import MenuButton from './MenuButton';
 import MenuContent from './MenuContent';
 import CardAlert from './CardAlert';
+import OptionsMenu from './OptionsMenu';
+import { getToken } from "../hooks/auth";
+import { useNavigate } from "react-router-dom";
+import { getProfile } from '../hooks/auth'; // Ensure this function exists
+import useClub from "../hooks/useClub";
+import Sitemark from '../components/Sitemarkicon'
 
 function SideMenuMobile({ open, toggleDrawer }) {
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [userProfile, setUserProfile] = useState(null); // ✅ Declare userProfile state
+  const [club, setClub] = useState(null);
+  
+  const token = getToken();
+  const headers = { Authorization: `Bearer ${token}` };
+  console.log("Token:", token); // 👈 check this in your console
+
+
+    useEffect(() => {
+    const fetchUser = async () => {
+      const profileData  = await getProfile();
+
+      setUserProfile(profileData);
+      
+    };
+
+    const fetchClub = async () => {
+      try {
+        const clubRes = await axios.get(
+          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
+          { headers }
+        );
+        setClub(clubRes.data);
+      } catch (err) {
+        console.warn("User might not have a club yet.");
+        console.error("Actual error:", err); // 👈 ADD THIS
+        setClub(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+    fetchClub();
+    fetchUser();
+  }, []);
+
   return (
     <Drawer
       anchor="right"
@@ -39,12 +84,12 @@ function SideMenuMobile({ open, toggleDrawer }) {
           >
             <Avatar
               sizes="small"
-              alt="Riley Carter"
-              src="/static/images/avatar/7.jpg"
+              alt={club?.name || "No club"}
+              src={club?.logo || "/static/images/avatar/7.jpg"}
               sx={{ width: 24, height: 24 }}
             />
             <Typography component="p" variant="h6">
-              Riley Carter
+            {club?.name || "No club"}
             </Typography>
           </Stack>
           <MenuButton showBadge>
