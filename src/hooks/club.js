@@ -9,7 +9,7 @@ export async function getClub() {
     return null;
   }
   try {
-    const response = await axios.get(`${API_URL}club/details/`, {
+    const response = await axios.get(`${API_URL}my-club/`, {
       headers: {
         Authorization: `Bearer ${token}`, // ✅ Attach token in headers
         "Content-Type": "application/json",
