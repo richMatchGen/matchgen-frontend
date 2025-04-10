@@ -72,7 +72,14 @@ export default function NestedModal() {
 
   return (
     <div>
-      <Button onClick={handleOpen}>Create Player</Button>
+      <Button onClick={handleOpen}
+                variant="contained"
+                size="small"
+                color="primary"
+                endIcon={<ChevronRightRoundedIcon />}
+                fullWidth={isSmallScreen}
+                >
+        Create Player</Button>
       <Modal
         open={open}
         onClose={handleClose}
