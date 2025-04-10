@@ -86,10 +86,12 @@ export default function AddResultModal() {
                 variant="contained"
                 size="small"
                 color="primary"
+                gutterBottom
                 endIcon={<ChevronRightRoundedIcon />}
                 fullWidth={isSmallScreen}
                 >
-        Create Fixture</Button>
+        Create Fixture
+        </Button>
       <Modal
         open={open}
         onClose={handleClose}

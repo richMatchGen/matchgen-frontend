@@ -87,6 +87,7 @@ export default function AddFixtureModal() {
                 variant="contained"
                 size="small"
                 color="primary"
+                gutterBottom
                 endIcon={<ChevronRightRoundedIcon />}
                 fullWidth={isSmallScreen}
                 >
