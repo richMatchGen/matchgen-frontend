@@ -27,10 +27,13 @@ const ITEMS = [
     id: '1',
     label: 'Squad, Results & Fixtures',
     children: [
-      <NestedModal />,
-      { id: '1.1', label: 'Create Player', color: 'green' },
-      { id: '1.2', label: 'Enter Result', color: 'green' },
-      { id: '1.3', label: 'Add Fixture', color: 'green' },
+      {
+        id: '1.1',
+        label: <NestedModal />, // Assuming this is a component
+      },
+      { id: '1.2', label: 'Create Player', color: 'green' },
+      { id: '1.3', label: 'Enter Result', color: 'green' },
+      { id: '1.4', label: 'Add Fixture', color: 'green' },
       // {
       //   id: '1.4',
       //   label: 'Blog',
