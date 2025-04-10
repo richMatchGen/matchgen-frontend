@@ -72,7 +72,7 @@ export default function NestedModal() {
 
   return (
     <div>
-      <Link onClick={handleOpen}>Open modal</Link>
+      <Link onClick={handleOpen}>Create Player</Link>
       <Modal
         open={open}
         onClose={handleClose}

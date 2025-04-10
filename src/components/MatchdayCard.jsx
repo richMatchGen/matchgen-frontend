@@ -74,7 +74,7 @@ export default function MatchDayCard() {
         >
           Gen Matchday
         </Button>
-      <NestedModal />
+
       </CardContent>
     </Card>
   );

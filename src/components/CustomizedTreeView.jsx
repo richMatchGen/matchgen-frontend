@@ -20,12 +20,14 @@ import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
 import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 
 import { useTheme } from '@mui/material/styles';
+import NestedModal from './AddPlayerModal';
 
 const ITEMS = [
   {
     id: '1',
-    label: 'Website',
+    label: 'Squad, Results & Fixtures',
     children: [
+      <NestedModal />,
       { id: '1.1', label: 'Create Player', color: 'green' },
       { id: '1.2', label: 'Enter Result', color: 'green' },
       { id: '1.3', label: 'Add Fixture', color: 'green' },
