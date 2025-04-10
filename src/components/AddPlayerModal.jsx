@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import { useState, useEffect } from "react";
 import { addPlayer } from "../hooks/club";
 import { getToken } from "../hooks/auth";
+import CreatePlayer from '../pages/createplayer';
 
 const style = {
   position: 'absolute',
@@ -81,9 +82,7 @@ export default function NestedModal() {
           {/* <p id="parent-modal-description">
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
           </p> */}
-      <input placeholder="Player Name" class="input input-bordered" value={newPlayer.name} onChange={e => setNewPlayer({ ...newPlayer, name: e.target.value })} />
-      <input placeholder="Position" class="input input-bordered" value={newPlayer.position} onChange={e => setNewPlayer({ ...newPlayer, position: e.target.value })} />
-      <button className="btn btn-primary" onClick={handleAddPlayer}>Add Player</button>
+            <CreatePlayer/>
           <ChildModal />
         </Box>
       </Modal>

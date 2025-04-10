@@ -36,7 +36,7 @@ const handleChange = (e) => {
         }
       );
 
-      alert("Match created!");
+      alert("Player created!");
       setForm({
         club: "",
         name: "",
