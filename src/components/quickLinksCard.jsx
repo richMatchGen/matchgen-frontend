@@ -11,6 +11,8 @@ import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import Link from '@mui/material/Link';
 import NestedModal from './AddPlayerModal';
+import AddFixtureModal from './AddFixtureModal';
+import AddResultModal from './AddResultModal';
 
 export default function QuickLinksCard() {
   const theme = useTheme();
@@ -48,7 +50,8 @@ export default function QuickLinksCard() {
           Quick Links
         </Typography>
           <NestedModal />
-
+          <AddFixtureModal />
+          <AddResultModal />
       </CardContent>
     </Card>
   );
