@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import { addPlayer } from "../hooks/club";
 import { getToken } from "../hooks/auth";
 import CreatePlayer from '../pages/createplayer';
-
+import CreateMatch from '../pages/creatematch';
 
 const style = {
   position: 'absolute',
@@ -101,7 +101,7 @@ export default function AddResultModal() {
           {/* <p id="parent-modal-description">
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
           </p> */}
-            <CreatePlayer/>
+            <CreateMatch/>
             {/* <Divider />
           <ChildModal /> */}
         </Box>
