@@ -55,7 +55,7 @@ export default function SideMenu({ user }) {
     const fetchClub = async () => {
       try {
         const clubRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/club/",
+          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
           { headers }
         );
         setClub(clubRes.data);
