@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import Divider, { dividerClasses } from '@mui/material/Divider';
+import Link from '@mui/material/Link';
 import { useState, useEffect } from "react";
 import { addPlayer } from "../hooks/club";
 import { getToken } from "../hooks/auth";
@@ -71,7 +72,7 @@ export default function NestedModal() {
 
   return (
     <div>
-      <Button onClick={handleOpen}>Open modal</Button>
+      <Link onClick={handleOpen}>Open modal</Link>
       <Modal
         open={open}
         onClose={handleClose}
