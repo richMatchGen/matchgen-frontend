@@ -10,6 +10,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
 import NestedModal from './AddPlayerModal';
 import AddFixtureModal from './AddFixtureModal';
 import AddResultModal from './AddResultModal';
