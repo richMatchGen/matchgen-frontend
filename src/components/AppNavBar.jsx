@@ -67,7 +67,7 @@ export default function AppNavbar() {
           >
             <CustomIcon />
             <Typography variant="h4" component="h1" sx={{ color: 'text.primary' }}>
-              Dashboard
+            <Sitemark />
             </Typography>
           </Stack>
           <ColorModeIconDropdown />
@@ -102,8 +102,8 @@ export function CustomIcon() {
       }}
     >
       {/* <SitemarkIcon /> */}
-             <Sitemark />
-      <DashboardRoundedIcon color="inherit" sx={{ fontSize: '1rem' }} />
+             {/* <Sitemark />
+      <DashboardRoundedIcon color="inherit" sx={{ fontSize: '1rem' }} /> */}
     </Box>
   );
 }
