@@ -10,6 +10,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import Link from '@mui/material/Link';
+import NestedModal from './AddPlayerModal';
 
 export default function MatchDayCard() {
   const theme = useTheme();
@@ -73,6 +74,7 @@ export default function MatchDayCard() {
         >
           Gen Matchday
         </Button>
+      <NestedModal />
       </CardContent>
     </Card>
   );

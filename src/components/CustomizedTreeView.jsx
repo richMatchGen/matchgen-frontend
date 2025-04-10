@@ -26,8 +26,8 @@ const ITEMS = [
     id: '1',
     label: 'Website',
     children: [
-      { id: '1.1', label: 'Add Player', color: 'green' },
-      { id: '1.2', label: 'Add Result', color: 'green' },
+      { id: '1.1', label: 'Create Player', color: 'green' },
+      { id: '1.2', label: 'Enter Result', color: 'green' },
       { id: '1.3', label: 'Add Fixture', color: 'green' },
       // {
       //   id: '1.4',
