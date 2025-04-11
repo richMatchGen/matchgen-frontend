@@ -20,14 +20,14 @@ export default function FixtureCard() {
   React.useEffect(() => {
     const fetchLastMatch = async () => {
       try {
-        const res = await axios.get('/api/matches/last/', {
+        const res = await axios.get('https://matchgen-backend-production.up.railway.app/api/content/matches/upcoming/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('access')}`, // Or however you store your JWT
           },
         });
         setMatch(res.data);
       } catch (err) {
-        console.error('Failed to fetch last match:', err);
+        console.error('Failed to fetch upcoming fixtures', err);
       }
     };
 
@@ -35,45 +35,56 @@ export default function FixtureCard() {
   }, []);
 
   return (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <DateRangeIcon />
-        <Typography
-          component="h2"
-          variant="subtitle2"
-          gutterBottom
-          sx={{ fontWeight: '600' }}
-        >
-          Upcoming Fixture
-        </Typography>
+<Card sx={{ height: '100%' }}>
+  <CardContent>
+    <TodayIcon />
+    <Typography
+      component="h2"
+      variant="subtitle2"
+      gutterBottom
+      sx={{ fontWeight: '600' }}
+    >
+      Matchday
+    </Typography>
 
-        {match ? (
-          <>
-            <Typography variant="h6" sx={{ mb: 1 }}>
-              vs {match.opponent}
-            </Typography>
-            <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
-              {match.date} — {match.result}
-            </Typography>
-          </>
-        ) : (
-          <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
-            No matches available.
+    {match ? (
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+        <Box>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            vs {match.opponent}
           </Typography>
-        )}
+          <Typography sx={{ color: 'text.secondary' }}>
+            {new Date(match.date).toLocaleDateString('en-GB')} — {match.venue}
+          </Typography>
+        </Box>
 
-        <Button
-          variant="contained"
-          size="small"
-          color="primary"
-          endIcon={<ChevronRightRoundedIcon />}
-          fullWidth={isSmallScreen}
-                    component={Link} 
-                    to='gen/fixture'
-        >
-          Gen Fixture
-        </Button>
-      </CardContent>
-    </Card>
+        {match.opponent_logo && (
+          <Box
+            component="img"
+            src={match.opponent_logo}
+            alt={`${match.opponent} logo`}
+            sx={{ width: 64, height: 64, ml: 2 }}
+          />
+        )}
+      </Box>
+    ) : (
+      <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
+        No matches available.
+      </Typography>
+    )}
+
+    <Button
+      variant="contained"
+      size="small"
+      color="primary"
+      endIcon={<ChevronRightRoundedIcon />}
+      fullWidth={isSmallScreen}
+      component={Link}
+      to="gen/result"
+    >
+      Gen Matchday
+    </Button>
+  </CardContent>
+</Card>
   );
 }
