@@ -44,8 +44,20 @@ const CreateMatch = () => {
     }
 
     const formData = new FormData();
-    for (const key in form) {
-      formData.append(key, form[key]);
+    formData.append("club", form.club);
+    formData.append("match_type", form.match_type);
+    formData.append("opponent", form.opponent);
+    formData.append("club_logo", form.club_logo);
+    formData.append("opponent_logo", form.opponent_logo);
+    formData.append("sponsor", form.sponsor);
+    formData.append("date", form.date?.toISOString().split("T")[0]);
+    formData.append("time_start", form.time_start);
+    formData.append("venue", form.venue);
+    formData.append("location", form.location);
+  
+    console.log("FormData preview:");
+    for (const [key, val] of formData.entries()) {
+      console.log(`${key}:`, val);
     }
 
     try {
