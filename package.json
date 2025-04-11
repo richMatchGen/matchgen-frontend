@@ -23,7 +23,7 @@
     "axios": "^1.8.1",
     "card3d": "^2.6.5",
     "chroma-js": "^3.1.2",
-    "date-fns": "^4.1.0",
+    "date-fns": "^2.30.0",
     "dayjs": "^1.11.13",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.479.0",
