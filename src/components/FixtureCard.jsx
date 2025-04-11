@@ -18,11 +18,11 @@ export default function FixtureCard() {
   const [match, setMatch] = React.useState(null);
 
   React.useEffect(() => {
-    const fetchLastMatch = async () => {
+    const fetchUpcomingMatch = async () => {
       try {
         const res = await axios.get('https://matchgen-backend-production.up.railway.app/api/content/matches/upcoming/', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('access')}`, // Or however you store your JWT
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },
         });
         setMatch(res.data);
@@ -31,7 +31,7 @@ export default function FixtureCard() {
       }
     };
 
-    fetchLastMatch();
+    fetchUpcomingMatch();
   }, []);
 
   return (
