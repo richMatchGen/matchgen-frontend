@@ -50,7 +50,7 @@ export default function MatchDayCard() {
 
     {match ? (
       <>
-        {match.logo && (
+        {match.opponent_logo && (
           <Box
             component="img"
             src={match.opponent_logo}
