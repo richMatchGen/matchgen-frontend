@@ -150,7 +150,7 @@ const CreateMatch = () => {
           name="club_logo"
           hidden
           accept="image/*"
-          onChange={handleChange}
+          onChange={handleFileChange}
         />
       </Button>
 
