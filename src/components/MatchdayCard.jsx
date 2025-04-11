@@ -36,46 +36,53 @@ export default function MatchDayCard() {
   }, []);
 
   return (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <TodayIcon />
-        <Typography
-          component="h2"
-          variant="subtitle2"
-          gutterBottom
-          sx={{ fontWeight: '600' }}
-        >
-          Matchday
-        </Typography>
+<Card sx={{ height: '100%' }}>
+  <CardContent>
+    <TodayIcon />
+    <Typography
+      component="h2"
+      variant="subtitle2"
+      gutterBottom
+      sx={{ fontWeight: '600' }}
+    >
+      Matchday
+    </Typography>
 
-        {match ? (
-          <>
-            <Typography variant="h6" sx={{ mb: 1 }}>
-              vs {match.opponent}
-            </Typography>
-            <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
-            {new Date(match.date).toLocaleDateString("en-GB")} — {match.venue}
-            </Typography>
-          </>
-        ) : (
-          <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
-            No matches available.
-          </Typography>
+    {match ? (
+      <>
+        {match.logo && (
+          <Box
+            component="img"
+            src={match.opponent_logo}
+            alt={`${match.opponent} logo`}
+            sx={{ width: 64, height: 64, mb: 1 }}
+          />
         )}
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          vs {match.opponent}
+        </Typography>
+        <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
+          {new Date(match.date).toLocaleDateString('en-GB')} — {match.venue}
+        </Typography>
+      </>
+    ) : (
+      <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
+        No matches available.
+      </Typography>
+    )}
 
-        <Button
-          variant="contained"
-          size="small"
-          color="primary"
-          endIcon={<ChevronRightRoundedIcon />}
-          fullWidth={isSmallScreen}
-          component={Link} 
-          to='gen/result'
-        >
-          Gen Matchday
-        </Button>
-
-      </CardContent>
-    </Card>
+    <Button
+      variant="contained"
+      size="small"
+      color="primary"
+      endIcon={<ChevronRightRoundedIcon />}
+      fullWidth={isSmallScreen}
+      component={Link}
+      to="gen/result"
+    >
+      Gen Matchday
+    </Button>
+  </CardContent>
+</Card>
   );
 }
