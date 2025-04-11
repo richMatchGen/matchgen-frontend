@@ -32,6 +32,33 @@ const CreateMatch = () => {
     }));
   };
 
+
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "ml_default"); // set in Cloudinary dashboard
+
+    const response = await axios.post(
+      `https://api.cloudinary.com/v1_1/dxoxuyz0j/image/upload`,
+
+      formData
+    );
+
+    return response.data.secure_url;
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const imageUrl = await uploadToCloudinary(file);
+
+    setForm((prev) => ({
+      ...prev,
+      club_logo: imageUrl, // now this is a URL, perfect for your Django backend
+    }));
+  };
+
   const handleDateChange = (newDate) => {
     setForm((prev) => ({ ...prev, date: newDate }));
   };
@@ -48,8 +75,8 @@ const CreateMatch = () => {
     formData.append("match_type", form.match_type);
     formData.append("opponent", form.opponent);
     formData.append("club_logo", form.club_logo);
-    formData.append("opponent_logo", form.opponent_logo);
-    formData.append("sponsor", form.sponsor);
+    // formData.append("opponent_logo", form.opponent_logo);
+    // formData.append("sponsor", form.sponsor);
     formData.append("date", form.date?.toISOString().split("T")[0]);
     formData.append("time_start", form.time_start);
     formData.append("venue", form.venue);
@@ -78,8 +105,8 @@ const CreateMatch = () => {
         match_type: "",
         opponent: "",
         club_logo: null,
-        opponent_logo: null,
-        sponsor: null,
+        // opponent_logo: null,
+        // sponsor: null,
         date: null,
         time_start: "",
         venue: "",
@@ -127,7 +154,7 @@ const CreateMatch = () => {
         />
       </Button>
 
-      <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
+      {/* <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
         Upload Opponent Logo
         <input
           type="file"
@@ -147,7 +174,7 @@ const CreateMatch = () => {
           accept="image/*"
           onChange={handleChange}
         />
-      </Button>
+      </Button> */}
 
       {/* Date Picker */}
       <LocalizationProvider dateAdapter={AdapterDateFns}>

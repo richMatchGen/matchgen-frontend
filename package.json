@@ -20,7 +20,7 @@
     "@mui/x-tree-view": "^7.26.0",
     "@react-spring/web": "^9.7.5",
     "@tailwindcss/vite": "^4.0.9",
-    "axios": "^1.8.1",
+    "axios": "^1.8.4",
     "card3d": "^2.6.5",
     "chroma-js": "^3.1.2",
     "date-fns": "^2.30.0",
