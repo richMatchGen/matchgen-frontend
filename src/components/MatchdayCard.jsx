@@ -51,22 +51,25 @@ export default function MatchDayCard() {
     </Typography>
 
     {match ? (
-      <>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+        <Box>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            vs {match.opponent}
+          </Typography>
+          <Typography sx={{ color: 'text.secondary' }}>
+            {new Date(match.date).toLocaleDateString('en-GB')} — {match.venue}
+          </Typography>
+        </Box>
+
         {match.opponent_logo && (
           <Box
             component="img"
             src={match.opponent_logo}
             alt={`${match.opponent} logo`}
-            sx={{ width: 64, height: 64, mb: 1 }}
+            sx={{ width: 64, height: 64, ml: 2 }}
           />
         )}
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          vs {match.opponent}
-        </Typography>
-        <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
-          {new Date(match.date).toLocaleDateString('en-GB')} — {match.venue}
-        </Typography>
-      </>
+      </Box>
     ) : (
       <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
         No matches available.
@@ -86,5 +89,6 @@ export default function MatchDayCard() {
     </Button>
   </CardContent>
 </Card>
+
   );
 }
