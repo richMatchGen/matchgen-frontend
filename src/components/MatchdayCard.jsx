@@ -47,7 +47,7 @@ export default function MatchDayCard() {
       gutterBottom
       sx={{ fontWeight: '600' }}
     >
-      Upcoming Fixture
+      Matchday
     </Typography>
 
     {match ? (

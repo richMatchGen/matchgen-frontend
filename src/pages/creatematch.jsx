@@ -56,6 +56,7 @@ const CreateMatch = () => {
     setForm((prev) => ({
       ...prev,
       club_logo: imageUrl, // now this is a URL, perfect for your Django backend
+      opponent_logo: imageUrl,
     }));
   };
 
@@ -75,7 +76,7 @@ const CreateMatch = () => {
     formData.append("match_type", form.match_type);
     formData.append("opponent", form.opponent);
     formData.append("club_logo", form.club_logo);
-    // formData.append("opponent_logo", form.opponent_logo);
+    formData.append("opponent_logo", form.opponent_logo);
     // formData.append("sponsor", form.sponsor);
     formData.append("date", form.date?.toISOString().split("T")[0]);
     formData.append("time_start", form.time_start);
@@ -105,7 +106,7 @@ const CreateMatch = () => {
         match_type: "",
         opponent: "",
         club_logo: null,
-        // opponent_logo: null,
+        opponent_logo: null,
         // sponsor: null,
         date: null,
         time_start: "",
@@ -154,18 +155,18 @@ const CreateMatch = () => {
         />
       </Button>
 
-      {/* <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
+      <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
         Upload Opponent Logo
         <input
           type="file"
           name="opponent_logo"
           hidden
           accept="image/*"
-          onChange={handleChange}
+          onChange={handleFileChange}
         />
       </Button>
 
-      <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
+      {/* <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
         Upload Sponsor Logo
         <input
           type="file"
