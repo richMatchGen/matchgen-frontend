@@ -75,7 +75,7 @@ const CreateMatch = () => {
     formData.append("club", form.club);
     formData.append("match_type", form.match_type);
     formData.append("opponent", form.opponent);
-    formData.append("club_logo", form.club_logo);
+    // formData.append("club_logo", form.club_logo);
     formData.append("opponent_logo", form.opponent_logo);
     // formData.append("sponsor", form.sponsor);
     formData.append("date", form.date?.toISOString().split("T")[0]);
@@ -83,7 +83,7 @@ const CreateMatch = () => {
     formData.append("venue", form.venue);
     formData.append("location", form.location);
   
-    console.log("FormData preview:");
+
     for (const [key, val] of formData.entries()) {
       console.log(`${key}:`, val);
     }
@@ -144,7 +144,7 @@ const CreateMatch = () => {
       />
 
       {/* Logo upload fields */}
-      <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
+      {/* <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
         Upload Club Logo
         <input
           type="file"
@@ -153,7 +153,7 @@ const CreateMatch = () => {
           accept="image/*"
           onChange={handleFileChange}
         />
-      </Button>
+      </Button> */}
 
       <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
         Upload Opponent Logo

@@ -29,7 +29,7 @@ export default function QuickLinksCard() {
           },
         });
         setMatch(res.data);
-        console.log(res)
+
       } catch (err) {
         console.error('Failed to fetch Matchday:', err);
       }

@@ -16,7 +16,6 @@ export default function CustomizedDataGrid({ user }) {
 
   useEffect(() => {
     if (!token) {
-      console.log(token);
       setError("User not authenticated. Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
       return;
