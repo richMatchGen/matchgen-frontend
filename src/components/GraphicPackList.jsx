@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
+  Button,
+} from "@mui/material";
 
 export default function GraphicPackList({ onSelect }) {
   const [packs, setPacks] = useState([]);
@@ -11,24 +19,35 @@ export default function GraphicPackList({ onSelect }) {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {packs.map(pack => (
-        <div key={pack.id} className="border rounded-xl p-4 shadow-md">
-          <img
-            src={pack.preview_image}
-            alt={pack.name}
-            className="w-full h-48 object-cover rounded-md"
-          />
-          <h3 className="text-xl font-bold mt-2">{pack.name}</h3>
-          <p className="text-sm text-gray-600">{pack.description}</p>
-          <button
-            onClick={() => onSelect(pack.id)}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          >
-            Use this Pack
-          </button>
-        </div>
+    <Grid container spacing={3}>
+      {packs.map((pack) => (
+        <Grid item xs={12} sm={6} md={4} key={pack.id}>
+          <Card>
+            <CardMedia
+              component="img"
+              height="200"
+              image={pack.preview_image}
+              alt={pack.name}
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h6" component="div">
+                {pack.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {pack.description}
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => onSelect(pack.id)}
+                sx={{ mt: 2 }}
+              >
+                Use this Pack
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
       ))}
-    </div>
+    </Grid>
   );
 }
