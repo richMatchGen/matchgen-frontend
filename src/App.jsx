@@ -22,6 +22,7 @@ import GenResult from "./pages/genResult";
 import GenTeamLineup from "./pages/genTeamLineup";
 import GenLiveScore from "./pages/genLiveScore";
 import GenTemplates from "./pages/genTemplates";
+import ChoosePackPage from "./pages/ChoosePackage";
 
 
 
@@ -61,8 +62,9 @@ function App() {
         <Route path="/gen/result" element={<PrivateRoute><GenResult /></PrivateRoute>} />
         <Route path="/gen/player" element={<PrivateRoute><GenPlayer /></PrivateRoute>} />
 
-        <Route path="/gen/templates" element={<PrivateRoute><GenTemplates/></PrivateRoute>} />
 
+        <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
+        <Route path="/profile" element={<Overview />} />
       </Routes>
 
     </>
