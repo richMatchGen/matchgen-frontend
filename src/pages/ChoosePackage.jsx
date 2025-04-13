@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import GraphicPackList from "@/components/GraphicPackList";
+import GraphicPackList from "../components/GraphicPackList";
 import { Container, Typography } from "@mui/material";
 
 export default function ChoosePackPage() {
