@@ -14,7 +14,10 @@ export default function GraphicPackList({ onSelect }) {
 
   useEffect(() => {
     axios.get("/api/graphic-packs/")
-      .then(res => setPacks(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data : res.data.results;
+        setPacks(data || []); // fallback to [] just in case
+      })
       .catch(err => console.error("Failed to load packs", err));
   }, []);
 
