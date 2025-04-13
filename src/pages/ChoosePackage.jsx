@@ -18,7 +18,7 @@ export default function ChoosePackPage() {
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Choose a Graphic Pack
+        Choose a Template Pack
       </Typography>
       <GraphicPackList onSelect={handleSelect} />
     </Container>
