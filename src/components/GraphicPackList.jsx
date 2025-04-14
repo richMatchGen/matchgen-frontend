@@ -13,7 +13,7 @@ export default function GraphicPackList({ onSelect }) {
   const [packs, setPacks] = useState([]);
 
   useEffect(() => {
-    axios.get("/api/graphic-packs/")
+    axios.get("https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/")
       .then(res => {
         const data = Array.isArray(res.data) ? res.data : res.data.results;
         setPacks(data || []); // fallback to [] just in case

@@ -8,7 +8,7 @@ export default function ChoosePackPage() {
 
   const handleSelect = async (packId) => {
     try {
-      await axios.post("/api/select-pack/", { pack_id: packId });
+      await axios.post("https://matchgen-backend-production.up.railway.app/api/graphicpack/select-pack/", { pack_id: packId });
       navigate("/dashboard"); // This replaces router.push()
     } catch (err) {
       console.error("Error selecting pack", err);
