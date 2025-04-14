@@ -29,7 +29,7 @@ export default function GraphicPackList({ onSelect }) {
             <CardMedia
               component="img"
               height="200"
-              image={pack.preview_image}
+              image={pack.preview_image_url}
               alt={pack.name}
             />
             <CardContent>
