@@ -23,6 +23,7 @@ import GenTeamLineup from "./pages/genTeamLineup";
 import GenLiveScore from "./pages/genLiveScore";
 import GenTemplates from "./pages/genTemplates";
 import ChoosePackPage from "./pages/ChoosePackage";
+import MatchdayPostPage from "./pages/MatchdayPost";
 
 
 
@@ -58,10 +59,10 @@ function App() {
 
         <Route path="/gen/teamlineup" element={<PrivateRoute><GenTeamLineup /></PrivateRoute>} />
         <Route path="/gen/livescore" element={<PrivateRoute><GenLiveScore /></PrivateRoute>} />
-        <Route path="/gen/fixture" element={<PrivateRoute><GenFixture /></PrivateRoute>} />
+        <Route path="/gen/fixture" element={<PrivateRoute><MatchdayPostPage /></PrivateRoute>} />
         <Route path="/gen/result" element={<PrivateRoute><GenResult /></PrivateRoute>} />
         <Route path="/gen/player" element={<PrivateRoute><GenPlayer /></PrivateRoute>} />
-
+ 
 
         <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
         <Route path="/profile" element={<Overview />} />
