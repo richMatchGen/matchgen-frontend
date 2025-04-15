@@ -34,7 +34,7 @@ export default function MatchdayPostPage() {
     try {
       const token = localStorage.getItem("accessToken");
       const res = await axios.get(
-        `https://matchgen-backend-production.up.railway.app/match/${matchId}/generate-matchday/`,
+        `https://matchgen-backend-production.up.railway.app/api/graphicpack/match/${matchId}/generate-matchday/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
