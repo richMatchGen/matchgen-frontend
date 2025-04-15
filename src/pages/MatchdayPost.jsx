@@ -16,10 +16,17 @@ export default function MatchdayPostPage() {
   const handleGenerate = async (matchId) => {
     setLoading(matchId);
     try {
-      const res = await axios.get(`/match/${matchId}/generate-matchday/`);
+      const res = await axios.get(
+        `https://matchgen-backend-production.up.railway.app/match/${matchId}/generate-matchday/`,
+        {
+          headers: {
+            Authorization: `Bearer ${yourToken}`,
+          },
+        }
+      );
+  
       setSnackbar({ open: true, message: "Post generated successfully!" });
-
-      // Replace the match in the list with updated one
+  
       setMatches(prev =>
         prev.map(m => m.id === matchId ? { ...m, matchday_post_url: res.data.url } : m)
       );
