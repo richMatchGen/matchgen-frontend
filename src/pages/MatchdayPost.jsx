@@ -11,7 +11,7 @@ export default function MatchdayPostPage() {
   const [snackbar, setSnackbar] = useState({ open: false, message: "" });
 
   useEffect(() => {
-    axios.get("https://matchgen-backend-production.up.railway.app/api/matches/upcoming/")
+    axios.get("https://matchgen-backend-production.up.railway.app/api/matches/")
       .then(res => setMatches(res.data))
       .catch(err => console.error("Failed to load matches", err));
   }, []);
