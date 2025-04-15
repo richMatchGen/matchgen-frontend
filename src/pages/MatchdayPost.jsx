@@ -19,6 +19,7 @@ export default function MatchdayPostPage() {
   const handleGenerate = async (matchId) => {
     setLoadingId(matchId);
     try {
+      console.log("Stored token:", localStorage.getItem("accessToken"));
       const token = localStorage.getItem("accessToken");
       const res = await axios.get(
         `https://matchgen-backend-production.up.railway.app/match/${matchId}/generate-matchday/`,
