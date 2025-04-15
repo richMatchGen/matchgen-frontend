@@ -24,9 +24,14 @@ export default function MatchdayPostPage() {
   }, []);
 
   const handleGenerate = async (matchId) => {
+    if (!matchId) {
+      console.warn("⚠️ Tried to generate with undefined match ID");
+      return;
+    }
+  
     setLoadingId(matchId);
+  
     try {
-      console.log("Stored token:", localStorage.getItem("accessToken"));
       const token = localStorage.getItem("accessToken");
       const res = await axios.get(
         `https://matchgen-backend-production.up.railway.app/match/${matchId}/generate-matchday/`,
@@ -36,10 +41,9 @@ export default function MatchdayPostPage() {
           },
         }
       );
-
+  
       setSnackbar({ open: true, message: "Post generated!" });
-
-      // Update match with new URL
+  
       setMatches(prev =>
         prev.map(m => m.id === matchId ? { ...m, matchday_post_url: res.data.url } : m)
       );
