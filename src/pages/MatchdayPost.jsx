@@ -1,32 +1,37 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Typography, Button, Card, CardContent, CircularProgress, Snackbar } from "@mui/material";
+import {
+  Container, Typography, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow, Button, CircularProgress, Snackbar, Paper
+} from "@mui/material";
 
 export default function MatchdayPostPage() {
   const [matches, setMatches] = useState([]);
-  const [loading, setLoading] = useState(null); // match ID being generated
+  const [loadingId, setLoadingId] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "" });
 
   useEffect(() => {
-    axios.get("https://matchgen-backend-production.up.railway.app/api/content/matches/") // your match listing endpoint
+    axios.get("https://matchgen-backend-production.up.railway.app/api/matches/upcoming/")
       .then(res => setMatches(res.data))
       .catch(err => console.error("Failed to load matches", err));
   }, []);
 
   const handleGenerate = async (matchId) => {
-    setLoading(matchId);
+    setLoadingId(matchId);
     try {
+      const token = localStorage.getItem("accessToken");
       const res = await axios.get(
         `https://matchgen-backend-production.up.railway.app/match/${matchId}/generate-matchday/`,
         {
           headers: {
-            Authorization: `Bearer ${yourToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-  
-      setSnackbar({ open: true, message: "Post generated successfully!" });
-  
+
+      setSnackbar({ open: true, message: "Post generated!" });
+
+      // Update match with new URL
       setMatches(prev =>
         prev.map(m => m.id === matchId ? { ...m, matchday_post_url: res.data.url } : m)
       );
@@ -34,38 +39,58 @@ export default function MatchdayPostPage() {
       console.error("Error generating post", err);
       setSnackbar({ open: true, message: "Failed to generate post." });
     } finally {
-      setLoading(null);
+      setLoadingId(null);
     }
   };
 
   return (
     <Container sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>Generate Matchday Post</Typography>
+      <Typography variant="h4" gutterBottom>
+        Matchday Posts
+      </Typography>
 
-      {matches.map((match) => (
-        <Card key={match.id} sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6">{match.opponent} — {new Date(match.date).toLocaleDateString()}</Typography>
-            <Typography variant="body2">{match.venue}</Typography>
-
-            {match.matchday_post_url ? (
-              <div style={{ marginTop: 10 }}>
-                <Typography variant="body2">✅ Generated</Typography>
-                <a href={match.matchday_post_url} target="_blank" rel="noreferrer">View Post</a>
-              </div>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={() => handleGenerate(match.id)}
-                disabled={loading === match.id}
-                sx={{ mt: 2 }}
-              >
-                {loading === match.id ? <CircularProgress size={20} color="inherit" /> : "Generate Post"}
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Opponent</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell>Venue</TableCell>
+              <TableCell>Post</TableCell>
+              <TableCell align="right">Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {matches.map((match) => (
+              <TableRow key={match.id}>
+                <TableCell>{match.opponent}</TableCell>
+                <TableCell>{new Date(match.date).toLocaleDateString()}</TableCell>
+                <TableCell>{match.venue}</TableCell>
+                <TableCell>
+                  {match.matchday_post_url ? (
+                    <a href={match.matchday_post_url} target="_blank" rel="noreferrer">View</a>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
+                <TableCell align="right">
+                  <Button
+                    variant="contained"
+                    onClick={() => handleGenerate(match.id)}
+                    disabled={loadingId === match.id}
+                  >
+                    {loadingId === match.id ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : (
+                      "Generate"
+                    )}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <Snackbar
         open={snackbar.open}
