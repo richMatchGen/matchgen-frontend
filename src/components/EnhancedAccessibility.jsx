@@ -16,7 +16,7 @@ import {
   VolumeUp,
   VolumeOff,
   Accessibility,
-  HighContrast,
+  Contrast,
   ZoomIn,
   ZoomOut,
 } from '@mui/icons-material';
@@ -241,7 +241,7 @@ const AccessibilityToolbar = () => {
               color: isHighContrast ? 'primary.contrastText' : 'inherit',
             }}
           >
-            <HighContrast fontSize="small" />
+            <Contrast fontSize="small" />
           </IconButton>
         </Tooltip>
         
