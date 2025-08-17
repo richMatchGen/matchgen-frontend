@@ -1,9 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import { Button, Container, Typography, AppBar, Toolbar } from "@mui/material";
+import { Button, Container, Typography, AppBar, Toolbar, Box } from "@mui/material";
 import Link from '@mui/material/Link';
 import { Suspense, lazy } from "react";
 import PrivateRoute from "./components/PrivateRoute";
 import useAuth from "./hooks/useAuth";
+import LoadingSpinner from "./components/LoadingSpinner";
 
 // Lazy load components for better performance
 const Login = lazy(() => import("./pages/Login"));
@@ -38,7 +39,29 @@ function App() {
       {/* Optional: Add logout button for testing
       {auth.token && <button onClick={logout}>Logout</button>} */}
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          minHeight="100vh"
+          sx={{
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "white",
+          }}
+        >
+          <Box textAlign="center">
+            <Typography variant="h4" sx={{ mb: 2, fontWeight: 700 }}>
+              MatchGen
+            </Typography>
+            <LoadingSpinner 
+              message="Loading application..." 
+              variant="dots"
+              size={60}
+            />
+          </Box>
+        </Box>
+      }>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
