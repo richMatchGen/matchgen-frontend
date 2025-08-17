@@ -51,7 +51,37 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const { login } = useAuth(); // ✅ use login from hook
 
-  const handleLogin = async () => {
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email is invalid";
+    }
+    
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
     try {
       const response = await axios.post(
         "https://matchgen-backend-production.up.railway.app/api/users/token/",
@@ -59,13 +89,14 @@ const Login = () => {
       );
 
       const { access, refresh } = response.data;
-
-      login({ access, refresh }); // ✅ replaces localStorage.setItem
-      // alert("Login successful!");
+      login({ access, refresh });
       window.location.href = "/dashboard";
     } catch (error) {
-      alert("Invalid email or password");
-      console.error(error);
+      const errorMessage = error.response?.data?.detail || "Invalid email or password";
+      setErrors({ submit: errorMessage });
+      console.error("Login error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -95,11 +126,11 @@ const Login = () => {
         gap: 2,
       }}
     >
-                  <FormControl>
+                  <FormControl error={!!errors.email}>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
-                // error={emailError}
-                // helperText={emailErrorMessage}
+                error={!!errors.email}
+                helperText={errors.email}
                 id="email"
                 type="email"
                 name="email"
@@ -111,38 +142,44 @@ const Login = () => {
                 variant="outlined"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                // color={emailError ? 'error' : 'primary'}
+                disabled={isSubmitting}
               />
             </FormControl>
       
-                  <FormControl>
+                  <FormControl error={!!errors.password}>
               <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
-                // error={passwordError}
-                // helperText={passwordErrorMessage}
+                error={!!errors.password}
+                helperText={errors.password}
                 name="password"
                 placeholder="••••••"
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                autoFocus
                 required
                 fullWidth
                 variant="outlined"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                // color={passwordError ? 'error' : 'primary'}
+                disabled={isSubmitting}
               />
             </FormControl>
+
+      {errors.submit && (
+        <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+          {errors.submit}
+        </Typography>
+      )}
 
       <Button
         fullWidth
         variant="contained"
         color="primary"
         onClick={handleLogin}
+        disabled={isSubmitting}
         sx={{ mt: 2 }}
       >
-        Login
+        {isSubmitting ? "Signing in..." : "Sign in"}
       </Button>
     </Box>
 
