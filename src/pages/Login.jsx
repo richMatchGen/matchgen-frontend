@@ -151,7 +151,7 @@ const Login = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Typography sx={{ textAlign: 'center' }}>
         Don&apos;t have an account?{' '}
-        <Link href="/material-ui/getting-started/templates/sign-in/" variant="body2">
+        <Link href="/register" variant="body2">
           Sign up
         </Link>
       </Typography>
