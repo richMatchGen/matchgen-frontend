@@ -302,6 +302,16 @@ const CreateClub = () => {
     }
   }, []);
 
+  // Convert file to base64 for temporary logo storage
+  const fileToBase64 = useCallback((file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }, []);
+
   // Enhanced drag and drop
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
@@ -374,27 +384,69 @@ const CreateClub = () => {
             setUploadProgress(100);
           } else {
             console.warn("Logo upload failed:", uploadResult.error);
-            setSnackbar({
-              open: true,
-              message: "Logo upload failed, continuing without logo",
-              severity: "warning"
-            });
+            // Fallback to base64 conversion
+            try {
+              const base64Logo = await fileToBase64(logoFile);
+              finalLogoUrl = base64Logo;
+              setUploadProgress(100);
+              setSnackbar({
+                open: true,
+                message: "Logo uploaded as base64 (upload endpoint not available)",
+                severity: "info"
+              });
+            } catch (base64Error) {
+              console.warn("Base64 conversion failed:", base64Error);
+              setSnackbar({
+                open: true,
+                message: "Logo upload failed, continuing without logo",
+                severity: "warning"
+              });
+            }
           }
         } catch (uploadError) {
           console.warn("Logo upload endpoint not available:", uploadError);
-          setSnackbar({
-            open: true,
-            message: "Logo upload not available, continuing without logo",
-            severity: "warning"
-          });
+          // Fallback to base64 conversion
+          try {
+            const base64Logo = await fileToBase64(logoFile);
+            finalLogoUrl = base64Logo;
+            setUploadProgress(100);
+            setSnackbar({
+              open: true,
+              message: "Logo uploaded as base64 (upload endpoint not available)",
+              severity: "info"
+            });
+          } catch (base64Error) {
+            console.warn("Base64 conversion failed:", base64Error);
+            setSnackbar({
+              open: true,
+              message: "Logo upload not available, continuing without logo",
+              severity: "warning"
+            });
+          }
         }
       }
 
       // Create club with enhanced error handling
       const clubData = {
-        ...formData,
-        logo: finalLogoUrl,
+        name: formData.name.trim(),
+        sport: formData.sport,
+        location: formData.location.trim() || null,
+        founded_year: formData.founded_year ? parseInt(formData.founded_year) : null,
+        description: formData.description.trim() || null,
+        website: formData.website.trim() || null,
+        email: formData.email.trim() || null,
+        phone: formData.phone.trim() || null,
+        logo: finalLogoUrl || null,
       };
+
+      // Remove null/empty values to avoid validation issues
+      Object.keys(clubData).forEach(key => {
+        if (clubData[key] === null || clubData[key] === "") {
+          delete clubData[key];
+        }
+      });
+
+      console.log("Sending club data:", clubData);
 
       const response = await axios.post(
         "https://matchgen-backend-production.up.railway.app/api/users/club/",
@@ -402,9 +454,12 @@ const CreateClub = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
+
+      console.log("Club creation response:", response.data);
 
       setSuccess("Club created successfully! Redirecting to club overview...");
       setSnackbar({
@@ -436,9 +491,37 @@ const CreateClub = () => {
       
     } catch (err) {
       console.error("Error creating club:", err);
-      const errorMessage = err.response?.data?.error || 
-                          err.response?.data?.message || 
-                          "Error creating club. Please try again.";
+      console.error("Error response:", err.response?.data);
+      
+      let errorMessage = "Error creating club. Please try again.";
+      
+      if (err.response?.data) {
+        if (err.response.data.error) {
+          errorMessage = err.response.data.error;
+        } else if (err.response.data.message) {
+          errorMessage = err.response.data.message;
+        } else if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        } else if (err.response.data.detail) {
+          errorMessage = err.response.data.detail;
+        } else if (err.response.data.non_field_errors) {
+          errorMessage = err.response.data.non_field_errors.join(', ');
+        } else {
+          // Handle field-specific errors
+          const fieldErrors = [];
+          Object.keys(err.response.data).forEach(field => {
+            if (Array.isArray(err.response.data[field])) {
+              fieldErrors.push(`${field}: ${err.response.data[field].join(', ')}`);
+            } else {
+              fieldErrors.push(`${field}: ${err.response.data[field]}`);
+            }
+          });
+          if (fieldErrors.length > 0) {
+            errorMessage = fieldErrors.join('; ');
+          }
+        }
+      }
+      
       setError(errorMessage);
       setSnackbar({
         open: true,
@@ -449,7 +532,7 @@ const CreateClub = () => {
       setLoading(false);
       setUploadProgress(0);
     }
-  }, [validateForm, useLogoUrl, logoUrl, logoFile, formData, navigate, handleRemoveLogo]);
+  }, [validateForm, useLogoUrl, logoUrl, logoFile, formData, navigate, handleRemoveLogo, fileToBase64]);
 
   // Step navigation
   const handleNext = useCallback(() => {
