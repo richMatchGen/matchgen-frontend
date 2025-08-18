@@ -71,9 +71,30 @@ const GenHalfTime = () => {
         const res = await axios.get("https://matchgen-backend-production.up.railway.app/api/content/matches/matchday/", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setMatches(res.data);
+        // Handle different response structures
+        let matchesData = [];
+        if (res.data) {
+          if (Array.isArray(res.data)) {
+            matchesData = res.data;
+          } else if (res.data.results && Array.isArray(res.data.results)) {
+            matchesData = res.data.results;
+          } else if (res.data.matches && Array.isArray(res.data.matches)) {
+            matchesData = res.data.matches;
+          } else if (typeof res.data === 'object' && res.data.id) {
+            matchesData = [res.data];
+          } else if (typeof res.data === 'string') {
+            try {
+              const parsed = JSON.parse(res.data);
+              matchesData = Array.isArray(parsed) ? parsed : [parsed];
+            } catch (e) {
+              console.warn('Failed to parse response data as JSON:', e);
+            }
+          }
+        }
+        setMatches(matchesData);
       } catch (err) {
         console.error("Failed to load matchday matches", err);
+        setMatches([]); // Set empty array on error
       }
     };
   
@@ -102,9 +123,12 @@ const GenHalfTime = () => {
   
       setSnackbar({ open: true, message: "Half time post generated!" });
   
-      setMatches(prev =>
-        prev.map(m => m.id === matchId ? { ...m, halftime_post_url: res.data.url } : m)
-      );
+      setMatches(prev => {
+        if (Array.isArray(prev)) {
+          return prev.map(m => m.id === matchId ? { ...m, halftime_post_url: res.data.url } : m);
+        }
+        return prev;
+      });
     } catch (err) {
       console.error("Error generating half time post", err);
       setSnackbar({ open: true, message: "Failed to generate half time post." });

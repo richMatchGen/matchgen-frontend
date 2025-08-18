@@ -71,10 +71,30 @@ const GenFullTime = () => {
         const res = await axios.get("https://matchgen-backend-production.up.railway.app/api/content/matches/last/", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // Convert single match to array for consistency
-        setMatches(Array.isArray(res.data) ? res.data : [res.data]);
+        // Handle different response structures
+        let matchesData = [];
+        if (res.data) {
+          if (Array.isArray(res.data)) {
+            matchesData = res.data;
+          } else if (res.data.results && Array.isArray(res.data.results)) {
+            matchesData = res.data.results;
+          } else if (res.data.matches && Array.isArray(res.data.matches)) {
+            matchesData = res.data.matches;
+          } else if (typeof res.data === 'object' && res.data.id) {
+            matchesData = [res.data];
+          } else if (typeof res.data === 'string') {
+            try {
+              const parsed = JSON.parse(res.data);
+              matchesData = Array.isArray(parsed) ? parsed : [parsed];
+            } catch (e) {
+              console.warn('Failed to parse response data as JSON:', e);
+            }
+          }
+        }
+        setMatches(matchesData);
       } catch (err) {
         console.error("Failed to load last match", err);
+        setMatches([]); // Set empty array on error
       }
     };
   
@@ -103,9 +123,12 @@ const GenFullTime = () => {
   
       setSnackbar({ open: true, message: "Full time post generated!" });
   
-      setMatches(prev =>
-        prev.map(m => m.id === matchId ? { ...m, fulltime_post_url: res.data.url } : m)
-      );
+      setMatches(prev => {
+        if (Array.isArray(prev)) {
+          return prev.map(m => m.id === matchId ? { ...m, fulltime_post_url: res.data.url } : m);
+        }
+        return prev;
+      });
     } catch (err) {
       console.error("Error generating full time post", err);
       setSnackbar({ open: true, message: "Failed to generate full time post." });

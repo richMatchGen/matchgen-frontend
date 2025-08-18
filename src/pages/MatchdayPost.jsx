@@ -19,8 +19,33 @@ export default function MatchdayPostPage() {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((res) => setMatches(res.data))
-      .catch((err) => console.error("Failed to load matches", err));
+      .then((res) => {
+        // Handle different response structures
+        let matchesData = [];
+        if (res.data) {
+          if (Array.isArray(res.data)) {
+            matchesData = res.data;
+          } else if (res.data.results && Array.isArray(res.data.results)) {
+            matchesData = res.data.results;
+          } else if (res.data.matches && Array.isArray(res.data.matches)) {
+            matchesData = res.data.matches;
+          } else if (typeof res.data === 'object' && res.data.id) {
+            matchesData = [res.data];
+          } else if (typeof res.data === 'string') {
+            try {
+              const parsed = JSON.parse(res.data);
+              matchesData = Array.isArray(parsed) ? parsed : [parsed];
+            } catch (e) {
+              console.warn('Failed to parse response data as JSON:', e);
+            }
+          }
+        }
+        setMatches(matchesData);
+      })
+      .catch((err) => {
+        console.error("Failed to load matches", err);
+        setMatches([]); // Set empty array on error
+      });
   }, []);
 
   const handleGenerate = async (matchId) => {
@@ -44,9 +69,12 @@ export default function MatchdayPostPage() {
   
       setSnackbar({ open: true, message: "Post generated!" });
   
-      setMatches(prev =>
-        prev.map(m => m.id === matchId ? { ...m, matchday_post_url: res.data.url } : m)
-      );
+      setMatches(prev => {
+        if (Array.isArray(prev)) {
+          return prev.map(m => m.id === matchId ? { ...m, matchday_post_url: res.data.url } : m);
+        }
+        return prev;
+      });
     } catch (err) {
       console.error("Error generating post", err);
       setSnackbar({ open: true, message: "Failed to generate post." });
@@ -73,33 +101,43 @@ export default function MatchdayPostPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {matches.map((match) => (
-              <TableRow key={match.id}>
-                <TableCell>{match.opponent}</TableCell>
-                <TableCell>{new Date(match.date).toLocaleDateString()}</TableCell>
-                <TableCell>{match.venue}</TableCell>
-                <TableCell>
-                  {match.matchday_post_url ? (
-                    <a href={match.matchday_post_url} target="_blank" rel="noreferrer">View</a>
-                  ) : (
-                    "—"
-                  )}
-                </TableCell>
-                <TableCell align="right">
-                  <Button
-                    variant="contained"
-                    onClick={() => handleGenerate(match.id)}
-                    disabled={loadingId === match.id}
-                  >
-                    {loadingId === match.id ? (
-                      <CircularProgress size={20} color="inherit" />
+            {Array.isArray(matches) && matches.length > 0 ? (
+              matches.map((match) => (
+                <TableRow key={match.id}>
+                  <TableCell>{match.opponent}</TableCell>
+                  <TableCell>{new Date(match.date).toLocaleDateString()}</TableCell>
+                  <TableCell>{match.venue}</TableCell>
+                  <TableCell>
+                    {match.matchday_post_url ? (
+                      <a href={match.matchday_post_url} target="_blank" rel="noreferrer">View</a>
                     ) : (
-                      "Generate"
+                      "—"
                     )}
-                  </Button>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Button
+                      variant="contained"
+                      onClick={() => handleGenerate(match.id)}
+                      disabled={loadingId === match.id}
+                    >
+                      {loadingId === match.id ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        "Generate"
+                      )}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <Typography color="text.secondary">
+                    No matches available
+                  </Typography>
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>
