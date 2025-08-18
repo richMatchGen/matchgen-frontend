@@ -30,6 +30,10 @@ const GenTemplates = lazy(() => import("./pages/genTemplates"));
 const ChoosePackPage = lazy(() => import("./pages/ChoosePackage"));
 const MatchdayPostPage = lazy(() => import("./pages/MatchdayPost"));
 const ClubOverview = lazy(() => import("./pages/ClubOverview"));
+const GenStartingXI = lazy(() => import("./pages/GenStartingXI"));
+const GenUpcomingPost = lazy(() => import("./pages/GenUpcomingPost"));
+const GenHalfTime = lazy(() => import("./pages/GenHalfTime"));
+const GenFullTime = lazy(() => import("./pages/GenFullTime"));
 
 
 
@@ -96,6 +100,10 @@ function App() {
           <Route path="/gen/fixture" element={<PrivateRoute><MatchdayPostPage /></PrivateRoute>} />
           <Route path="/gen/result" element={<PrivateRoute><GenResult /></PrivateRoute>} />
           <Route path="/gen/player" element={<PrivateRoute><GenPlayer /></PrivateRoute>} />
+          <Route path="/gen/startingxi" element={<PrivateRoute><GenStartingXI /></PrivateRoute>} />
+          <Route path="/gen/upcoming" element={<PrivateRoute><GenUpcomingPost /></PrivateRoute>} />
+          <Route path="/gen/halftime" element={<PrivateRoute><GenHalfTime /></PrivateRoute>} />
+          <Route path="/gen/fulltime" element={<PrivateRoute><GenFullTime /></PrivateRoute>} />
    
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
           <Route path="/profile" element={<Overview />} />

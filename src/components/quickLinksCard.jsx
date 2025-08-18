@@ -54,7 +54,18 @@ export default function QuickLinksCard() {
           <NestedModal />
           <AddFixtureModal />
           <AddResultModal />
-          </Stack>
+          <Button
+            variant="contained"
+            size="small"
+            color="secondary"
+            endIcon={<ChevronRightRoundedIcon />}
+            fullWidth={isSmallScreen}
+            component={Link}
+            to="gen/halftime"
+          >
+            Gen Half Time
+          </Button>
+        </Stack>
       </CardContent>
     </Card>
   );

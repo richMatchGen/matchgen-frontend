@@ -81,9 +81,9 @@ export default function FixtureCard() {
       endIcon={<ChevronRightRoundedIcon />}
       fullWidth={isSmallScreen}
       component={Link}
-      to="gen/result"
+      to="gen/upcoming"
     >
-      Gen Matchday
+      Gen Upcoming
     </Button>
   </CardContent>
 </Card>

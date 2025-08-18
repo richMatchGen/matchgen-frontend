@@ -68,10 +68,9 @@ export default function HighlightedCard() {
           endIcon={<ChevronRightRoundedIcon />}
           fullWidth={isSmallScreen}
           component={Link} 
-          to='gen/result'
-          // to={`/matches/${match.id}`} 
+          to='gen/fulltime'
         >
-          Gen Result
+          Gen Full Time
         </Button>
       </CardContent>
     </Card>
