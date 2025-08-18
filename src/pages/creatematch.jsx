@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
   Container,
   Typography,
+  Alert,
+  CircularProgress,
+  Box,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -24,106 +31,241 @@ const CreateMatch = () => {
     location: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [userClub, setUserClub] = useState(null);
+
+  // Fetch user's club on component mount
+  useEffect(() => {
+    const fetchUserClub = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
+        const response = await axios.get(
+          "https://matchgen-backend-production.up.railway.app/api/users/my-club",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        
+        if (response.data) {
+          setUserClub(response.data);
+          setForm(prev => ({ ...prev, club: response.data.id || response.data.name }));
+        }
+      } catch (err) {
+        console.warn("Could not fetch user club:", err);
+      }
+    };
+
+    fetchUserClub();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setForm((prev) => ({
       ...prev,
       [name]: files ? files[0] : value,
     }));
+    
+    // Clear error when user starts typing
+    if (error) setError("");
   };
-
 
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "matchgen_unsigned"); // must match Cloudinary exactly
-  
+    formData.append("upload_preset", "matchgen_unsigned");
+
     const response = await axios.post(
       "https://api.cloudinary.com/v1_1/dxoxuyz0j/image/upload",
       formData
     );
-  
+
     return response.data.secure_url;
   };
-  
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const imageUrl = await uploadToCloudinary(file);
-
-    setForm((prev) => ({
-      ...prev,
-      club_logo: imageUrl, // now this is a URL, perfect for your Django backend
-      opponent_logo: imageUrl,
-    }));
+    try {
+      const imageUrl = await uploadToCloudinary(file);
+      setForm((prev) => ({
+        ...prev,
+        opponent_logo: imageUrl,
+      }));
+      setSuccess("Logo uploaded successfully!");
+    } catch (err) {
+      setError("Failed to upload logo. Please try again.");
+    }
   };
 
   const handleDateChange = (newDate) => {
     setForm((prev) => ({ ...prev, date: newDate }));
+    if (error) setError("");
+  };
+
+  const validateForm = () => {
+    if (!form.match_type.trim()) {
+      setError("Match type is required");
+      return false;
+    }
+    if (!form.opponent.trim()) {
+      setError("Opponent is required");
+      return false;
+    }
+    if (!form.date) {
+      setError("Date is required");
+      return false;
+    }
+    if (!form.time_start.trim()) {
+      setError("Time is required");
+      return false;
+    }
+    if (!form.venue.trim()) {
+      setError("Venue is required");
+      return false;
+    }
+    return true;
   };
 
   const handleCreate = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      alert("You must be logged in to create a Fixture.");
+    setError("");
+    setSuccess("");
+    
+    if (!validateForm()) {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("club", form.club);
-    formData.append("match_type", form.match_type);
-    formData.append("opponent", form.opponent);
-    // formData.append("club_logo", form.club_logo);
-    formData.append("opponent_logo", form.opponent_logo);
-    // formData.append("sponsor", form.sponsor);
-    formData.append("date", form.date?.toISOString().split("T")[0]);
-    formData.append("time_start", form.time_start);
-    formData.append("venue", form.venue);
-    formData.append("location", form.location);
-  
-
-    for (const [key, val] of formData.entries()) {
-      console.log(`${key}:`, val);
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setError("You must be logged in to create a match.");
+      return;
     }
 
+    setLoading(true);
+
     try {
+      // Prepare the data - use JSON instead of FormData for better compatibility
+      const matchData = {
+        match_type: form.match_type.trim(),
+        opponent: form.opponent.trim(),
+        date: form.date?.toISOString().split("T")[0],
+        time_start: form.time_start.trim(),
+        venue: form.venue.trim(),
+        location: form.location.trim() || null,
+      };
+
+      // Only add logo if it exists
+      if (form.opponent_logo) {
+        matchData.opponent_logo = form.opponent_logo;
+      }
+
+      // Remove null/empty values
+      Object.keys(matchData).forEach(key => {
+        if (matchData[key] === null || matchData[key] === "") {
+          delete matchData[key];
+        }
+      });
+
+      console.log("Sending match data:", matchData);
+
       const response = await axios.post(
         "https://matchgen-backend-production.up.railway.app/api/content/matches/",
-        formData,
+        matchData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         }
       );
 
-      alert("Match created!");
+      console.log("Match creation response:", response.data);
+
+      setSuccess("Match created successfully!");
       setForm({
-        club: "",
+        club: userClub?.id || userClub?.name || "",
         match_type: "",
         opponent: "",
         club_logo: null,
         opponent_logo: null,
-        // sponsor: null,
+        sponsor: null,
         date: null,
         time_start: "",
         venue: "",
         location: "",
       });
     } catch (err) {
-      console.error(err);
-      alert("Error creating Fixture.");
+      console.error("Error creating match:", err);
+      console.error("Error response:", err.response?.data);
+      
+      let errorMessage = "Error creating match. Please try again.";
+      
+      if (err.response?.data) {
+        if (err.response.data.error) {
+          errorMessage = err.response.data.error;
+        } else if (err.response.data.message) {
+          errorMessage = err.response.data.message;
+        } else if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        } else if (err.response.data.detail) {
+          errorMessage = err.response.data.detail;
+        } else if (err.response.data.non_field_errors) {
+          errorMessage = err.response.data.non_field_errors.join(', ');
+        } else {
+          // Handle field-specific errors
+          const fieldErrors = [];
+          Object.keys(err.response.data).forEach(field => {
+            if (Array.isArray(err.response.data[field])) {
+              fieldErrors.push(`${field}: ${err.response.data[field].join(', ')}`);
+            } else {
+              fieldErrors.push(`${field}: ${err.response.data[field]}`);
+            }
+          });
+          if (fieldErrors.length > 0) {
+            errorMessage = fieldErrors.join('; ');
+          }
+        }
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Container maxWidth="sm" style={{ marginTop: "40px" }}>
-      <Typography variant="h4" align="center">
+      <Typography variant="h4" align="center" gutterBottom>
         Create Match
       </Typography>
+
+      {/* Error/Success Messages */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+      
+      {success && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {success}
+        </Alert>
+      )}
+
+      {/* Club Display (if available) */}
+      {userClub && (
+        <Box sx={{ mb: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Creating match for: <strong>{userClub.name}</strong>
+          </Typography>
+        </Box>
+      )}
 
       <TextField
         fullWidth
@@ -132,6 +274,8 @@ const CreateMatch = () => {
         value={form.match_type}
         onChange={handleChange}
         margin="normal"
+        required
+        placeholder="e.g., League, Cup, Friendly"
       />
 
       <TextField
@@ -141,20 +285,11 @@ const CreateMatch = () => {
         value={form.opponent}
         onChange={handleChange}
         margin="normal"
+        required
+        placeholder="e.g., Manchester United"
       />
 
-      {/* Logo upload fields */}
-      {/* <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
-        Upload Club Logo
-        <input
-          type="file"
-          name="club_logo"
-          hidden
-          accept="image/*"
-          onChange={handleFileChange}
-        />
-      </Button> */}
-
+      {/* Opponent Logo Upload */}
       <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
         Upload Opponent Logo
         <input
@@ -166,25 +301,14 @@ const CreateMatch = () => {
         />
       </Button>
 
-      {/* <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>
-        Upload Sponsor Logo
-        <input
-          type="file"
-          name="sponsor"
-          hidden
-          accept="image/*"
-          onChange={handleChange}
-        />
-      </Button> */}
-
       {/* Date Picker */}
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DatePicker
-          label="Date"
+          label="Date *"
           value={form.date}
           onChange={handleDateChange}
           renderInput={(params) => (
-            <TextField fullWidth margin="normal" {...params} />
+            <TextField fullWidth margin="normal" {...params} required />
           )}
         />
       </LocalizationProvider>
@@ -196,6 +320,8 @@ const CreateMatch = () => {
         value={form.time_start}
         onChange={handleChange}
         margin="normal"
+        required
+        placeholder="e.g., 15:00"
       />
 
       <TextField
@@ -205,6 +331,8 @@ const CreateMatch = () => {
         value={form.venue}
         onChange={handleChange}
         margin="normal"
+        required
+        placeholder="e.g., Old Trafford"
       />
 
       <TextField
@@ -214,6 +342,7 @@ const CreateMatch = () => {
         value={form.location}
         onChange={handleChange}
         margin="normal"
+        placeholder="e.g., Manchester, UK"
       />
 
       <Button
@@ -222,8 +351,10 @@ const CreateMatch = () => {
         color="primary"
         sx={{ mt: 2 }}
         onClick={handleCreate}
+        disabled={loading}
+        startIcon={loading ? <CircularProgress size={20} /> : null}
       >
-        Create Match
+        {loading ? "Creating Match..." : "Create Match"}
       </Button>
     </Container>
   );
