@@ -11,6 +11,7 @@ import HighlightedCard from './ResultCard';
 import MatchDayCard from './MatchdayCard';
 import FixtureCard from './FixtureCard';
 import QuickLinksCard from './quickLinksCard';
+import StartingXISelection from './StartingXI';
 import PageViewsBarChart from './PageViewsBarChart';
 import SessionsChart from './SessionsChart';
 import StatCard from './StatCard';
@@ -74,9 +75,20 @@ export default function MainGrid() {
               <PageViewsBarChart />
             </Grid> */}
       </Grid>
-        <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-          Squad
-        </Typography>
+
+      {/* Starting XI Selection Section */}
+      <Typography component="h2" variant="h6" sx={{ mb: 2, mt: 4 }}>
+        Starting XI Selection
+      </Typography>
+      <Grid container spacing={2} columns={12} sx={{ mb: (AppTheme) => AppTheme.spacing(2) }}>
+        <Grid size={{ xs: 12 }}>
+          <StartingXISelection />
+        </Grid>
+      </Grid>
+
+      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+        Squad
+      </Typography>
         <Grid container spacing={2} columns={12}>
           <Grid size={{ xs: 12, lg: 12}}>
               <CustomizedDataGrid />
