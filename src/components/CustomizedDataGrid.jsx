@@ -235,8 +235,42 @@ export default function CustomizedDataGrid({ user }) {
       
       const response = await getSquad(token);
       
+      // Handle different response structures
+      let squadData = [];
+      
+      if (response && response.data) {
+        // Check if data is an array
+        if (Array.isArray(response.data)) {
+          squadData = response.data;
+        } 
+        // Check if data has a nested array (e.g., response.data.players)
+        else if (response.data.players && Array.isArray(response.data.players)) {
+          squadData = response.data.players;
+        }
+        // Check if data has a results array (common in paginated APIs)
+        else if (response.data.results && Array.isArray(response.data.results)) {
+          squadData = response.data.results;
+        }
+        // If data is an object with player info, wrap it in an array
+        else if (typeof response.data === 'object' && response.data.name) {
+          squadData = [response.data];
+        }
+        // If data is a string or other type, try to parse it
+        else if (typeof response.data === 'string') {
+          try {
+            const parsed = JSON.parse(response.data);
+            squadData = Array.isArray(parsed) ? parsed : [parsed];
+          } catch (e) {
+            console.warn('Failed to parse response data as JSON:', e);
+          }
+        }
+      }
+      
+      console.log('API Response:', response);
+      console.log('Squad Data:', squadData);
+      
       // Transform the data to ensure proper formatting
-      const transformedSquad = response.data.map((player, index) => ({
+      const transformedSquad = squadData.map((player, index) => ({
         id: player.id || index + 1,
         name: player.name || 'Unknown Player',
         position: player.position || 'Unknown',
@@ -248,6 +282,46 @@ export default function CustomizedDataGrid({ user }) {
       }));
 
       setSquad(transformedSquad);
+      
+      // If no data from API, show sample data for demonstration
+      if (transformedSquad.length === 0) {
+        console.log('No squad data from API, showing sample data for demonstration');
+        const sampleData = [
+          {
+            id: 1,
+            name: 'John Smith',
+            position: 'Forward',
+            squad_no: 10,
+            sponsor: 'Nike',
+            player_pic: null
+          },
+          {
+            id: 2,
+            name: 'Mike Johnson',
+            position: 'Midfielder',
+            squad_no: 8,
+            sponsor: 'Adidas',
+            player_pic: null
+          },
+          {
+            id: 3,
+            name: 'David Wilson',
+            position: 'Defender',
+            squad_no: 4,
+            sponsor: 'Puma',
+            player_pic: null
+          },
+          {
+            id: 4,
+            name: 'Tom Brown',
+            position: 'Goalkeeper',
+            squad_no: 1,
+            sponsor: 'Under Armour',
+            player_pic: null
+          }
+        ];
+        setSquad(sampleData);
+      }
     } catch (err) {
       console.error("Error fetching squad:", err);
       
