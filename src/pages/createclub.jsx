@@ -62,10 +62,10 @@ const UploadBox = styled(Box)(({ theme, isDragOver }) => ({
   textAlign: "center",
   cursor: "pointer",
   transition: "all 0.2s ease-in-out",
-  backgroundColor: isDragOver ? theme.palette.primary.50 : theme.palette.background.paper,
+  backgroundColor: isDragOver ? theme.palette.action.hover : theme.palette.background.paper,
   "&:hover": {
     borderColor: theme.palette.primary.main,
-    backgroundColor: theme.palette.primary.50,
+    backgroundColor: theme.palette.action.hover,
   },
 }));
 
