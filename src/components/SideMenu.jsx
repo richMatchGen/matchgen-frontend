@@ -38,6 +38,7 @@ export default function SideMenu({ user }) {
   const [error, setError] = useState("");
   const [userProfile, setUserProfile] = useState(null); // ✅ Declare userProfile state
   const [club, setClub] = useState(null);
+  const [loading, setLoading] = useState(true);
   
   const token = getToken();
   const headers = { Authorization: `Bearer ${token}` };

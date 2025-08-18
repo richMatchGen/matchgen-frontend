@@ -29,6 +29,7 @@ const GenLiveScore = lazy(() => import("./pages/genLiveScore"));
 const GenTemplates = lazy(() => import("./pages/genTemplates"));
 const ChoosePackPage = lazy(() => import("./pages/ChoosePackage"));
 const MatchdayPostPage = lazy(() => import("./pages/MatchdayPost"));
+const ClubOverview = lazy(() => import("./pages/ClubOverview"));
 
 
 
@@ -79,6 +80,7 @@ function App() {
             </PrivateRoute>
           } />
           <Route path="/clubs/createclub" element={<PrivateRoute><CreateClub /></PrivateRoute>} />
+          <Route path="/club" element={<PrivateRoute><ClubOverview /></PrivateRoute>} />
           
           <Route path="/fixture/creatematch" element={<PrivateRoute><CreateMatch /></PrivateRoute>} />
           <Route path="/squad/createplayer" element={<PrivateRoute><CreatePlayer /></PrivateRoute>} />
