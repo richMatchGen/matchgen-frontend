@@ -8,7 +8,7 @@ import SportsIcon from '@mui/icons-material/Sports';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import Link from '@mui/material/Link';
+import { Link as RouterLink } from 'react-router-dom';
 
 export default function HighlightedCard() {
   const theme = useTheme();
@@ -67,8 +67,8 @@ export default function HighlightedCard() {
           color="primary"
           endIcon={<ChevronRightRoundedIcon />}
           fullWidth={isSmallScreen}
-          component={Link} 
-          to='gen/posts'
+          component={RouterLink} 
+          to='/gen/posts'
         >
           Gen Posts
         </Button>

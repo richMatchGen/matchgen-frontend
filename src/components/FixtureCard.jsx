@@ -11,7 +11,7 @@ import TodayIcon from '@mui/icons-material/Today';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import Link from '@mui/material/Link';
+import { Link as RouterLink } from 'react-router-dom';
 
 export default function FixtureCard() {
   const theme = useTheme();
@@ -80,8 +80,8 @@ export default function FixtureCard() {
       color="primary"
       endIcon={<ChevronRightRoundedIcon />}
       fullWidth={isSmallScreen}
-      component={Link}
-      to="gen/posts"
+      component={RouterLink}
+      to="/gen/posts"
     >
       Gen Posts
     </Button>

@@ -11,7 +11,7 @@ import TodayIcon from '@mui/icons-material/Today';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import Link from '@mui/material/Link';
+import { Link as RouterLink } from 'react-router-dom';
 import NestedModal from './AddPlayerModal';
 
 export default function MatchDayCard() {
@@ -82,8 +82,8 @@ export default function MatchDayCard() {
       color="primary"
       endIcon={<ChevronRightRoundedIcon />}
       fullWidth={isSmallScreen}
-      component={Link}
-      to="gen/posts"
+      component={RouterLink}
+      to="/gen/posts"
     >
       Gen Posts
     </Button>
