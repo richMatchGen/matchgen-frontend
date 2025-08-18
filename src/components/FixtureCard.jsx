@@ -81,9 +81,9 @@ export default function FixtureCard() {
       endIcon={<ChevronRightRoundedIcon />}
       fullWidth={isSmallScreen}
       component={Link}
-      to="gen/upcoming"
+      to="gen/posts"
     >
-      Gen Upcoming
+      Gen Posts
     </Button>
   </CardContent>
 </Card>

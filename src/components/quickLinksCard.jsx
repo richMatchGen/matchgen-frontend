@@ -61,9 +61,9 @@ export default function QuickLinksCard() {
             endIcon={<ChevronRightRoundedIcon />}
             fullWidth={isSmallScreen}
             component={Link}
-            to="gen/halftime"
+            to="gen/posts"
           >
-            Gen Half Time
+            Gen Posts
           </Button>
         </Stack>
       </CardContent>

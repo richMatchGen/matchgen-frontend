@@ -83,9 +83,9 @@ export default function MatchDayCard() {
       endIcon={<ChevronRightRoundedIcon />}
       fullWidth={isSmallScreen}
       component={Link}
-      to="gen/startingxi"
+      to="gen/posts"
     >
-      Gen Starting XI
+      Gen Posts
     </Button>
   </CardContent>
 </Card>

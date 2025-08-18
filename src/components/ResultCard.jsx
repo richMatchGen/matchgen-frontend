@@ -68,9 +68,9 @@ export default function HighlightedCard() {
           endIcon={<ChevronRightRoundedIcon />}
           fullWidth={isSmallScreen}
           component={Link} 
-          to='gen/fulltime'
+          to='gen/posts'
         >
-          Gen Full Time
+          Gen Posts
         </Button>
       </CardContent>
     </Card>
