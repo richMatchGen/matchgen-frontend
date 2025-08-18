@@ -49,9 +49,22 @@ export const uploadClubLogo = async (token, file) => {
   formData.append("logo", file);
 
   try {
-    const response = await axios.put(`${API_URL}club/upload-logo/`, formData, {
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
-    });
+    // Try POST first, then PUT if POST fails
+    let response;
+    try {
+      response = await axios.post(`${API_URL}club/upload-logo/`, formData, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+      });
+    } catch (postError) {
+      if (postError.response?.status === 405) {
+        // If POST is not allowed, try PUT
+        response = await axios.put(`${API_URL}club/upload-logo/`, formData, {
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        throw postError;
+      }
+    }
     return { success: true, message: response.data.message, logoUrl: response.data.logo_url };
   } catch (error) {
     return { success: false, error: error.response?.data?.error || "Error uploading logo." };

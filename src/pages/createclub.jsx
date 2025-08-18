@@ -384,67 +384,49 @@ const CreateClub = () => {
             setUploadProgress(100);
           } else {
             console.warn("Logo upload failed:", uploadResult.error);
-            // Fallback to base64 conversion
-            try {
-              const base64Logo = await fileToBase64(logoFile);
-              finalLogoUrl = base64Logo;
-              setUploadProgress(100);
-              setSnackbar({
-                open: true,
-                message: "Logo uploaded as base64 (upload endpoint not available)",
-                severity: "info"
-              });
-            } catch (base64Error) {
-              console.warn("Base64 conversion failed:", base64Error);
-              setSnackbar({
-                open: true,
-                message: "Logo upload failed, continuing without logo",
-                severity: "warning"
-              });
-            }
+                         // Skip logo upload since endpoint is not available
+             setUploadProgress(100);
+             setSnackbar({
+               open: true,
+               message: "Logo will be added later (upload endpoint not available)",
+               severity: "info"
+             });
           }
         } catch (uploadError) {
           console.warn("Logo upload endpoint not available:", uploadError);
-          // Fallback to base64 conversion
-          try {
-            const base64Logo = await fileToBase64(logoFile);
-            finalLogoUrl = base64Logo;
-            setUploadProgress(100);
-            setSnackbar({
-              open: true,
-              message: "Logo uploaded as base64 (upload endpoint not available)",
-              severity: "info"
-            });
-          } catch (base64Error) {
-            console.warn("Base64 conversion failed:", base64Error);
-            setSnackbar({
-              open: true,
-              message: "Logo upload not available, continuing without logo",
-              severity: "warning"
-            });
-          }
+          // Skip logo upload since endpoint is not available
+          setUploadProgress(100);
+          setSnackbar({
+            open: true,
+            message: "Logo will be added later (upload endpoint not available)",
+            severity: "info"
+          });
         }
       }
 
-      // Create club with enhanced error handling
-      const clubData = {
-        name: formData.name.trim(),
-        sport: formData.sport,
-        location: formData.location.trim() || null,
-        founded_year: formData.founded_year ? parseInt(formData.founded_year) : null,
-        description: formData.description.trim() || null,
-        website: formData.website.trim() || null,
-        email: formData.email.trim() || null,
-        phone: formData.phone.trim() || null,
-        logo: finalLogoUrl || null,
-      };
+             // Create club with enhanced error handling
+       const clubData = {
+         name: formData.name.trim(),
+         sport: formData.sport,
+         location: formData.location.trim() || null,
+         founded_year: formData.founded_year ? parseInt(formData.founded_year) : null,
+         description: formData.description.trim() || null,
+         website: formData.website.trim() || null,
+         email: formData.email.trim() || null,
+         phone: formData.phone.trim() || null,
+       };
 
-      // Remove null/empty values to avoid validation issues
-      Object.keys(clubData).forEach(key => {
-        if (clubData[key] === null || clubData[key] === "") {
-          delete clubData[key];
-        }
-      });
+       // Only add logo if it's a valid URL (not base64)
+       if (finalLogoUrl && finalLogoUrl.startsWith('http')) {
+         clubData.logo = finalLogoUrl;
+       }
+
+       // Remove null/empty values to avoid validation issues
+       Object.keys(clubData).forEach(key => {
+         if (clubData[key] === null || clubData[key] === "") {
+           delete clubData[key];
+         }
+       });
 
       console.log("Sending club data:", clubData);
 
