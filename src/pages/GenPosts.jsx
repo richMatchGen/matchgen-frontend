@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
@@ -59,74 +59,114 @@ const GenPosts = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
+  // Memoize the fetch functions to prevent unnecessary re-renders
+  const fetchData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
-
     if (!token) {
       navigate("/login");
       return;
     }
-  
+
     const headers = { Authorization: `Bearer ${token}` };
-  
-    const fetchData = async () => {
-      try {
-        const userRes = await axios.get("/api/users/me/", { headers });
-        setUser(userRes.data);
-      } catch {
-        logout();
-        return;
+
+    try {
+      const userRes = await axios.get("/api/users/me/", { headers });
+      setUser(userRes.data);
+    } catch {
+      logout();
+      return;
+    }
+
+    try {
+      const clubRes = await axios.get(
+        "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
+        { headers }
+      );
+      setClub(clubRes.data);
+    } catch {
+      console.warn("User might not have a club yet.");
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate, logout]);
+
+  const fetchMatches = useCallback(async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    try {
+      const res = await axios.get("https://matchgen-backend-production.up.railway.app/api/content/matches/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // Handle different response structures
+      let matchesData = [];
+      if (res.data) {
+        if (Array.isArray(res.data)) {
+          matchesData = res.data;
+        } else if (res.data.results && Array.isArray(res.data.results)) {
+          matchesData = res.data.results;
+        } else if (res.data.matches && Array.isArray(res.data.matches)) {
+          matchesData = res.data.matches;
+        } else if (typeof res.data === 'object' && res.data.id) {
+          matchesData = [res.data];
+        } else if (typeof res.data === 'string') {
+          try {
+            const parsed = JSON.parse(res.data);
+            matchesData = Array.isArray(parsed) ? parsed : [parsed];
+          } catch (e) {
+            console.warn('Failed to parse response data as JSON:', e);
+          }
+        }
       }
-  
-      try {
-        const clubRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
-          { headers }
-        );
-        setClub(clubRes.data);
-      } catch {
-        console.warn("User might not have a club yet.");
-      } finally {
-        setLoading(false);
+      setMatches(matchesData);
+    } catch (err) {
+      console.error("Failed to load matches", err);
+      setMatches([]); // Set empty array on error
+    }
+  }, []);
+
+  // Manual refresh function
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchMatches();
+      setSnackbar({ 
+        open: true, 
+        message: "Data refreshed successfully!", 
+        severity: "success" 
+      });
+    } catch (error) {
+      setSnackbar({ 
+        open: true, 
+        message: "Failed to refresh data.", 
+        severity: "error" 
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchMatches]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const initializeData = async () => {
+      if (!isMounted) return;
+      
+      await fetchData();
+      if (isMounted) {
+        await fetchMatches();
       }
     };
 
-    const fetchMatches = async () => {
-      try {
-        const res = await axios.get("https://matchgen-backend-production.up.railway.app/api/content/matches/", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        // Handle different response structures
-        let matchesData = [];
-        if (res.data) {
-          if (Array.isArray(res.data)) {
-            matchesData = res.data;
-          } else if (res.data.results && Array.isArray(res.data.results)) {
-            matchesData = res.data.results;
-          } else if (res.data.matches && Array.isArray(res.data.matches)) {
-            matchesData = res.data.matches;
-          } else if (typeof res.data === 'object' && res.data.id) {
-            matchesData = [res.data];
-          } else if (typeof res.data === 'string') {
-            try {
-              const parsed = JSON.parse(res.data);
-              matchesData = Array.isArray(parsed) ? parsed : [parsed];
-            } catch (e) {
-              console.warn('Failed to parse response data as JSON:', e);
-            }
-          }
-        }
-        setMatches(matchesData);
-      } catch (err) {
-        console.error("Failed to load matches", err);
-        setMatches([]); // Set empty array on error
-      }
+    initializeData();
+
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isMounted = false;
     };
-  
-    fetchData();
-    fetchMatches();
-  }, [navigate, logout]);
+  }, [fetchData, fetchMatches]);
 
   const handleGenerate = async (matchId, postType) => {
     if (!matchId) {
@@ -277,16 +317,32 @@ const GenPosts = () => {
           >
             <Header />
             <Container sx={{ py: 4, width: '100%' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <SportsSoccer sx={{ mr: 2, fontSize: 40, color: 'primary.main' }} />
-                <Box>
-                  <Typography variant="h4" gutterBottom>
-                    Social Media Posts
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    Generate and manage social media content for all your matches
-                  </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <SportsSoccer sx={{ mr: 2, fontSize: 40, color: 'primary.main' }} />
+                  <Box>
+                    <Typography variant="h4" gutterBottom>
+                      Social Media Posts
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      Generate and manage social media content for all your matches
+                    </Typography>
+                  </Box>
                 </Box>
+                <Tooltip title="Refresh matches data">
+                  <IconButton 
+                    onClick={handleRefresh} 
+                    disabled={refreshing}
+                    sx={{ 
+                      backgroundColor: 'primary.main', 
+                      color: 'white',
+                      '&:hover': { backgroundColor: 'primary.dark' },
+                      '&:disabled': { backgroundColor: 'grey.400' }
+                    }}
+                  >
+                    {refreshing ? <CircularProgress size={24} color="inherit" /> : <Refresh />}
+                  </IconButton>
+                </Tooltip>
               </Box>
 
               <TableContainer component={Paper} elevation={2}>
