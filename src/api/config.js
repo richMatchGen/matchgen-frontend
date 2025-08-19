@@ -1,67 +1,158 @@
+import axios from 'axios';
+
 // API Configuration
-export const API_BASE_URL = "https://matchgen-backend-production.up.railway.app/api";
+const API_BASE_URL = import.meta.env.MODE === 'production' 
+  ? 'https://matchgen-backend-production.up.railway.app/api/'
+  : 'http://localhost:8000/api/';
 
-// Common headers for authenticated requests
-export const getAuthHeaders = () => {
-  const token = localStorage.getItem("accessToken");
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-};
+// Rate limiting configuration
+const RATE_LIMIT_DELAY = 1000; // 1 second delay between requests
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 2000; // 2 seconds
 
-// Axios instance with default configuration
-import axios from "axios";
+// Request tracking for rate limiting
+let lastRequestTime = 0;
+let requestQueue = [];
 
-export const apiClient = axios.create({
+// Create axios instance with default config
+const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Request interceptor to add auth headers
+// Rate limiting interceptor
 apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
+  async (config) => {
+    const now = Date.now();
+    const timeSinceLastRequest = now - lastRequestTime;
+    
+    if (timeSinceLastRequest < RATE_LIMIT_DELAY) {
+      const delay = RATE_LIMIT_DELAY - timeSinceLastRequest;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    
+    lastRequestTime = Date.now();
+    
+    // Add auth token if available
+    const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
     return config;
   },
-  (error) => Promise.reject(error)
-);
-
-// Response interceptor for error handling
-apiClient.interceptors.response.use(
-  (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      window.location.href = "/login";
-    }
     return Promise.reject(error);
   }
 );
 
-// Common error handler
-export const handleApiError = (error, customMessage = "An error occurred") => {
-  console.error("API Error:", error);
-  
-  if (error.response?.data?.message) {
-    return error.response.data.message;
+// Response interceptor for handling 429 errors and retries
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // Handle 429 (Too Many Requests) errors
+    if (error.response?.status === 429 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      // Get retry-after header or use default delay
+      const retryAfter = error.response.headers['retry-after'] || RETRY_DELAY;
+      
+      console.warn(`Rate limited. Retrying after ${retryAfter}ms...`);
+      
+      await new Promise(resolve => setTimeout(resolve, retryAfter));
+      
+      return apiClient(originalRequest);
+    }
+    
+    // Handle other errors with retry logic
+    if (error.response?.status >= 500 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      console.warn(`Server error ${error.response.status}. Retrying...`);
+      
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      
+      return apiClient(originalRequest);
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+// Helper function to handle API errors gracefully
+export const handleApiError = (error, context = 'API request') => {
+  if (error.response?.status === 429) {
+    console.warn(`${context}: Rate limited. Please wait before making more requests.`);
+    return {
+      error: 'Rate limited. Please wait before making more requests.',
+      retryAfter: error.response.headers['retry-after'] || 60
+    };
   }
   
   if (error.response?.status === 401) {
-    return "Authentication failed. Please log in again.";
+    console.warn(`${context}: Unauthorized. Please log in again.`);
+    localStorage.removeItem('accessToken');
+    window.location.href = '/login';
+    return { error: 'Please log in again.' };
   }
   
-  if (error.response?.status === 403) {
-    return "You don't have permission to perform this action.";
+  if (error.response?.status === 404) {
+    console.warn(`${context}: Resource not found.`);
+    return { error: 'Resource not found.' };
   }
   
   if (error.response?.status >= 500) {
-    return "Server error. Please try again later.";
+    console.error(`${context}: Server error.`, error.response.data);
+    return { error: 'Server error. Please try again later.' };
   }
   
-  return customMessage;
+  console.error(`${context}:`, error.message);
+  return { error: error.message || 'An unexpected error occurred.' };
 };
+
+// Helper function for making API requests with better error handling
+export const makeApiRequest = async (requestFn, context = 'API request') => {
+  try {
+    const response = await requestFn();
+    return { success: true, data: response.data };
+  } catch (error) {
+    const errorInfo = handleApiError(error, context);
+    return { success: false, ...errorInfo };
+  }
+};
+
+// Common API functions
+export const getAuthHeaders = () => {
+  const token = localStorage.getItem('accessToken');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const getUserProfile = async () => {
+  return makeApiRequest(
+    () => apiClient.get('/users/me/'),
+    'Get user profile'
+  );
+};
+
+export const getClubInfo = async () => {
+  return makeApiRequest(
+    () => apiClient.get('/users/my-club/'),
+    'Get club info'
+  );
+};
+
+export const getMatches = async () => {
+  return makeApiRequest(
+    () => apiClient.get('/content/matches/'),
+    'Get matches'
+  );
+};
+
+export default apiClient;

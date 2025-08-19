@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import { getClubInfo, getMatches, handleApiError } from "../api/config";
 import {
   Container,
   Typography,
@@ -29,7 +30,8 @@ import {
   DialogActions,
   IconButton,
   Tooltip,
-  Divider
+  Divider,
+  Alert
 } from "@mui/material";
 import {
   SportsSoccer,
@@ -60,6 +62,7 @@ const GenPosts = () => {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
 
   // Memoize the fetch functions to prevent unnecessary re-renders
   const fetchData = useCallback(async () => {
@@ -69,23 +72,45 @@ const GenPosts = () => {
       return;
     }
 
-    const headers = { Authorization: `Bearer ${token}` };
-
     try {
-      const userRes = await axios.get("/api/users/me/", { headers });
+      // Get user profile
+      const userRes = await axios.get("/api/users/me/", { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
       setUser(userRes.data);
-    } catch {
-      logout();
+    } catch (error) {
+      const errorInfo = handleApiError(error, 'Get user profile');
+      if (errorInfo.error.includes('Rate limited')) {
+        setRateLimited(true);
+        setSnackbar({ 
+          open: true, 
+          message: `Rate limited. Please wait ${errorInfo.retryAfter} seconds before trying again.`, 
+          severity: "warning" 
+        });
+      } else {
+        logout();
+      }
       return;
     }
 
     try {
-      const clubRes = await axios.get(
-        "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
-        { headers }
-      );
-      setClub(clubRes.data);
-    } catch {
+      // Get club info with better error handling
+      const clubResult = await getClubInfo();
+      if (clubResult.success) {
+        setClub(clubResult.data);
+      } else {
+        if (clubResult.error.includes('Rate limited')) {
+          setRateLimited(true);
+          setSnackbar({ 
+            open: true, 
+            message: `Rate limited. Please wait ${clubResult.retryAfter} seconds before trying again.`, 
+            severity: "warning" 
+          });
+        } else {
+          console.warn("User might not have a club yet:", clubResult.error);
+        }
+      }
+    } catch (error) {
       console.warn("User might not have a club yet.");
     } finally {
       setLoading(false);
@@ -97,39 +122,63 @@ const GenPosts = () => {
     if (!token) return;
 
     try {
-      const res = await axios.get("https://matchgen-backend-production.up.railway.app/api/content/matches/", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      // Handle different response structures
-      let matchesData = [];
-      if (res.data) {
-        if (Array.isArray(res.data)) {
-          matchesData = res.data;
-        } else if (res.data.results && Array.isArray(res.data.results)) {
-          matchesData = res.data.results;
-        } else if (res.data.matches && Array.isArray(res.data.matches)) {
-          matchesData = res.data.matches;
-        } else if (typeof res.data === 'object' && res.data.id) {
-          matchesData = [res.data];
-        } else if (typeof res.data === 'string') {
+      const matchesResult = await getMatches();
+      if (matchesResult.success) {
+        // Handle different response structures
+        let matchesData = [];
+        const data = matchesResult.data;
+        
+        if (Array.isArray(data)) {
+          matchesData = data;
+        } else if (data.results && Array.isArray(data.results)) {
+          matchesData = data.results;
+        } else if (data.matches && Array.isArray(data.matches)) {
+          matchesData = data.matches;
+        } else if (typeof data === 'object' && data.id) {
+          matchesData = [data];
+        } else if (typeof data === 'string') {
           try {
-            const parsed = JSON.parse(res.data);
+            const parsed = JSON.parse(data);
             matchesData = Array.isArray(parsed) ? parsed : [parsed];
           } catch (e) {
             console.warn('Failed to parse response data as JSON:', e);
           }
         }
+        
+        setMatches(matchesData);
+      } else {
+        if (matchesResult.error.includes('Rate limited')) {
+          setRateLimited(true);
+          setSnackbar({ 
+            open: true, 
+            message: `Rate limited. Please wait ${matchesResult.retryAfter} seconds before trying again.`, 
+            severity: "warning" 
+          });
+        } else {
+          console.error("Failed to load matches:", matchesResult.error);
+          setMatches([]);
+        }
       }
-      setMatches(matchesData);
     } catch (err) {
       console.error("Failed to load matches", err);
-      setMatches([]); // Set empty array on error
+      setMatches([]);
     }
   }, []);
 
   // Manual refresh function
   const handleRefresh = useCallback(async () => {
+    if (rateLimited) {
+      setSnackbar({ 
+        open: true, 
+        message: "Please wait before refreshing again.", 
+        severity: "warning" 
+      });
+      return;
+    }
+
     setRefreshing(true);
+    setRateLimited(false);
+    
     try {
       await fetchMatches();
       setSnackbar({ 
@@ -146,7 +195,7 @@ const GenPosts = () => {
     } finally {
       setRefreshing(false);
     }
-  }, [fetchMatches]);
+  }, [fetchMatches, rateLimited]);
 
   useEffect(() => {
     let isMounted = true;
@@ -332,7 +381,7 @@ const GenPosts = () => {
                 <Tooltip title="Refresh matches data">
                   <IconButton 
                     onClick={handleRefresh} 
-                    disabled={refreshing}
+                    disabled={refreshing || rateLimited}
                     sx={{ 
                       backgroundColor: 'primary.main', 
                       color: 'white',
@@ -344,6 +393,12 @@ const GenPosts = () => {
                   </IconButton>
                 </Tooltip>
               </Box>
+
+              {rateLimited && (
+                <Alert severity="warning" sx={{ mb: 3 }}>
+                  You are currently rate limited. Please wait before making more requests to avoid being blocked.
+                </Alert>
+              )}
 
               <TableContainer component={Paper} elevation={2}>
                 <Table>
