@@ -172,9 +172,14 @@ const GenPosts = () => {
         }
       );
   
+      // Check if this is a regeneration (post already exists)
+      const isRegenerating = selectedMatch && selectedMatch[`${postType}_post_url`];
+      
       setSnackbar({ 
         open: true, 
-        message: `${postType.charAt(0).toUpperCase() + postType.slice(1)} post generated successfully!`, 
+        message: isRegenerating 
+          ? `${postType.charAt(0).toUpperCase() + postType.slice(1)} post regenerated successfully!`
+          : `${postType.charAt(0).toUpperCase() + postType.slice(1)} post generated successfully!`, 
         severity: "success" 
       });
   
@@ -187,11 +192,22 @@ const GenPosts = () => {
         }
         return prev;
       });
+      
+      // Update the selected match if it's the current one
+      if (selectedMatch && selectedMatch.id === matchId) {
+        setSelectedMatch(prev => ({
+          ...prev,
+          [`${postType}_post_url`]: res.data.url
+        }));
+      }
     } catch (err) {
       console.error(`Error generating ${postType} post`, err);
+      const isRegenerating = selectedMatch && selectedMatch[`${postType}_post_url`];
       setSnackbar({ 
         open: true, 
-        message: `Failed to generate ${postType} post.`, 
+        message: isRegenerating 
+          ? `Failed to regenerate ${postType} post.`
+          : `Failed to generate ${postType} post.`, 
         severity: "error" 
       });
     } finally {
@@ -440,7 +456,9 @@ const GenPosts = () => {
                                 sx={{ 
                                   height: '100%',
                                   border: postStatus === 'generated' ? 2 : 1,
-                                  borderColor: postStatus === 'generated' ? 'success.main' : 'grey.300'
+                                  borderColor: postStatus === 'generated' ? 'success.main' : 'grey.300',
+                                  opacity: isGenerating ? 0.7 : 1,
+                                  transition: 'opacity 0.2s ease-in-out'
                                 }}
                               >
                                 <CardContent sx={{ textAlign: 'center' }}>
@@ -452,7 +470,7 @@ const GenPosts = () => {
                                   </Typography>
                                   
                                   {postStatus === 'generated' ? (
-                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
                                       <Button
                                         variant="outlined"
                                         size="small"
@@ -474,6 +492,18 @@ const GenPosts = () => {
                                       >
                                         Download
                                       </Button>
+                                      <Tooltip title={`Regenerate ${option.label} post`}>
+                                        <Button
+                                          variant="contained"
+                                          size="small"
+                                          color={option.color}
+                                          onClick={() => handleGenerate(selectedMatch.id, option.type)}
+                                          disabled={isGenerating}
+                                          startIcon={isGenerating ? <CircularProgress size={16} /> : <Refresh />}
+                                        >
+                                          {isGenerating ? 'Regenerating...' : 'Regenerate'}
+                                        </Button>
+                                      </Tooltip>
                                     </Box>
                                   ) : (
                                     <Button
