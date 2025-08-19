@@ -13,11 +13,9 @@ import CardAlert from './CardAlert';
 import OptionsMenu from './OptionsMenu';
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
-import { getProfile } from '../hooks/auth'; // Ensure this function exists
+import { getProfile } from '../hooks/auth';
 import useClub from "../hooks/useClub";
 import Sitemark from '../components/Sitemarkicon'
-import axios from 'axios';
-
 
 const drawerWidth = 240;
 
@@ -32,45 +30,20 @@ const Drawer = styled(MuiDrawer)({
   },
 });
 
-
 export default function SideMenu({ user }) {
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const [userProfile, setUserProfile] = useState(null); // ✅ Declare userProfile state
-  const [club, setClub] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
+  const { club, loading, error: clubError, rateLimited } = useClub();
   
   const token = getToken();
-  const headers = { Authorization: `Bearer ${token}` };
 
-
-
-    useEffect(() => {
+  useEffect(() => {
     const fetchUser = async () => {
-      const profileData  = await getProfile();
-
+      const profileData = await getProfile();
       setUserProfile(profileData);
-      
     };
 
-    const fetchClub = async () => {
-      try {
-        const clubRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
-          { headers }
-        );
-        setClub(clubRes.data);
-      } catch (err) {
-        console.warn("User might not have a club yet.");
-        console.error("Actual error:", err); // 👈 ADD THIS
-        setClub(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-
-    fetchClub();
     fetchUser();
   }, []);
 

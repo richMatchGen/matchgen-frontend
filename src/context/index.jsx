@@ -18,44 +18,13 @@ Coded by www.creative-tim.com
   you can customize the states for the different components here.
 */
 
-import { createContext, useContext, useReducer, useMemo } from "react";
+import { createContext, useContext, useReducer, useMemo, useState, useCallback } from "react";
 
 // prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
 
-// Material Dashboard 2 React main context
-const MaterialUI = createContext();
-
-// Setting custom name for the context which is visible on react dev tools
-MaterialUI.displayName = "MaterialUIContext";
-
-// Material Dashboard 2 React reducer
-function reducer(state, action) {
-  switch (action.type) {
-    case "MINI_SIDENAV":
-      return { ...state, miniSidenav: action.value };
-    case "TRANSPARENT_SIDENAV":
-      return { ...state, transparentSidenav: action.value };
-    case "WHITE_SIDENAV":
-      return { ...state, whiteSidenav: action.value };
-    case "SIDENAV_COLOR":
-      return { ...state, sidenavColor: action.value };
-    case "TRANSPARENT_NAVBAR":
-      return { ...state, transparentNavbar: action.value };
-    case "FIXED_NAVBAR":
-      return { ...state, fixedNavbar: action.value };
-    case "OPEN_CONFIGURATOR":
-      return { ...state, openConfigurator: action.value };
-    case "DIRECTION":
-      return { ...state, direction: action.value };
-    case "LAYOUT":
-      return { ...state, layout: action.value };
-    case "DARKMODE":
-      return { ...state, darkMode: action.value };
-    default:
-      throw new Error(`Unhandled action type: ${action.type}`);
-  }
-}
+// Creating the context for Material Dashboard 2 React
+const MaterialUIProvider = createContext();
 
 // Material Dashboard 2 React context provider
 function MaterialUIControllerProvider({ children }) {
@@ -76,12 +45,51 @@ function MaterialUIControllerProvider({ children }) {
 
   const value = useMemo(() => [controller, dispatch], [controller, dispatch]);
 
-  return <MaterialUI.Provider value={value}>{children}</MaterialUI.Provider>;
+  return <MaterialUIProvider.Provider value={value}>{children}</MaterialUIProvider.Provider>;
+}
+
+// Context reducer function
+function reducer(state, action) {
+  switch (action.type) {
+    case "MINI_SIDENAV": {
+      return { ...state, miniSidenav: action.value };
+    }
+    case "TRANSPARENT_SIDENAV": {
+      return { ...state, transparentSidenav: action.value };
+    }
+    case "WHITE_SIDENAV": {
+      return { ...state, whiteSidenav: action.value };
+    }
+    case "SIDENAV_COLOR": {
+      return { ...state, sidenavColor: action.value };
+    }
+    case "TRANSPARENT_NAVBAR": {
+      return { ...state, transparentNavbar: action.value };
+    }
+    case "FIXED_NAVBAR": {
+      return { ...state, fixedNavbar: action.value };
+    }
+    case "OPEN_CONFIGURATOR": {
+      return { ...state, openConfigurator: action.value };
+    }
+    case "DIRECTION": {
+      return { ...state, direction: action.value };
+    }
+    case "LAYOUT": {
+      return { ...state, layout: action.value };
+    }
+    case "DARKMODE": {
+      return { ...state, darkMode: action.value };
+    }
+    default: {
+      throw new Error(`Unhandled action type: ${action.type}`);
+    }
+  }
 }
 
 // Material Dashboard 2 React custom hook for using context
 function useMaterialUIController() {
-  const context = useContext(MaterialUI);
+  const context = useContext(MaterialUIProvider);
 
   if (!context) {
     throw new Error(
@@ -92,7 +100,7 @@ function useMaterialUIController() {
   return context;
 }
 
-// Typechecking props for the MaterialUIControllerProvider
+// Proptypes for Material Dashboard 2 React context provider
 MaterialUIControllerProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
@@ -108,6 +116,64 @@ const setOpenConfigurator = (dispatch, value) => dispatch({ type: "OPEN_CONFIGUR
 const setDirection = (dispatch, value) => dispatch({ type: "DIRECTION", value });
 const setLayout = (dispatch, value) => dispatch({ type: "LAYOUT", value });
 const setDarkMode = (dispatch, value) => dispatch({ type: "DARKMODE", value });
+
+// Create context for rate limiting
+const RateLimitContext = createContext();
+
+export const useRateLimit = () => {
+  const context = useContext(RateLimitContext);
+  if (!context) {
+    throw new Error('useRateLimit must be used within a RateLimitProvider');
+  }
+  return context;
+};
+
+export const RateLimitProvider = ({ children }) => {
+  const [rateLimited, setRateLimited] = useState(false);
+  const [retryAfter, setRetryAfter] = useState(0);
+  const [lastRequestTime, setLastRequestTime] = useState(0);
+
+  const setRateLimit = useCallback((limited, retryTime = 0) => {
+    setRateLimited(limited);
+    setRetryAfter(retryTime);
+    if (limited) {
+      console.warn(`Rate limited. Retry after ${retryTime} seconds.`);
+    }
+  }, []);
+
+  const canMakeRequest = useCallback(() => {
+    if (rateLimited) {
+      const now = Date.now();
+      const timeSinceLastRequest = now - lastRequestTime;
+      const retryTimeMs = retryAfter * 1000;
+      
+      if (timeSinceLastRequest >= retryTimeMs) {
+        setRateLimit(false, 0);
+        return true;
+      }
+      return false;
+    }
+    return true;
+  }, [rateLimited, lastRequestTime, retryAfter, setRateLimit]);
+
+  const updateLastRequestTime = useCallback(() => {
+    setLastRequestTime(Date.now());
+  }, []);
+
+  const value = {
+    rateLimited,
+    retryAfter,
+    setRateLimit,
+    canMakeRequest,
+    updateLastRequestTime
+  };
+
+  return (
+    <RateLimitContext.Provider value={value}>
+      {children}
+    </RateLimitContext.Provider>
+  );
+};
 
 export {
   MaterialUIControllerProvider,

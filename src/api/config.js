@@ -155,4 +155,35 @@ export const getMatches = async () => {
   );
 };
 
+// Enhanced club info function with global rate limiting
+export const getClubInfoWithRateLimit = async () => {
+  // Check if we're already rate limited globally
+  const globalRateLimit = localStorage.getItem('globalRateLimit');
+  if (globalRateLimit) {
+    const rateLimitData = JSON.parse(globalRateLimit);
+    const now = Date.now();
+    if (now < rateLimitData.until) {
+      const remainingTime = Math.ceil((rateLimitData.until - now) / 1000);
+      return {
+        success: false,
+        error: `Rate limited. Please wait ${remainingTime} seconds before trying again.`,
+        retryAfter: remainingTime
+      };
+    } else {
+      localStorage.removeItem('globalRateLimit');
+    }
+  }
+
+  const result = await getClubInfo();
+  
+  // If we get rate limited, store it globally
+  if (!result.success && result.error.includes('Rate limited')) {
+    const retryAfter = result.retryAfter || 60;
+    const until = Date.now() + (retryAfter * 1000);
+    localStorage.setItem('globalRateLimit', JSON.stringify({ until, retryAfter }));
+  }
+  
+  return result;
+};
+
 export default apiClient;

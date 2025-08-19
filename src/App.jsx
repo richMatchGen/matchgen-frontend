@@ -8,6 +8,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import { SkipToMainContent, AccessibilityToolbar } from "./components/EnhancedAccessibility";
 import { createEnhancedTheme } from "./themes/EnhancedTheme";
 import { ThemeProvider } from "@mui/material/styles";
+import { RateLimitProvider } from "./context";
 
 // Lazy load components for better performance
 const Login = lazy(() => import("./pages/Login"));
@@ -36,18 +37,16 @@ const GenHalfTime = lazy(() => import("./pages/GenHalfTime"));
 const GenFullTime = lazy(() => import("./pages/GenFullTime"));
 const GenPosts = lazy(() => import("./pages/GenPosts"));
 
-
-
-
 function App() {
-  const { auth, logout } = useAuth(); // 👈
+  const { auth, logout } = useAuth();
   const theme = createEnhancedTheme('light');
 
   return (
-    <ThemeProvider theme={theme}>
-      <SkipToMainContent />
-      <AccessibilityToolbar />
-      <Box id="main-content">
+    <RateLimitProvider>
+      <ThemeProvider theme={theme}>
+        <SkipToMainContent />
+        <AccessibilityToolbar />
+        <Box id="main-content">
 
       {/* Optional: Add logout button for testing
       {auth.token && <button onClick={logout}>Logout</button>} */}
@@ -113,6 +112,7 @@ function App() {
       </Suspense>
       </Box>
     </ThemeProvider>
+    </RateLimitProvider>
   );
 }
 

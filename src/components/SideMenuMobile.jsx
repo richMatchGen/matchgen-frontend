@@ -1,64 +1,50 @@
 import * as React from 'react';
 import { useState, useEffect } from "react";
-import PropTypes from 'prop-types';
+import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
+import MuiDrawer, { drawerClasses } from '@mui/material/Drawer';
+import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Drawer, { drawerClasses } from '@mui/material/Drawer';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
-import MenuButton from './MenuButton';
+import Button from '@mui/material/Button';
 import MenuContent from './MenuContent';
 import CardAlert from './CardAlert';
-import OptionsMenu from './OptionsMenu';
+import MenuButton from './MenuButton';
+import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import { getToken } from "../hooks/auth";
-import { useNavigate } from "react-router-dom";
-import { getProfile } from '../hooks/auth'; // Ensure this function exists
+import { getProfile } from '../hooks/auth';
 import useClub from "../hooks/useClub";
 import Sitemark from '../components/Sitemarkicon'
-import axios from 'axios';
+import PropTypes from 'prop-types';
 
+const drawerWidth = 240;
 
-function SideMenuMobile({ open, toggleDrawer }) {
-  const navigate = useNavigate();
+const Drawer = styled(MuiDrawer)({
+  width: drawerWidth,
+  flexShrink: 0,
+  boxSizing: 'border-box',
+  mt: 10,
+  [`& .${drawerClasses.paper}`]: {
+    width: drawerWidth,
+    boxSizing: 'border-box',
+  },
+});
+
+export default function SideMenuMobile({ open, toggleDrawer }) {
   const [error, setError] = useState("");
-  const [userProfile, setUserProfile] = useState(null); // ✅ Declare userProfile state
-  const [club, setClub] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
+  const { club, loading, error: clubError, rateLimited } = useClub();
   
   const token = getToken();
-  const headers = { Authorization: `Bearer ${token}` };
 
-
-
-    useEffect(() => {
+  useEffect(() => {
     const fetchUser = async () => {
-      const profileData  = await getProfile();
-
+      const profileData = await getProfile();
       setUserProfile(profileData);
-      
     };
 
-    const fetchClub = async () => {
-      try {
-        const clubRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
-          { headers }
-        );
-        setClub(clubRes.data);
-      } catch (err) {
-        console.warn("User might not have a club yet.");
-        console.error("Actual error:", err); // 👈 ADD THIS
-        setClub(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-
-    fetchClub();
     fetchUser();
   }, []);
 
@@ -120,5 +106,3 @@ SideMenuMobile.propTypes = {
   open: PropTypes.bool,
   toggleDrawer: PropTypes.func.isRequired,
 };
-
-export default SideMenuMobile;
