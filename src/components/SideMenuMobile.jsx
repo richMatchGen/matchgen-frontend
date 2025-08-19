@@ -15,7 +15,7 @@ import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import { getToken } from "../hooks/auth";
 import { getProfile } from '../hooks/auth';
-import useClub from "../hooks/useClub";
+import useClubSingleton from "../hooks/useClubSingleton";
 import Sitemark from '../components/Sitemarkicon'
 import PropTypes from 'prop-types';
 
@@ -35,7 +35,7 @@ const Drawer = styled(MuiDrawer)({
 export default function SideMenuMobile({ open, toggleDrawer }) {
   const [error, setError] = useState("");
   const [userProfile, setUserProfile] = useState(null);
-  const { club, loading, error: clubError, rateLimited } = useClub();
+  const { club, loading, error: clubError, rateLimited } = useClubSingleton();
   
   const token = getToken();
 

@@ -14,7 +14,7 @@ import OptionsMenu from './OptionsMenu';
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { getProfile } from '../hooks/auth';
-import useClub from "../hooks/useClub";
+import useClubSingleton from "../hooks/useClubSingleton";
 import Sitemark from '../components/Sitemarkicon'
 
 const drawerWidth = 240;
@@ -34,7 +34,7 @@ export default function SideMenu({ user }) {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [userProfile, setUserProfile] = useState(null);
-  const { club, loading, error: clubError, rateLimited } = useClub();
+  const { club, loading, error: clubError, rateLimited } = useClubSingleton();
   
   const token = getToken();
 

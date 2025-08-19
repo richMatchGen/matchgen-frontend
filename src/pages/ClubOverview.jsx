@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import useClubSingleton from "../hooks/useClubSingleton";
 import useAuth from "../hooks/useAuth";
 import {
   Box,
@@ -44,9 +45,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
 const ClubOverview = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [club, setClub] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { club, loading, error } = useClubSingleton(); // Use singleton hook
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -55,30 +54,6 @@ const ClubOverview = () => {
       navigate("/login");
       return;
     }
-
-    const headers = { Authorization: `Bearer ${token}` };
-
-    const fetchClub = async () => {
-      try {
-        const response = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
-          { headers }
-        );
-        setClub(response.data);
-      } catch (error) {
-        if (error.response?.status === 404) {
-          // Club doesn't exist, which is fine
-          setClub(null);
-        } else {
-          setError("Failed to load club information");
-          console.error("Error fetching club:", error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchClub();
   }, [navigate]);
 
   const handleCreateClub = () => {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import useClubSingleton from "../hooks/useClubSingleton";
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -28,8 +29,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [user, setUser] = useState(null);
-  const [club, setClub] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { club } = useClubSingleton(); // Use singleton hook for club data
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -49,17 +50,6 @@ const Dashboard = () => {
       } catch {
         logout();
         return;
-      }
-  
-      try {
-        const clubRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
-          { headers }
-        );
-        setClub(clubRes.data);
-
-      } catch {
-        console.warn("User might not have a club yet.");
       } finally {
         setLoading(false);
       }
