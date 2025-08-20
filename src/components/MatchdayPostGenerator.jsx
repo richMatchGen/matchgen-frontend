@@ -174,6 +174,27 @@ const MatchdayPostGenerator = () => {
     }
   };
 
+  const testDatabaseConnection = async () => {
+    try {
+      const response = await axios.patch(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/test/'
+      );
+      console.log('Database connection test response:', response.data);
+      setSnackbar({
+        open: true,
+        message: response.data.message,
+        severity: response.data.status === 'success' ? 'success' : 'error'
+      });
+    } catch (error) {
+      console.error('Database connection test failed:', error);
+      setSnackbar({
+        open: true,
+        message: 'Database connection test failed',
+        severity: 'error'
+      });
+    }
+  };
+
   const testDatabase = async () => {
     try {
       const response = await axios.post(
@@ -307,6 +328,12 @@ const MatchdayPostGenerator = () => {
            onClick={testBasicFunctionality}
          >
            Test Basic
+         </Button>
+         <Button
+           variant="outlined"
+           onClick={testDatabaseConnection}
+         >
+           Test DB Connection
          </Button>
          <Button
            variant="outlined"
