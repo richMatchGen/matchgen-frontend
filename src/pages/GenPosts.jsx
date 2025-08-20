@@ -288,15 +288,19 @@ const GenPosts = () => {
            console.log('User club:', club);
            console.log('Club selected_pack:', club.selected_pack);
            
-           if (club.selected_pack) {
-             // User has a selected pack, use that
-             setSelectedGraphicPack(club.selected_pack);
-             console.log('Selected graphic pack from club:', club.selected_pack);
-           } else {
-             // No selected pack, show message
-             setSelectedGraphicPack(null);
-             console.log('No graphic pack selected for club');
-           }
+                       if (club.selected_pack) {
+              // User has a selected pack, find the full pack object
+              const selectedPackId = club.selected_pack;
+              console.log('Selected graphic pack ID from club:', selectedPackId);
+              
+              // We'll set the full pack object after fetching available packs
+              // For now, store the ID
+              setSelectedGraphicPack({ id: selectedPackId });
+            } else {
+              // No selected pack, show message
+              setSelectedGraphicPack(null);
+              console.log('No graphic pack selected for club');
+            }
         } else {
           console.warn("No club found for user");
           setSelectedGraphicPack(null);
@@ -317,11 +321,22 @@ const GenPosts = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      console.log('Available graphic packs:', response.data);
-      
-      if (response.data && Array.isArray(response.data)) {
-        setGraphicPacks(response.data);
-      }
+             console.log('Available graphic packs:', response.data);
+       
+       if (response.data && response.data.results && Array.isArray(response.data.results)) {
+         setGraphicPacks(response.data.results);
+         
+         // If we have a selected pack ID, find the full pack object
+         if (selectedGraphicPack && selectedGraphicPack.id) {
+           const fullPack = response.data.results.find(pack => pack.id === selectedGraphicPack.id);
+           if (fullPack) {
+             setSelectedGraphicPack(fullPack);
+             console.log('Found full graphic pack:', fullPack);
+           } else {
+             console.warn(`Graphic pack with ID ${selectedGraphicPack.id} not found in available packs`);
+           }
+         }
+       }
     } catch (error) {
       console.warn("Failed to load graphic packs or club data", error);
       setSelectedGraphicPack(null);
