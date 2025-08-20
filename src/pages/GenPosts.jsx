@@ -5,6 +5,7 @@ import useAuth from "../hooks/useAuth";
 import useClubSingleton from "../hooks/useClubSingleton";
 import { getMatches } from "../api/config";
 import TemplateEditor from "../components/TemplateEditor";
+import QuickTextPositioner from "../components/QuickTextPositioner";
 import {
   Container,
   Typography,
@@ -166,6 +167,7 @@ const GenPosts = () => {
   const [currentPostType, setCurrentPostType] = useState(null);
   const [rateLimited, setRateLimited] = useState(false);
   const [showTemplateEditor, setShowTemplateEditor] = useState(false);
+  const [showQuickPositioner, setShowQuickPositioner] = useState(false);
   const [currentTemplateId, setCurrentTemplateId] = useState(null);
 
   // Memoized values
@@ -572,28 +574,52 @@ const GenPosts = () => {
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   {selectedMatch && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<Edit />}
-                      onClick={() => {
-                        // Get the matchday template ID for editing
-                        if (selectedGraphicPack) {
-                          const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
-                          if (matchdayTemplate) {
-                            setCurrentTemplateId(matchdayTemplate.id);
-                            setShowTemplateEditor(true);
-                          } else {
-                            setSnackbar({
-                              open: true,
-                              message: "No matchday template found for editing",
-                              severity: "warning"
-                            });
+                    <>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Edit />}
+                        onClick={() => {
+                          // Get the matchday template ID for editing
+                          if (selectedGraphicPack) {
+                            const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
+                            if (matchdayTemplate) {
+                              setCurrentTemplateId(matchdayTemplate.id);
+                              setShowQuickPositioner(true);
+                            } else {
+                              setSnackbar({
+                                open: true,
+                                message: "No matchday template found for editing",
+                                severity: "warning"
+                              });
+                            }
                           }
-                        }
-                      }}
-                    >
-                      Edit Template
-                    </Button>
+                        }}
+                      >
+                        Quick Position Text
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Edit />}
+                        onClick={() => {
+                          // Get the matchday template ID for editing
+                          if (selectedGraphicPack) {
+                            const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
+                            if (matchdayTemplate) {
+                              setCurrentTemplateId(matchdayTemplate.id);
+                              setShowTemplateEditor(true);
+                            } else {
+                              setSnackbar({
+                                open: true,
+                                message: "No matchday template found for editing",
+                                severity: "warning"
+                              });
+                            }
+                          }
+                        }}
+                      >
+                        Advanced Editor
+                      </Button>
+                    </>
                   )}
                   <Button
                     variant="outlined"
@@ -1005,38 +1031,54 @@ const GenPosts = () => {
                 </DialogActions>
               </Dialog>
 
-              {/* Template Editor Dialog */}
-              <Dialog 
-                open={showTemplateEditor} 
-                onClose={() => setShowTemplateEditor(false)}
-                maxWidth="xl"
-                fullWidth
-              >
-                <DialogTitle>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="h6">Template Editor</Typography>
-                    <IconButton onClick={() => setShowTemplateEditor(false)}>
-                      <Remove />
-                    </IconButton>
-                  </Box>
-                </DialogTitle>
-                <DialogContent sx={{ p: 0 }}>
-                  {currentTemplateId && (
-                    <TemplateEditor
-                      templateId={currentTemplateId}
-                      onSave={(elements) => {
-                        setSnackbar({
-                          open: true,
-                          message: "Template updated successfully!",
-                          severity: "success"
-                        });
-                        setShowTemplateEditor(false);
-                      }}
-                      onCancel={() => setShowTemplateEditor(false)}
-                    />
-                  )}
-                </DialogContent>
-              </Dialog>
+                             {/* Quick Text Positioner Dialog */}
+               {showQuickPositioner && currentTemplateId && (
+                 <QuickTextPositioner
+                   templateId={currentTemplateId}
+                   onSave={(elements) => {
+                     setSnackbar({
+                       open: true,
+                       message: "Text positions updated successfully!",
+                       severity: "success"
+                     });
+                     setShowQuickPositioner(false);
+                   }}
+                   onCancel={() => setShowQuickPositioner(false)}
+                 />
+               )}
+
+               {/* Template Editor Dialog */}
+               <Dialog 
+                 open={showTemplateEditor} 
+                 onClose={() => setShowTemplateEditor(false)}
+                 maxWidth="xl"
+                 fullWidth
+               >
+                 <DialogTitle>
+                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                     <Typography variant="h6">Advanced Template Editor</Typography>
+                     <IconButton onClick={() => setShowTemplateEditor(false)}>
+                       <Remove />
+                     </IconButton>
+                   </Box>
+                 </DialogTitle>
+                 <DialogContent sx={{ p: 0 }}>
+                   {currentTemplateId && (
+                     <TemplateEditor
+                       templateId={currentTemplateId}
+                       onSave={(elements) => {
+                         setSnackbar({
+                           open: true,
+                           message: "Template updated successfully!",
+                           severity: "success"
+                         });
+                         setShowTemplateEditor(false);
+                       }}
+                       onCancel={() => setShowTemplateEditor(false)}
+                     />
+                   )}
+                 </DialogContent>
+               </Dialog>
 
               {/* Snackbar */}
               <Snackbar

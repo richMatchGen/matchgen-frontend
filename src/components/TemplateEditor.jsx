@@ -10,22 +10,22 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Slider,
   Switch,
   FormControlLabel,
   Grid,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Stack,
   Chip,
   Divider,
   Alert,
   CircularProgress,
-  Tabs,
-  Tab
+  Slider,
+  Paper,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import {
   Edit,
@@ -40,7 +40,12 @@ import {
   Save,
   Cancel,
   Preview,
-  Download
+  Download,
+  ZoomIn,
+  ZoomOut,
+  CenterFocusStrong,
+  Undo,
+  Redo
 } from '@mui/icons-material';
 import axios from 'axios';
 
@@ -52,10 +57,14 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
-  const canvasRef = useRef(null);
+  const [canvasRef] = useState(useRef(null));
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [colorPickerTarget, setColorPickerTarget] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
 
   // Load template data
   useEffect(() => {
@@ -71,6 +80,7 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
       });
       setTemplate(response.data);
       setElements(response.data.elements || []);
+      addToHistory(response.data.elements || []);
     } catch (error) {
       console.error('Error loading template:', error);
       setError('Failed to load template data');
@@ -79,20 +89,43 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
     }
   };
 
+  const addToHistory = (newElements) => {
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(JSON.stringify(newElements));
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  };
+
+  const undo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setElements(JSON.parse(history[newIndex]));
+    }
+  };
+
+  const redo = () => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setElements(JSON.parse(history[newIndex]));
+    }
+  };
+
   // Render preview
   useEffect(() => {
     if (template && elements.length > 0) {
       renderPreview();
     }
-  }, [template, elements]);
+  }, [template, elements, zoom]);
 
   const renderPreview = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    const width = 800;
-    const height = 600;
+    const width = 800 * zoom;
+    const height = 600 * zoom;
 
     // Set canvas size
     canvas.width = width;
@@ -135,16 +168,16 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
     if (!stringElement) return;
 
     // Calculate position
-    let x = element.x;
-    let y = element.y;
+    let x = element.x * zoom;
+    let y = element.y * zoom;
     
     if (element.use_percentage) {
-      x = (x / 100) * 800;
-      y = (y / 100) * 600;
+      x = (x / 100) * 800 * zoom;
+      y = (y / 100) * 600 * zoom;
     }
 
     // Set font
-    const fontSize = stringElement.font_size || 24;
+    const fontSize = (stringElement.font_size || 24) * zoom;
     ctx.font = `${fontSize}px Arial`;
     ctx.fillStyle = stringElement.color || '#FFFFFF';
     ctx.textAlign = stringElement.alignment || 'left';
@@ -159,37 +192,58 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
       ctx.lineWidth = 2;
       const bbox = ctx.measureText(text);
       ctx.strokeRect(x - 5, y - fontSize - 5, bbox.width + 10, fontSize + 10);
+      
+      // Draw resize handles
+      const handleSize = 8;
+      ctx.fillStyle = '#1976d2';
+      ctx.fillRect(x - handleSize/2, y - fontSize - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(x + bbox.width - handleSize/2, y - fontSize - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(x - handleSize/2, y - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(x + bbox.width - handleSize/2, y - handleSize/2, handleSize, handleSize);
     }
   };
 
   const drawImageElement = (ctx, element) => {
-    let x = element.x;
-    let y = element.y;
+    let x = element.x * zoom;
+    let y = element.y * zoom;
     
     if (element.use_percentage) {
-      x = (x / 100) * 800;
-      y = (y / 100) * 600;
+      x = (x / 100) * 800 * zoom;
+      y = (y / 100) * 600 * zoom;
     }
+
+    const width = (element.width || 100) * zoom;
+    const height = (element.height || 100) * zoom;
 
     // Draw placeholder rectangle
     ctx.fillStyle = '#ddd';
-    ctx.fillRect(x, y, element.width || 100, element.height || 100);
+    ctx.fillRect(x, y, width, height);
     ctx.strokeStyle = '#999';
-    ctx.strokeRect(x, y, element.width || 100, element.height || 100);
+    ctx.strokeRect(x, y, width, height);
 
     // Draw selection indicator
     if (selectedElement?.id === element.id) {
       ctx.strokeStyle = '#1976d2';
       ctx.lineWidth = 2;
-      ctx.strokeRect(x - 2, y - 2, (element.width || 100) + 4, (element.height || 100) + 4);
+      ctx.strokeRect(x - 2, y - 2, width + 4, height + 4);
+      
+      // Draw resize handles
+      const handleSize = 8;
+      ctx.fillStyle = '#1976d2';
+      ctx.fillRect(x - handleSize/2, y - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(x + width - handleSize/2, y - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(x - handleSize/2, y + height - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(x + width - handleSize/2, y + height - handleSize/2, handleSize, handleSize);
     }
   };
 
-  const handleElementClick = (event) => {
+  const handleCanvasClick = (event) => {
+    if (isDragging) return;
+    
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    const x = (event.clientX - rect.left) / zoom;
+    const y = (event.clientY - rect.top) / zoom;
 
     // Find clicked element
     const clickedElement = elements.find(element => {
@@ -214,6 +268,44 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
     });
 
     setSelectedElement(clickedElement || null);
+  };
+
+  const handleMouseDown = (event) => {
+    if (!selectedElement) return;
+    
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / zoom;
+    const y = (event.clientY - rect.top) / zoom;
+    
+    setDragStart({ x, y });
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (event) => {
+    if (!isDragging || !selectedElement) return;
+    
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / zoom;
+    const y = (event.clientY - rect.top) / zoom;
+    
+    const deltaX = x - dragStart.x;
+    const deltaY = y - dragStart.y;
+    
+    updateElement(selectedElement.id, {
+      x: selectedElement.x + deltaX,
+      y: selectedElement.y + deltaY
+    });
+    
+    setDragStart({ x, y });
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      addToHistory(elements);
+    }
   };
 
   const updateElement = (elementId, updates) => {
@@ -281,6 +373,10 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
     }
   };
 
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 3));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.5));
+  const handleResetZoom = () => setZoom(1);
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
@@ -303,53 +399,99 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
         Template Editor - {template?.template_name}
       </Typography>
 
+      {/* Toolbar */}
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Tooltip title="Undo">
+            <IconButton onClick={undo} disabled={historyIndex <= 0}>
+              <Undo />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Redo">
+            <IconButton onClick={redo} disabled={historyIndex >= history.length - 1}>
+              <Redo />
+            </IconButton>
+          </Tooltip>
+          
+          <Divider orientation="vertical" flexItem />
+          
+          <Tooltip title="Zoom In">
+            <IconButton onClick={handleZoomIn}>
+              <ZoomIn />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Zoom Out">
+            <IconButton onClick={handleZoomOut}>
+              <ZoomOut />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Reset Zoom">
+            <IconButton onClick={handleResetZoom}>
+              <CenterFocusStrong />
+            </IconButton>
+          </Tooltip>
+          
+          <Typography variant="body2" sx={{ ml: 2 }}>
+            {Math.round(zoom * 100)}%
+          </Typography>
+          
+          <Divider orientation="vertical" flexItem />
+          
+          <Button
+            variant="outlined"
+            startIcon={<Preview />}
+            onClick={handleTestGeneration}
+            size="small"
+          >
+            Test Generation
+          </Button>
+          {previewUrl && (
+            <Button
+              variant="outlined"
+              startIcon={<Download />}
+              href={previewUrl}
+              target="_blank"
+              size="small"
+            >
+              Download
+            </Button>
+          )}
+        </Stack>
+      </Paper>
+
       <Grid container spacing={3}>
         {/* Preview Canvas */}
         <Grid item xs={12} md={8}>
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">
-                  Preview
-                </Typography>
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<Preview />}
-                    onClick={handleTestGeneration}
-                    size="small"
-                  >
-                    Test Generation
-                  </Button>
-                  {previewUrl && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<Download />}
-                      href={previewUrl}
-                      target="_blank"
-                      size="small"
-                    >
-                      Download
-                    </Button>
-                  )}
-                </Stack>
-              </Box>
+              <Typography variant="h6" gutterBottom>
+                Preview (Click and drag elements to move them)
+              </Typography>
               
-              <Box sx={{ border: '1px solid #ddd', borderRadius: 1, overflow: 'hidden' }}>
+              <Box sx={{ 
+                border: '1px solid #ddd', 
+                borderRadius: 1, 
+                overflow: 'hidden',
+                position: 'relative'
+              }}>
                 <canvas
                   ref={canvasRef}
                   style={{ 
                     width: '100%', 
                     height: 'auto',
-                    cursor: 'pointer',
+                    cursor: isDragging ? 'grabbing' : 'pointer',
                     maxHeight: '600px'
                   }}
-                  onClick={handleElementClick}
+                  onClick={handleCanvasClick}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
                 />
               </Box>
               
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Click on elements to select them for editing
+                💡 Tip: Click on elements to select them, then drag to move. Use the controls on the right to adjust properties.
               </Typography>
             </CardContent>
           </Card>
@@ -388,7 +530,7 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
                       <TextField
                         label="X"
                         type="number"
-                        value={selectedElement.x}
+                        value={Math.round(selectedElement.x)}
                         onChange={(e) => updateElement(selectedElement.id, { x: parseFloat(e.target.value) })}
                         size="small"
                       />
@@ -397,12 +539,41 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
                       <TextField
                         label="Y"
                         type="number"
-                        value={selectedElement.y}
+                        value={Math.round(selectedElement.y)}
                         onChange={(e) => updateElement(selectedElement.id, { y: parseFloat(e.target.value) })}
                         size="small"
                       />
                     </Grid>
                   </Grid>
+
+                  {/* Position Sliders */}
+                  <Box>
+                    <Typography variant="body2" gutterBottom>
+                      X Position: {Math.round(selectedElement.x)}
+                    </Typography>
+                    <Slider
+                      value={selectedElement.x}
+                      onChange={(e, value) => updateElement(selectedElement.id, { x: value })}
+                      min={0}
+                      max={800}
+                      step={1}
+                      size="small"
+                    />
+                  </Box>
+                  
+                  <Box>
+                    <Typography variant="body2" gutterBottom>
+                      Y Position: {Math.round(selectedElement.y)}
+                    </Typography>
+                    <Slider
+                      value={selectedElement.y}
+                      onChange={(e, value) => updateElement(selectedElement.id, { y: value })}
+                      min={0}
+                      max={600}
+                      step={1}
+                      size="small"
+                    />
+                  </Box>
 
                   <FormControlLabel
                     control={
@@ -422,13 +593,19 @@ const TemplateEditor = ({ templateId, onSave, onCancel }) => {
                       
                       {selectedElement.string_elements.map((stringEl, index) => (
                         <Stack key={stringEl.id || index} spacing={2}>
-                          <TextField
-                            label="Font Size"
-                            type="number"
-                            value={stringEl.font_size}
-                            onChange={(e) => updateStringElement(selectedElement.id, stringEl.id, { font_size: parseInt(e.target.value) })}
-                            size="small"
-                          />
+                          <Box>
+                            <Typography variant="body2" gutterBottom>
+                              Font Size: {stringEl.font_size}
+                            </Typography>
+                            <Slider
+                              value={stringEl.font_size || 24}
+                              onChange={(e, value) => updateStringElement(selectedElement.id, stringEl.id, { font_size: value })}
+                              min={8}
+                              max={72}
+                              step={1}
+                              size="small"
+                            />
+                          </Box>
 
                           <FormControl size="small">
                             <InputLabel>Alignment</InputLabel>
