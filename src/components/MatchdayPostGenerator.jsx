@@ -148,11 +148,17 @@ const MatchdayPostGenerator = () => {
 
   const formatTime = (timeString) => {
     if (!timeString) return 'Time TBC';
-    const time = new Date(`2000-01-01T${timeString}`);
-    return time.toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      // time_start is a string like "15:00", convert to time object for formatting
+      const [hours, minutes] = timeString.split(':');
+      const time = new Date(2000, 0, 1, parseInt(hours), parseInt(minutes));
+      return time.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return timeString; // Return as-is if parsing fails
+    }
   };
 
   if (loading) {
@@ -196,7 +202,7 @@ const MatchdayPostGenerator = () => {
                           {match.opponent || 'Opponent TBC'}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {formatDate(match.date)} at {formatTime(match.time)}
+                          {formatDate(match.date)} at {formatTime(match.time_start)}
                         </Typography>
                       </Box>
                     </MenuItem>
@@ -215,14 +221,14 @@ const MatchdayPostGenerator = () => {
                       <Box>
                         <Chip 
                           icon={<SportsSoccer />}
-                          label={`${match?.is_home ? 'HOME' : 'AWAY'} vs ${match?.opponent || 'Opponent TBC'}`}
+                          label={`HOME vs ${match?.opponent || 'Opponent TBC'}`}
                           color="primary"
                           sx={{ mb: 2, fontWeight: 'bold' }}
                         />
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                           <Schedule sx={{ mr: 1, fontSize: 16, color: 'primary.main' }} />
                           <Typography variant="body2">
-                            {formatDate(match?.date)} at {formatTime(match?.time)}
+                            {formatDate(match?.date)} at {formatTime(match?.time_start)}
                           </Typography>
                         </Box>
                         {match?.venue && (
