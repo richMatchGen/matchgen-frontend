@@ -265,6 +265,30 @@ const MatchdayPostGenerator = () => {
     }
   };
 
+  const runDiagnostic = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/diagnostic/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log('Diagnostic result:', response.data);
+      setDebugData(response.data);
+      setSnackbar({
+        open: true,
+        message: response.data.status === 'ready' ? 'System ready for matchday posts!' : 'System needs setup',
+        severity: response.data.status === 'ready' ? 'success' : 'warning'
+      });
+    } catch (error) {
+      console.error('Diagnostic failed:', error);
+      setSnackbar({
+        open: true,
+        message: 'Diagnostic failed',
+        severity: 'error'
+      });
+    }
+  };
+
   const debugTemplates = async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -374,13 +398,20 @@ const MatchdayPostGenerator = () => {
          >
            Debug Templates
          </Button>
-         <Button
-           variant="outlined"
-           onClick={createTestData}
-           color="secondary"
-         >
-           Create Test Data
-         </Button>
+                   <Button
+            variant="outlined"
+            onClick={createTestData}
+            color="secondary"
+          >
+            Create Test Data
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={runDiagnostic}
+            color="primary"
+          >
+            Run Diagnostic
+          </Button>
        </Box>
 
       <Grid container spacing={3}>
