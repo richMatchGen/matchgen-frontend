@@ -567,14 +567,26 @@ const GenPosts = () => {
                     </Typography>
                   </Box>
                 </Box>
-                <Button
-                  variant="contained"
-                  startIcon={<Add />}
-                  onClick={() => setShowMatchDialog(true)}
-                  disabled={generating}
-                >
-                  Select Match
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {selectedMatch && (
+                    <Button
+                      variant="outlined"
+                      startIcon={<SportsSoccer />}
+                      onClick={() => generatePost(selectedMatch.id, 'matchday')}
+                      disabled={generating}
+                    >
+                      Test Matchday
+                    </Button>
+                  )}
+                  <Button
+                    variant="contained"
+                    startIcon={<Add />}
+                    onClick={() => setShowMatchDialog(true)}
+                    disabled={generating}
+                  >
+                    Select Match
+                  </Button>
+                </Box>
               </Box>
 
               {rateLimited && (
@@ -720,6 +732,77 @@ const GenPosts = () => {
                         <LinearProgress />
                         <Typography variant="body2" sx={{ mt: 1 }}>
                           Generating posts... Please wait.
+                        </Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Generated Posts Preview */}
+              {selectedMatch && (
+                <Card sx={{ mb: 3 }}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Generated Posts
+                    </Typography>
+                    <Grid container spacing={2}>
+                      {POST_TYPES.map((postType) => {
+                        const postUrl = selectedMatch[`${postType.id}_post_url`];
+                        return postUrl ? (
+                          <Grid item xs={12} sm={6} md={4} key={postType.id}>
+                            <Card variant="outlined">
+                              <CardContent>
+                                <Typography variant="subtitle2" gutterBottom>
+                                  {postType.label}
+                                </Typography>
+                                <Box sx={{ mb: 2 }}>
+                                  <img 
+                                    src={postUrl} 
+                                    alt={`${postType.label} for ${selectedMatch.opponent}`}
+                                    style={{ 
+                                      width: '100%', 
+                                      height: 'auto', 
+                                      borderRadius: '4px',
+                                      border: '1px solid #e0e0e0'
+                                    }}
+                                  />
+                                </Box>
+                                <Stack direction="row" spacing={1}>
+                                  <Button
+                                    size="small"
+                                    variant="outlined"
+                                    startIcon={<Visibility />}
+                                    onClick={() => window.open(postUrl, '_blank')}
+                                  >
+                                    View
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    variant="outlined"
+                                    startIcon={<Download />}
+                                    onClick={() => {
+                                      const link = document.createElement('a');
+                                      link.href = postUrl;
+                                      link.download = `${postType.id}-${selectedMatch.opponent}-${new Date().toISOString().split('T')[0]}.png`;
+                                      document.body.appendChild(link);
+                                      link.click();
+                                      document.body.removeChild(link);
+                                    }}
+                                  >
+                                    Download
+                                  </Button>
+                                </Stack>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                        ) : null;
+                      })}
+                    </Grid>
+                    {!POST_TYPES.some(postType => selectedMatch[`${postType.id}_post_url`]) && (
+                      <Box sx={{ textAlign: 'center', py: 3 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          No posts generated yet. Select post types and generate to see previews.
                         </Typography>
                       </Box>
                     )}
