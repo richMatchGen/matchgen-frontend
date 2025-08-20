@@ -209,11 +209,11 @@ const GenPosts = () => {
       return;
     }
 
-         try {
+    try {
        const userRes = await axios.get("https://matchgen-backend-production.up.railway.app/api/users/me/", { 
-         headers: { Authorization: `Bearer ${token}` } 
-       });
-       setUser(userRes.data);
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      setUser(userRes.data);
     } catch (error) {
       // Handle logout without dependency
       localStorage.removeItem("accessToken");
@@ -263,7 +263,7 @@ const GenPosts = () => {
     }
   }, [urlMatchId]); // Only depend on urlMatchId
 
-    const fetchGraphicPacks = useCallback(async () => {
+  const fetchGraphicPacks = useCallback(async () => {
     try {
       const token = localStorage.getItem("accessToken");
       
@@ -348,16 +348,16 @@ const GenPosts = () => {
       setLoading(true);
       setError(null);
       try {
-        await Promise.all([
-          fetchUserData(),
-          fetchMatches(),
-          fetchGraphicPacks()
-        ]);
+      await Promise.all([
+        fetchUserData(),
+        fetchMatches(),
+        fetchGraphicPacks()
+      ]);
       } catch (error) {
         console.error("Error initializing data:", error);
         setError("Failed to load data. Please refresh the page.");
       } finally {
-        setLoading(false);
+      setLoading(false);
       }
     };
 
@@ -628,10 +628,10 @@ const GenPosts = () => {
                 </Box>
                                  <Box sx={{ display: 'flex', gap: 2 }}>
                    {!selectedGraphicPack && (
-                     <Button
-                       variant="contained"
+                <Button
+                  variant="contained"
                        color="primary"
-                       startIcon={<Add />}
+                  startIcon={<Add />}
                        onClick={() => navigate('/club/create')}
                      >
                        Create Club
@@ -751,37 +751,65 @@ const GenPosts = () => {
                                          >
                        Debug
                      </Button>
-                     <Button
-                       variant="outlined"
-                       startIcon={<Add />}
-                       onClick={async () => {
-                         try {
-                           const token = localStorage.getItem("accessToken");
-                           const response = await axios.post(
-                             "https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/",
-                             {},
-                             { headers: { Authorization: `Bearer ${token}` } }
-                           );
-                           console.log('Create test data response:', response.data);
-                           setSnackbar({
-                             open: true,
-                             message: `Test data created: ${response.data.elements_created} elements`,
-                             severity: "success"
-                           });
-                           // Refresh the graphic packs
-                           fetchGraphicPacks();
-                         } catch (error) {
-                           console.error('Create test data error:', error);
-                           setSnackbar({
-                             open: true,
-                             message: `Create test data error: ${error.message}`,
-                             severity: "error"
-                           });
-                         }
-                       }}
-                     >
-                       Create Test Data
-                     </Button>
+                                           <Button
+                        variant="outlined"
+                        startIcon={<Add />}
+                        onClick={async () => {
+                          try {
+                            const token = localStorage.getItem("accessToken");
+                            const response = await axios.post(
+                              "https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/",
+                              {},
+                              { headers: { Authorization: `Bearer ${token}` } }
+                            );
+                            console.log('Create test data response:', response.data);
+                            setSnackbar({
+                              open: true,
+                              message: `Test data created: ${response.data.elements_created} elements`,
+                              severity: "success"
+                            });
+                            // Refresh the graphic packs
+                            fetchGraphicPacks();
+                          } catch (error) {
+                            console.error('Create test data error:', error);
+                            setSnackbar({
+                              open: true,
+                              message: `Create test data error: ${error.message}`,
+                              severity: "error"
+                            });
+                          }
+                        }}
+                      >
+                        Create Test Data
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Settings />}
+                        onClick={async () => {
+                          try {
+                            const token = localStorage.getItem("accessToken");
+                            const response = await axios.get(
+                              "https://matchgen-backend-production.up.railway.app/api/graphicpack/debug-templates/?pack_id=7",
+                              { headers: { Authorization: `Bearer ${token}` } }
+                            );
+                            console.log('Debug templates response:', response.data);
+                            setSnackbar({
+                              open: true,
+                              message: `Pack 7 has ${response.data.templates_count} templates`,
+                              severity: "info"
+                            });
+                          } catch (error) {
+                            console.error('Debug templates error:', error);
+                            setSnackbar({
+                              open: true,
+                              message: `Debug templates error: ${error.message}`,
+                              severity: "error"
+                            });
+                          }
+                        }}
+                      >
+                        Debug Templates
+                      </Button>
                 </Box>
               </Box>
 
@@ -815,7 +843,7 @@ const GenPosts = () => {
                           sx={{ mt: 1 }}
                         />
                       </Grid>
-                                             <Grid item xs={12} md={4}>
+                      <Grid item xs={12} md={4}>
                          <Box sx={{ textAlign: 'right' }}>
                            <Typography variant="body2" color="text.secondary" gutterBottom>
                              Graphic Pack
@@ -837,7 +865,7 @@ const GenPosts = () => {
                                </Typography>
                              )}
                          </Box>
-                       </Grid>
+                      </Grid>
                     </Grid>
                   </CardContent>
                 </Card>
