@@ -153,6 +153,27 @@ const MatchdayPostGenerator = () => {
     }
   };
 
+  const testBasicFunctionality = async () => {
+    try {
+      const response = await axios.put(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/test/'
+      );
+      console.log('Basic functionality test response:', response.data);
+      setSnackbar({
+        open: true,
+        message: response.data.message,
+        severity: response.data.status === 'success' ? 'success' : 'error'
+      });
+    } catch (error) {
+      console.error('Basic functionality test failed:', error);
+      setSnackbar({
+        open: true,
+        message: 'Basic functionality test failed',
+        severity: 'error'
+      });
+    }
+  };
+
   const testDatabase = async () => {
     try {
       const response = await axios.post(
@@ -274,12 +295,18 @@ const MatchdayPostGenerator = () => {
          Select a fixture to generate a high-quality matchday post with fixture details overlaid on your club's template.
        </Typography>
 
-       <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
+       <Box sx={{ mb: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
          <Button
            variant="outlined"
            onClick={testBackend}
          >
            Test Backend
+         </Button>
+         <Button
+           variant="outlined"
+           onClick={testBasicFunctionality}
+         >
+           Test Basic
          </Button>
          <Button
            variant="outlined"
