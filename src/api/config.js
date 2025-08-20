@@ -17,7 +17,7 @@ let requestQueue = [];
 // Create axios instance with default config
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 30000, // Increased from 10000 to 30000 (30 seconds)
   headers: {
     'Content-Type': 'application/json',
   },
@@ -88,6 +88,15 @@ apiClient.interceptors.response.use(
 
 // Helper function to handle API errors gracefully
 export const handleApiError = (error, context = 'API request') => {
+  // Handle timeout errors specifically
+  if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    console.error(`${context}: Request timed out.`);
+    return {
+      error: 'Request timed out. Please check your connection and try again.',
+      timeout: true
+    };
+  }
+  
   if (error.response?.status === 429) {
     console.warn(`${context}: Rate limited. Please wait before making more requests.`);
     return {

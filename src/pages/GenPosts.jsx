@@ -153,6 +153,7 @@ const GenPosts = () => {
   const [graphicPacks, setGraphicPacks] = useState([]);
   const [selectedGraphicPack, setSelectedGraphicPack] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [generatingPosts, setGeneratingPosts] = useState(new Set());
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
@@ -199,7 +200,7 @@ const GenPosts = () => {
   const fetchUserData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
-      navigate("/login");
+      window.location.href = "/login";
       return;
     }
 
@@ -209,10 +210,13 @@ const GenPosts = () => {
       });
       setUser(userRes.data);
     } catch (error) {
-      logout();
+      // Handle logout without dependency
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      window.location.href = "/login";
       return;
     }
-  }, [navigate, logout]);
+  }, []); // Remove navigate and logout dependencies
 
   const fetchMatches = useCallback(async () => {
     try {
@@ -240,11 +244,19 @@ const GenPosts = () => {
             setSelectedMatch(match);
           }
         }
+      } else {
+        console.error("Failed to load matches:", result.error);
+        if (result.timeout) {
+          setError("Request timed out. Please check your connection and try again.");
+        } else {
+          setError(`Failed to load matches: ${result.error}`);
+        }
       }
     } catch (error) {
       console.error("Failed to load matches:", error);
+      setError("Failed to load matches. Please try again.");
     }
-  }, [urlMatchId]);
+  }, [urlMatchId]); // Only depend on urlMatchId
 
   const fetchGraphicPacks = useCallback(async () => {
     try {
@@ -269,22 +281,29 @@ const GenPosts = () => {
       ]);
       setSelectedGraphicPack({ id: 1, name: "Default Pack", description: "Standard design" });
     }
-  }, []);
+  }, []); // No dependencies
 
-  // Initialize data
+  // Initialize data - only run once on mount
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
-      await Promise.all([
-        fetchUserData(),
-        fetchMatches(),
-        fetchGraphicPacks()
-      ]);
-      setLoading(false);
+      setError(null);
+      try {
+        await Promise.all([
+          fetchUserData(),
+          fetchMatches(),
+          fetchGraphicPacks()
+        ]);
+      } catch (error) {
+        console.error("Error initializing data:", error);
+        setError("Failed to load data. Please refresh the page.");
+      } finally {
+        setLoading(false);
+      }
     };
 
     initializeData();
-  }, [fetchUserData, fetchMatches, fetchGraphicPacks]);
+  }, []); // Empty dependency array - only run once
 
   // Post generation
   const generatePost = useCallback(async (matchId, postType, customData = {}) => {
@@ -301,41 +320,50 @@ const GenPosts = () => {
 
     try {
       const token = localStorage.getItem("accessToken");
-      let endpoint = '';
       
-      switch (postType) {
-        case 'upcoming':
-          endpoint = `generate-upcoming/`;
-          break;
-        case 'matchday':
-          endpoint = `generate-matchday/`;
-          break;
-        case 'startingxi':
-          endpoint = `generate-startingxi/`;
-          break;
-        case 'goal':
-          endpoint = `generate-goal/`;
-          break;
-        case 'substitution':
-          endpoint = `generate-substitution/`;
-          break;
-        case 'halftime':
-          endpoint = `generate-halftime/`;
-          break;
-        case 'fulltime':
-          endpoint = `generate-fulltime/`;
-          break;
-        default:
-          throw new Error('Invalid post type');
+      // Map frontend post types to backend content types
+      const contentTypeMap = {
+        'upcoming': 'upcomingFixture',
+        'matchday': 'matchday',
+        'startingxi': 'startingXI',
+        'goal': 'goal',
+        'substitution': 'sub',
+        'halftime': 'halftime',
+        'fulltime': 'fulltime'
+      };
+      
+      const contentType = contentTypeMap[postType];
+      if (!contentType) {
+        throw new Error('Invalid post type');
       }
 
+      // Prepare request data based on content type
       const requestData = {
-        ...customData,
-        graphic_pack_id: selectedGraphicPack?.id
+        content_type: contentType,
+        match_id: matchId,
+        regenerate: false
       };
 
+      // Add specific data for content types that need it
+      switch (contentType) {
+        case 'goal':
+          requestData.scorer_name = customData.scorer_name || 'Player';
+          break;
+        case 'sub':
+          requestData.player_in = customData.player_in || 'Player In';
+          requestData.player_out = customData.player_out || 'Player Out';
+          break;
+        case 'halftime':
+        case 'fulltime':
+          // Convert home_score and away_score to single score field
+          const homeScore = customData.home_score || '0';
+          const awayScore = customData.away_score || '0';
+          requestData.score = `${homeScore}-${awayScore}`;
+          break;
+      }
+
       const response = await axios.post(
-        `https://matchgen-backend-production.up.railway.app/api/graphicpack/match/${matchId}/${endpoint}`,
+        `https://matchgen-backend-production.up.railway.app/api/graphicpack/generate/`,
         requestData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -366,7 +394,7 @@ const GenPosts = () => {
       } else {
         setSnackbar({ 
           open: true, 
-          message: `Failed to generate ${postType} post.`, 
+          message: `Failed to generate ${postType} post: ${error.response?.data?.error || error.message}`, 
           severity: "error" 
         });
       }
@@ -377,7 +405,7 @@ const GenPosts = () => {
         return newSet;
       });
     }
-  }, [selectedGraphicPack]);
+  }, []);
 
   const generateBatch = useCallback(async () => {
     if (!selectedMatch || selectedPostTypes.size === 0) {
@@ -467,6 +495,31 @@ const GenPosts = () => {
         <CssBaseline enableColorScheme />
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
           <CircularProgress size={60} />
+        </Box>
+      </AppTheme>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppTheme>
+        <CssBaseline enableColorScheme />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <Card sx={{ p: 4, maxWidth: 400 }}>
+            <Typography variant="h6" color="error" gutterBottom>
+              Error Loading Data
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+            <Button 
+              variant="contained" 
+              onClick={() => window.location.reload()}
+              fullWidth
+            >
+              Retry
+            </Button>
+          </Card>
         </Box>
       </AppTheme>
     );
