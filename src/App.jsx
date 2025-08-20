@@ -22,22 +22,9 @@ const LandingPage = lazy(() => import("./pages/landingpage"));
 const Overview = lazy(() => import("./pages/profile"));
 const Fixtures = lazy(() => import("./pages/fixtures"));
 const Results = lazy(() => import("./pages/results"));
-const GenFixture = lazy(() => import("./pages/genFixture"));
-const GenPlayer = lazy(() => import("./pages/genPlayer"));
-const GenResult = lazy(() => import("./pages/genResult"));
-const GenTeamLineup = lazy(() => import("./pages/genTeamLineup"));
-const GenLiveScore = lazy(() => import("./pages/genLiveScore"));
-const GenTemplates = lazy(() => import("./pages/genTemplates"));
-const ChoosePackPage = lazy(() => import("./pages/ChoosePackage"));
-const MatchdayPostPage = lazy(() => import("./pages/MatchdayPost"));
 const ClubOverview = lazy(() => import("./pages/ClubOverview"));
-const GenStartingXI = lazy(() => import("./pages/GenStartingXI"));
-const GenUpcomingPost = lazy(() => import("./pages/GenUpcomingPost"));
-const GenHalfTime = lazy(() => import("./pages/GenHalfTime"));
-const GenFullTime = lazy(() => import("./pages/GenFullTime"));
-const GenPosts = lazy(() => import("./pages/GenPosts"));
-const TemplateManagement = lazy(() => import("./pages/TemplateManagement"));
-const MatchdayPosts = lazy(() => import("./pages/MatchdayPosts"));
+const ChoosePackPage = lazy(() => import("./pages/ChoosePackage"));
+
 
 function App() {
   const { auth, logout } = useAuth();
@@ -97,19 +84,8 @@ function App() {
 
           <Route path="/profile" element={<Overview />} />
 
-          <Route path="/gen/teamlineup" element={<PrivateRoute><GenTeamLineup /></PrivateRoute>} />
-          <Route path="/gen/livescore" element={<PrivateRoute><GenLiveScore /></PrivateRoute>} />
-          <Route path="/gen/fixture" element={<PrivateRoute><MatchdayPostPage /></PrivateRoute>} />
-          <Route path="/gen/result" element={<PrivateRoute><GenResult /></PrivateRoute>} />
-          <Route path="/gen/player" element={<PrivateRoute><GenPlayer /></PrivateRoute>} />
-          <Route path="/gen/startingxi" element={<PrivateRoute><GenStartingXI /></PrivateRoute>} />
-          <Route path="/gen/upcoming" element={<PrivateRoute><GenUpcomingPost /></PrivateRoute>} />
-          <Route path="/gen/halftime" element={<PrivateRoute><GenHalfTime /></PrivateRoute>} />
-          <Route path="/gen/fulltime" element={<PrivateRoute><GenFullTime /></PrivateRoute>} />
-          <Route path="/gen/posts" element={<PrivateRoute><GenPosts /></PrivateRoute>} />
-          <Route path="/gen/posts/:matchId" element={<PrivateRoute><GenPosts /></PrivateRoute>} />
-          <Route path="/templates" element={<PrivateRoute><TemplateManagement /></PrivateRoute>} />
-          <Route path="/matchday-posts" element={<PrivateRoute><MatchdayPosts /></PrivateRoute>} />
+
+
    
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
           <Route path="/profile" element={<Overview />} />
