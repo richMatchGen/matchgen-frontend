@@ -19,10 +19,13 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  ColorPicker,
   Stack,
   Chip,
-  Divider
+  Divider,
+  Alert,
+  CircularProgress,
+  Tabs,
+  Tab
 } from '@mui/material';
 import {
   Edit,
@@ -33,26 +36,55 @@ import {
   ColorLens,
   FormatBold,
   FormatItalic,
-  TextFields
+  TextFields,
+  Save,
+  Cancel,
+  Preview,
+  Download
 } from '@mui/icons-material';
+import axios from 'axios';
 
-const TemplateEditor = ({ template, onSave, onCancel }) => {
+const TemplateEditor = ({ templateId, onSave, onCancel }) => {
+  const [template, setTemplate] = useState(null);
   const [elements, setElements] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
   const canvasRef = useRef(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [colorPickerTarget, setColorPickerTarget] = useState(null);
 
+  // Load template data
   useEffect(() => {
-    if (template) {
-      setElements(template.elements || []);
-    }
-  }, [template]);
+    loadTemplate();
+  }, [templateId]);
 
+  const loadTemplate = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(`/api/graphicpack/template/${templateId}/edit/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTemplate(response.data);
+      setElements(response.data.elements || []);
+    } catch (error) {
+      console.error('Error loading template:', error);
+      setError('Failed to load template data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Render preview
   useEffect(() => {
-    renderPreview();
-  }, [elements]);
+    if (template && elements.length > 0) {
+      renderPreview();
+    }
+  }, [template, elements]);
 
   const renderPreview = () => {
     const canvas = canvasRef.current;
@@ -69,7 +101,7 @@ const TemplateEditor = ({ template, onSave, onCancel }) => {
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
 
-    // Draw background (placeholder)
+    // Draw background
     ctx.fillStyle = '#f0f0f0';
     ctx.fillRect(0, 0, width, height);
 
@@ -118,13 +150,15 @@ const TemplateEditor = ({ template, onSave, onCancel }) => {
     ctx.textAlign = stringElement.alignment || 'left';
 
     // Draw text
-    ctx.fillText(stringElement.content_key || 'Sample Text', x, y);
+    const text = stringElement.content_key || 'Sample Text';
+    ctx.fillText(text, x, y);
 
     // Draw selection indicator
     if (selectedElement?.id === element.id) {
       ctx.strokeStyle = '#1976d2';
       ctx.lineWidth = 2;
-      ctx.strokeRect(x - 5, y - fontSize - 5, 200, fontSize + 10);
+      const bbox = ctx.measureText(text);
+      ctx.strokeRect(x - 5, y - fontSize - 5, bbox.width + 10, fontSize + 10);
     }
   };
 
@@ -206,28 +240,67 @@ const TemplateEditor = ({ template, onSave, onCancel }) => {
     updateElement(elementId, { visible: !elements.find(el => el.id === elementId)?.visible });
   };
 
-  const handleColorChange = (color) => {
-    if (colorPickerTarget) {
-      const { elementId, stringId, field } = colorPickerTarget;
-      if (stringId) {
-        updateStringElement(elementId, stringId, { [field]: color });
-      } else {
-        updateElement(elementId, { [field]: color });
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const token = localStorage.getItem('accessToken');
+      await axios.put(`/api/graphicpack/template/${templateId}/edit/`, {
+        elements: elements
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (onSave) {
+        onSave(elements);
       }
+    } catch (error) {
+      console.error('Error saving template:', error);
+      setError('Failed to save template changes');
+    } finally {
+      setSaving(false);
     }
-    setShowColorPicker(false);
-    setColorPickerTarget(null);
   };
 
-  const openColorPicker = (elementId, stringId = null, field = 'color') => {
-    setColorPickerTarget({ elementId, stringId, field });
-    setShowColorPicker(true);
+  const handleTestGeneration = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post('/api/graphicpack/generate/', {
+        content_type: template?.content_type,
+        match_id: 1, // Use a test match ID
+        test_mode: true
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.url) {
+        setPreviewUrl(response.data.url);
+      }
+    } catch (error) {
+      console.error('Error testing generation:', error);
+      setError('Failed to test template generation');
+    }
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert severity="error" sx={{ mb: 2 }}>
+        {error}
+      </Alert>
+    );
+  }
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
-        Template Editor
+        Template Editor - {template?.template_name}
       </Typography>
 
       <Grid container spacing={3}>
@@ -235,9 +308,33 @@ const TemplateEditor = ({ template, onSave, onCancel }) => {
         <Grid item xs={12} md={8}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Preview
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6">
+                  Preview
+                </Typography>
+                <Stack direction="row" spacing={1}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Preview />}
+                    onClick={handleTestGeneration}
+                    size="small"
+                  >
+                    Test Generation
+                  </Button>
+                  {previewUrl && (
+                    <Button
+                      variant="outlined"
+                      startIcon={<Download />}
+                      href={previewUrl}
+                      target="_blank"
+                      size="small"
+                    >
+                      Download
+                    </Button>
+                  )}
+                </Stack>
+              </Box>
+              
               <Box sx={{ border: '1px solid #ddd', borderRadius: 1, overflow: 'hidden' }}>
                 <canvas
                   ref={canvasRef}
@@ -250,6 +347,7 @@ const TemplateEditor = ({ template, onSave, onCancel }) => {
                   onClick={handleElementClick}
                 />
               </Box>
+              
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                 Click on elements to select them for editing
               </Typography>
@@ -353,7 +451,10 @@ const TemplateEditor = ({ template, onSave, onCancel }) => {
                             <Button
                               variant="outlined"
                               startIcon={<ColorLens />}
-                              onClick={() => openColorPicker(selectedElement.id, stringEl.id, 'color')}
+                              onClick={() => {
+                                setColorPickerTarget({ elementId: selectedElement.id, stringId: stringEl.id, field: 'color' });
+                                setShowColorPicker(true);
+                              }}
                               sx={{ 
                                 backgroundColor: stringEl.color,
                                 color: stringEl.color === '#FFFFFF' ? '#000' : '#fff',
@@ -487,11 +588,16 @@ const TemplateEditor = ({ template, onSave, onCancel }) => {
 
       {/* Action Buttons */}
       <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-        <Button variant="outlined" onClick={onCancel}>
+        <Button variant="outlined" onClick={onCancel} startIcon={<Cancel />}>
           Cancel
         </Button>
-        <Button variant="contained" onClick={() => onSave(elements)}>
-          Save Changes
+        <Button 
+          variant="contained" 
+          onClick={handleSave} 
+          startIcon={<Save />}
+          disabled={saving}
+        >
+          {saving ? 'Saving...' : 'Save Changes'}
         </Button>
       </Box>
 
@@ -500,9 +606,8 @@ const TemplateEditor = ({ template, onSave, onCancel }) => {
         <DialogTitle>Choose Color</DialogTitle>
         <DialogContent>
           <Box sx={{ p: 2 }}>
-            {/* Simple color picker - you can enhance this with a proper color picker library */}
             <Grid container spacing={1}>
-              {['#FFFFFF', '#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'].map((color) => (
+              {['#FFFFFF', '#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080', '#008000', '#FFC0CB'].map((color) => (
                 <Grid item key={color}>
                   <Box
                     sx={{
@@ -514,7 +619,18 @@ const TemplateEditor = ({ template, onSave, onCancel }) => {
                       cursor: 'pointer',
                       '&:hover': { borderColor: '#1976d2' }
                     }}
-                    onClick={() => handleColorChange(color)}
+                    onClick={() => {
+                      if (colorPickerTarget) {
+                        const { elementId, stringId, field } = colorPickerTarget;
+                        if (stringId) {
+                          updateStringElement(elementId, stringId, { [field]: color });
+                        } else {
+                          updateElement(elementId, { [field]: color });
+                        }
+                      }
+                      setShowColorPicker(false);
+                      setColorPickerTarget(null);
+                    }}
                   />
                 </Grid>
               ))}

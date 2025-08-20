@@ -4,6 +4,7 @@ import axios from "axios";
 import useAuth from "../hooks/useAuth";
 import useClubSingleton from "../hooks/useClubSingleton";
 import { getMatches } from "../api/config";
+import TemplateEditor from "../components/TemplateEditor";
 import {
   Container,
   Typography,
@@ -42,36 +43,29 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  LinearProgress,
-  Badge
+  Badge,
+  RateLimit
 } from "@mui/material";
 import {
+  PostAdd,
   SportsSoccer,
-  Today,
-  Schedule,
-  EmojiEvents,
+  CalendarToday,
   AccessTime,
-  CheckCircle,
-  Visibility,
+  LocationOn,
   Download,
-  Share,
   Refresh,
-  ExpandMore,
+  Settings,
+  Edit,
+  Visibility,
+  BatchPrediction,
   Add,
   Remove,
-  PlayArrow,
-  Stop,
-  Settings,
-  Palette,
-  PostAdd,
-  BatchPrediction,
-  PersonAdd,
-  SwapHoriz,
-  Score,
-  Flag,
-  Timer
-} from '@mui/icons-material';
-import AppTheme from '../themes/AppTheme';
+  CheckCircle,
+  Error,
+  Warning,
+  Info
+} from "@mui/icons-material";
+import AppTheme from "../components/AppTheme";
 import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
@@ -164,6 +158,8 @@ const GenPosts = () => {
   const [showDataDialog, setShowDataDialog] = useState(false);
   const [currentPostType, setCurrentPostType] = useState(null);
   const [rateLimited, setRateLimited] = useState(false);
+  const [showTemplateEditor, setShowTemplateEditor] = useState(false);
+  const [currentTemplateId, setCurrentTemplateId] = useState(null);
 
   // Memoized values
   const filteredMatches = useMemo(() => {
@@ -571,20 +567,40 @@ const GenPosts = () => {
                   {selectedMatch && (
                     <Button
                       variant="outlined"
-                      startIcon={<SportsSoccer />}
-                      onClick={() => generatePost(selectedMatch.id, 'matchday')}
-                      disabled={generating}
+                      startIcon={<Edit />}
+                      onClick={() => {
+                        // Get the matchday template ID for editing
+                        if (selectedGraphicPack) {
+                          const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
+                          if (matchdayTemplate) {
+                            setCurrentTemplateId(matchdayTemplate.id);
+                            setShowTemplateEditor(true);
+                          } else {
+                            setSnackbar({
+                              open: true,
+                              message: "No matchday template found for editing",
+                              severity: "warning"
+                            });
+                          }
+                        }
+                      }}
                     >
-                      Test Matchday
+                      Edit Template
                     </Button>
                   )}
                   <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() => setShowMatchDialog(true)}
-                    disabled={generating}
+                    variant="outlined"
+                    startIcon={<Refresh />}
+                    onClick={() => {
+                      setLoading(true);
+                      Promise.all([
+                        fetchUserData(),
+                        fetchMatches(),
+                        fetchGraphicPacks()
+                      ]).finally(() => setLoading(false));
+                    }}
                   >
-                    Select Match
+                    Refresh
                   </Button>
                 </Box>
               </Box>
@@ -982,12 +998,53 @@ const GenPosts = () => {
                 </DialogActions>
               </Dialog>
 
+              {/* Template Editor Dialog */}
+              <Dialog 
+                open={showTemplateEditor} 
+                onClose={() => setShowTemplateEditor(false)}
+                maxWidth="xl"
+                fullWidth
+              >
+                <DialogTitle>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="h6">Template Editor</Typography>
+                    <IconButton onClick={() => setShowTemplateEditor(false)}>
+                      <Remove />
+                    </IconButton>
+                  </Box>
+                </DialogTitle>
+                <DialogContent sx={{ p: 0 }}>
+                  {currentTemplateId && (
+                    <TemplateEditor
+                      templateId={currentTemplateId}
+                      onSave={(elements) => {
+                        setSnackbar({
+                          open: true,
+                          message: "Template updated successfully!",
+                          severity: "success"
+                        });
+                        setShowTemplateEditor(false);
+                      }}
+                      onCancel={() => setShowTemplateEditor(false)}
+                    />
+                  )}
+                </DialogContent>
+              </Dialog>
+
+              {/* Snackbar */}
               <Snackbar
                 open={snackbar.open}
-                autoHideDuration={4000}
-                onClose={() => setSnackbar({ open: false, message: "", severity: "info" })}
-                message={snackbar.message}
-              />
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+              >
+                <Alert
+                  onClose={() => setSnackbar({ ...snackbar, open: false })}
+                  severity={snackbar.severity}
+                  sx={{ width: "100%" }}
+                >
+                  {snackbar.message}
+                </Alert>
+              </Snackbar>
             </Container>
           </Stack>
         </Box>
