@@ -37,6 +37,7 @@ const GenHalfTime = lazy(() => import("./pages/GenHalfTime"));
 const GenFullTime = lazy(() => import("./pages/GenFullTime"));
 const GenPosts = lazy(() => import("./pages/GenPosts"));
 const TemplateManagement = lazy(() => import("./pages/TemplateManagement"));
+const MatchdayPosts = lazy(() => import("./pages/MatchdayPosts"));
 
 function App() {
   const { auth, logout } = useAuth();
@@ -108,6 +109,7 @@ function App() {
           <Route path="/gen/posts" element={<PrivateRoute><GenPosts /></PrivateRoute>} />
           <Route path="/gen/posts/:matchId" element={<PrivateRoute><GenPosts /></PrivateRoute>} />
           <Route path="/templates" element={<PrivateRoute><TemplateManagement /></PrivateRoute>} />
+          <Route path="/matchday-posts" element={<PrivateRoute><MatchdayPosts /></PrivateRoute>} />
    
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
           <Route path="/profile" element={<Overview />} />
