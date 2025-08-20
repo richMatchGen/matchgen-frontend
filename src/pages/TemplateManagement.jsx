@@ -129,14 +129,18 @@ const TemplateManagement = () => {
         return;
       }
       
-      // Fetch the full graphic pack with templates
-      const response = await axios.get(
-        `https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/${selectedPackId}/`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      setSelectedGraphicPack(response.data);
-      setTemplates(response.data.templates || []);
+             // Fetch the full graphic pack with templates
+       console.log('Fetching graphic pack with ID:', selectedPackId);
+       const response = await axios.get(
+         `https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/${selectedPackId}/`,
+         { headers: { Authorization: `Bearer ${token}` } }
+       );
+       
+       console.log('Graphic pack response:', response.data);
+       console.log('Templates in response:', response.data.templates);
+       
+       setSelectedGraphicPack(response.data);
+       setTemplates(response.data.templates || []);
       
     } catch (error) {
       console.error("Error fetching graphic pack:", error);
@@ -405,6 +409,34 @@ const TemplateManagement = () => {
                      }}
                    >
                      Debug
+                   </Button>
+                   <Button
+                     variant="outlined"
+                     startIcon={<Info />}
+                     onClick={async () => {
+                       try {
+                         const token = localStorage.getItem("accessToken");
+                         const response = await axios.get(
+                           `https://matchgen-backend-production.up.railway.app/api/graphicpack/test-graphic-pack-detail/?pack_id=${selectedGraphicPack?.id || 8}`,
+                           { headers: { Authorization: `Bearer ${token}` } }
+                         );
+                         console.log('Test Graphic Pack Detail Response:', response.data);
+                         setSnackbar({
+                           open: true,
+                           message: `Test detail logged to console. Templates: ${response.data.templates_count}`,
+                           severity: "info"
+                         });
+                       } catch (error) {
+                         console.error('Test detail error:', error);
+                         setSnackbar({
+                           open: true,
+                           message: `Test detail failed: ${error.message}`,
+                           severity: "error"
+                         });
+                       }
+                     }}
+                   >
+                     Test Detail
                    </Button>
                    <Button
                      variant="contained"
