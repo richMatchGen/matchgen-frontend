@@ -1,17 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
-import { getClubInfo, getMatches, handleApiError } from "../api/config";
+import useClubSingleton from "../hooks/useClubSingleton";
+import { getMatches } from "../api/config";
 import {
   Container,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Button,
   CircularProgress,
   Snackbar,
@@ -24,14 +19,31 @@ import {
   Grid,
   Chip,
   Avatar,
+  IconButton,
+  Tooltip,
+  Divider,
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton,
-  Tooltip,
-  Divider,
-  Alert
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Checkbox,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  LinearProgress,
+  Badge
 } from "@mui/material";
 import {
   SportsSoccer,
@@ -43,29 +55,148 @@ import {
   Visibility,
   Download,
   Share,
-  Refresh
+  Refresh,
+  ExpandMore,
+  Add,
+  Remove,
+  PlayArrow,
+  Stop,
+  Settings,
+  Palette,
+  PostAdd,
+  BatchPrediction,
+  PersonAdd,
+  SwapHoriz,
+  Score,
+  Flag,
+  Timer
 } from '@mui/icons-material';
 import AppTheme from '../themes/AppTheme';
 import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
 
+// Post type configurations
+const POST_TYPES = [
+  { 
+    id: 'matchday', 
+    label: 'Matchday Post', 
+    icon: <SportsSoccer />, 
+    color: 'primary',
+    description: 'Pre-match announcement and excitement',
+    requiresData: false
+  },
+  { 
+    id: 'startingxi', 
+    label: 'Starting XI', 
+    icon: <PersonAdd />, 
+    color: 'secondary',
+    description: 'Team lineup announcement',
+    requiresData: false
+  },
+  { 
+    id: 'upcoming', 
+    label: 'Upcoming Fixture', 
+    icon: <Schedule />, 
+    color: 'info',
+    description: 'Next match preview',
+    requiresData: false
+  },
+  { 
+    id: 'goal', 
+    label: 'Goal Celebration', 
+    icon: <EmojiEvents />, 
+    color: 'success',
+    description: 'Goal scorer celebration',
+    requiresData: true,
+    dataFields: ['scorer_name', 'minute', 'assist_name']
+  },
+  { 
+    id: 'substitution', 
+    label: 'Substitution', 
+    icon: <SwapHoriz />, 
+    color: 'warning',
+    description: 'Player substitution update',
+    requiresData: true,
+    dataFields: ['player_in', 'player_out', 'minute']
+  },
+  { 
+    id: 'halftime', 
+    label: 'Halftime Score', 
+    icon: <Timer />, 
+    color: 'info',
+    description: 'Half-time score update',
+    requiresData: true,
+    dataFields: ['home_score', 'away_score']
+  },
+  { 
+    id: 'fulltime', 
+    label: 'Full-time Result', 
+    icon: <Flag />, 
+    color: 'error',
+    description: 'Final match result',
+    requiresData: true,
+    dataFields: ['home_score', 'away_score', 'highlights']
+  }
+];
+
 const GenPosts = () => {
   const navigate = useNavigate();
+  const { matchId: urlMatchId } = useParams();
   const { logout } = useAuth();
+  const { club } = useClubSingleton();
+  
+  // State management
   const [user, setUser] = useState(null);
-  const [club, setClub] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [matches, setMatches] = useState([]);
-  const [loadingId, setLoadingId] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
   const [selectedMatch, setSelectedMatch] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [graphicPacks, setGraphicPacks] = useState([]);
+  const [selectedGraphicPack, setSelectedGraphicPack] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [generatingPosts, setGeneratingPosts] = useState(new Set());
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  const [selectedPostTypes, setSelectedPostTypes] = useState(new Set());
+  const [customData, setCustomData] = useState({});
+  const [activeTab, setActiveTab] = useState(0);
+  const [showMatchDialog, setShowMatchDialog] = useState(false);
+  const [showDataDialog, setShowDataDialog] = useState(false);
+  const [currentPostType, setCurrentPostType] = useState(null);
   const [rateLimited, setRateLimited] = useState(false);
 
-  // Memoize the fetch functions to prevent unnecessary re-renders
-  const fetchData = useCallback(async () => {
+  // Memoized values
+  const filteredMatches = useMemo(() => {
+    if (!matches.length) return [];
+    return matches.filter(match => {
+      const today = new Date();
+      const matchDate = new Date(match.date);
+      const diffDays = Math.ceil((matchDate - today) / (1000 * 60 * 60 * 24));
+      
+      switch (activeTab) {
+        case 0: return true; // All
+        case 1: return diffDays > 0; // Upcoming
+        case 2: return diffDays === 0; // Today
+        case 3: return diffDays < 0; // Past
+        default: return true;
+      }
+    });
+  }, [matches, activeTab]);
+
+  const stats = useMemo(() => {
+    const today = new Date();
+    return {
+      total: matches.length,
+      upcoming: matches.filter(m => new Date(m.date) > today).length,
+      today: matches.filter(m => {
+        const matchDate = new Date(m.date);
+        return Math.ceil((matchDate - today) / (1000 * 60 * 60 * 24)) === 0;
+      }).length,
+      past: matches.filter(m => new Date(m.date) < today).length
+    };
+  }, [matches]);
+
+  // Data fetching
+  const fetchUserData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
       navigate("/login");
@@ -73,60 +204,22 @@ const GenPosts = () => {
     }
 
     try {
-      // Get user profile
       const userRes = await axios.get("/api/users/me/", { 
         headers: { Authorization: `Bearer ${token}` } 
       });
       setUser(userRes.data);
     } catch (error) {
-      const errorInfo = handleApiError(error, 'Get user profile');
-      if (errorInfo.error.includes('Rate limited')) {
-        setRateLimited(true);
-        setSnackbar({ 
-          open: true, 
-          message: `Rate limited. Please wait ${errorInfo.retryAfter} seconds before trying again.`, 
-          severity: "warning" 
-        });
-      } else {
-        logout();
-      }
+      logout();
       return;
-    }
-
-    try {
-      // Get club info with better error handling
-      const clubResult = await getClubInfo();
-      if (clubResult.success) {
-        setClub(clubResult.data);
-      } else {
-        if (clubResult.error.includes('Rate limited')) {
-          setRateLimited(true);
-          setSnackbar({ 
-            open: true, 
-            message: `Rate limited. Please wait ${clubResult.retryAfter} seconds before trying again.`, 
-            severity: "warning" 
-          });
-        } else {
-          console.warn("User might not have a club yet:", clubResult.error);
-        }
-      }
-    } catch (error) {
-      console.warn("User might not have a club yet.");
-    } finally {
-      setLoading(false);
     }
   }, [navigate, logout]);
 
   const fetchMatches = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-
     try {
-      const matchesResult = await getMatches();
-      if (matchesResult.success) {
-        // Handle different response structures
+      const result = await getMatches();
+      if (result.success) {
         let matchesData = [];
-        const data = matchesResult.data;
+        const data = result.data;
         
         if (Array.isArray(data)) {
           matchesData = data;
@@ -136,95 +229,76 @@ const GenPosts = () => {
           matchesData = data.matches;
         } else if (typeof data === 'object' && data.id) {
           matchesData = [data];
-        } else if (typeof data === 'string') {
-          try {
-            const parsed = JSON.parse(data);
-            matchesData = Array.isArray(parsed) ? parsed : [parsed];
-          } catch (e) {
-            console.warn('Failed to parse response data as JSON:', e);
-          }
         }
         
         setMatches(matchesData);
-      } else {
-        if (matchesResult.error.includes('Rate limited')) {
-          setRateLimited(true);
-          setSnackbar({ 
-            open: true, 
-            message: `Rate limited. Please wait ${matchesResult.retryAfter} seconds before trying again.`, 
-            severity: "warning" 
-          });
-        } else {
-          console.error("Failed to load matches:", matchesResult.error);
-          setMatches([]);
+        
+        // Set selected match if URL has matchId
+        if (urlMatchId) {
+          const match = matchesData.find(m => m.id.toString() === urlMatchId);
+          if (match) {
+            setSelectedMatch(match);
+          }
         }
       }
-    } catch (err) {
-      console.error("Failed to load matches", err);
-      setMatches([]);
+    } catch (error) {
+      console.error("Failed to load matches:", error);
+    }
+  }, [urlMatchId]);
+
+  const fetchGraphicPacks = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.get(
+        "https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      if (response.data && Array.isArray(response.data)) {
+        setGraphicPacks(response.data);
+        if (response.data.length > 0) {
+          setSelectedGraphicPack(response.data[0]);
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to load graphic packs, using fallback");
+      // Fallback graphic packs
+      setGraphicPacks([
+        { id: 1, name: "Default Pack", description: "Standard design" },
+        { id: 2, name: "Premium Pack", description: "Enhanced design" }
+      ]);
+      setSelectedGraphicPack({ id: 1, name: "Default Pack", description: "Standard design" });
     }
   }, []);
 
-  // Manual refresh function
-  const handleRefresh = useCallback(async () => {
-    if (rateLimited) {
-      setSnackbar({ 
-        open: true, 
-        message: "Please wait before refreshing again.", 
-        severity: "warning" 
-      });
-      return;
-    }
-
-    setRefreshing(true);
-    setRateLimited(false);
-    
-    try {
-      await fetchMatches();
-      setSnackbar({ 
-        open: true, 
-        message: "Data refreshed successfully!", 
-        severity: "success" 
-      });
-    } catch (error) {
-      setSnackbar({ 
-        open: true, 
-        message: "Failed to refresh data.", 
-        severity: "error" 
-      });
-    } finally {
-      setRefreshing(false);
-    }
-  }, [fetchMatches, rateLimited]);
-
+  // Initialize data
   useEffect(() => {
-    let isMounted = true;
-
     const initializeData = async () => {
-      if (!isMounted) return;
-      
-      await fetchData();
-      if (isMounted) {
-        await fetchMatches();
-      }
+      setLoading(true);
+      await Promise.all([
+        fetchUserData(),
+        fetchMatches(),
+        fetchGraphicPacks()
+      ]);
+      setLoading(false);
     };
 
     initializeData();
+  }, [fetchUserData, fetchMatches, fetchGraphicPacks]);
 
-    // Cleanup function to prevent state updates on unmounted component
-    return () => {
-      isMounted = false;
-    };
-  }, [fetchData, fetchMatches]);
-
-  const handleGenerate = async (matchId, postType) => {
-    if (!matchId) {
-      console.warn("⚠️ Tried to generate with undefined match ID");
+  // Post generation
+  const generatePost = useCallback(async (matchId, postType, customData = {}) => {
+    if (!matchId || !postType) {
+      setSnackbar({ 
+        open: true, 
+        message: "Missing match ID or post type", 
+        severity: "error" 
+      });
       return;
     }
-  
-    setLoadingId(`${matchId}-${postType}`);
-  
+
+    setGeneratingPosts(prev => new Set(prev).add(`${matchId}-${postType}`));
+
     try {
       const token = localStorage.getItem("accessToken");
       let endpoint = '';
@@ -239,8 +313,11 @@ const GenPosts = () => {
         case 'startingxi':
           endpoint = `generate-startingxi/`;
           break;
-        case 'highlight':
-          endpoint = `generate-highlight/`;
+        case 'goal':
+          endpoint = `generate-goal/`;
+          break;
+        case 'substitution':
+          endpoint = `generate-substitution/`;
           break;
         case 'halftime':
           endpoint = `generate-halftime/`;
@@ -252,66 +329,119 @@ const GenPosts = () => {
           throw new Error('Invalid post type');
       }
 
-      const res = await axios.get(
+      const requestData = {
+        ...customData,
+        graphic_pack_id: selectedGraphicPack?.id
+      };
+
+      const response = await axios.post(
         `https://matchgen-backend-production.up.railway.app/api/graphicpack/match/${matchId}/${endpoint}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        requestData,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-  
-      // Check if this is a regeneration (post already exists)
-      const isRegenerating = selectedMatch && selectedMatch[`${postType}_post_url`];
-      
+
       setSnackbar({ 
         open: true, 
-        message: isRegenerating 
-          ? `${postType.charAt(0).toUpperCase() + postType.slice(1)} post regenerated successfully!`
-          : `${postType.charAt(0).toUpperCase() + postType.slice(1)} post generated successfully!`, 
+        message: `${POST_TYPES.find(pt => pt.id === postType)?.label} generated successfully!`, 
         severity: "success" 
       });
-  
-      setMatches(prev => {
-        if (Array.isArray(prev)) {
-          return prev.map(m => m.id === matchId ? { 
-            ...m, 
-            [`${postType}_post_url`]: res.data.url 
-          } : m);
-        }
-        return prev;
-      });
+
+      // Update match with new post URL
+      setMatches(prev => prev.map(m => 
+        m.id === matchId 
+          ? { ...m, [`${postType}_post_url`]: response.data.url }
+          : m
+      ));
+
+    } catch (error) {
+      console.error(`Error generating ${postType} post:`, error);
       
-      // Update the selected match if it's the current one
-      if (selectedMatch && selectedMatch.id === matchId) {
-        setSelectedMatch(prev => ({
-          ...prev,
-          [`${postType}_post_url`]: res.data.url
-        }));
+      if (error.response?.status === 429) {
+        setRateLimited(true);
+        setSnackbar({ 
+          open: true, 
+          message: "Rate limited. Please wait before generating more posts.", 
+          severity: "warning" 
+        });
+      } else {
+        setSnackbar({ 
+          open: true, 
+          message: `Failed to generate ${postType} post.`, 
+          severity: "error" 
+        });
       }
-    } catch (err) {
-      console.error(`Error generating ${postType} post`, err);
-      const isRegenerating = selectedMatch && selectedMatch[`${postType}_post_url`];
+    } finally {
+      setGeneratingPosts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(`${matchId}-${postType}`);
+        return newSet;
+      });
+    }
+  }, [selectedGraphicPack]);
+
+  const generateBatch = useCallback(async () => {
+    if (!selectedMatch || selectedPostTypes.size === 0) {
       setSnackbar({ 
         open: true, 
-        message: isRegenerating 
-          ? `Failed to regenerate ${postType} post.`
-          : `Failed to generate ${postType} post.`, 
-        severity: "error" 
+        message: "Please select a match and at least one post type", 
+        severity: "warning" 
       });
-    } finally {
-      setLoadingId(null);
+      return;
     }
-  };
 
-  const openMatchDialog = (match) => {
+    setGenerating(true);
+    
+    const promises = Array.from(selectedPostTypes).map(postType => {
+      const postConfig = POST_TYPES.find(pt => pt.id === postType);
+      const data = postConfig?.requiresData ? customData[postType] || {} : {};
+      return generatePost(selectedMatch.id, postType, data);
+    });
+
+    try {
+      await Promise.all(promises);
+      setSnackbar({ 
+        open: true, 
+        message: `Generated ${selectedPostTypes.size} posts successfully!`, 
+        severity: "success" 
+      });
+    } catch (error) {
+      console.error("Batch generation error:", error);
+    } finally {
+      setGenerating(false);
+    }
+  }, [selectedMatch, selectedPostTypes, customData, generatePost]);
+
+  // Event handlers
+  const handleMatchSelect = (match) => {
     setSelectedMatch(match);
-    setDialogOpen(true);
+    setShowMatchDialog(false);
+    navigate(`/gen/posts/${match.id}`);
   };
 
-  const closeMatchDialog = () => {
-    setDialogOpen(false);
-    setSelectedMatch(null);
+  const handlePostTypeToggle = (postType) => {
+    setSelectedPostTypes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postType)) {
+        newSet.delete(postType);
+      } else {
+        newSet.add(postType);
+      }
+      return newSet;
+    });
+  };
+
+  const handleCustomDataInput = (postType) => {
+    setCurrentPostType(postType);
+    setShowDataDialog(true);
+  };
+
+  const handleCustomDataSave = (data) => {
+    setCustomData(prev => ({
+      ...prev,
+      [currentPostType]: data
+    }));
+    setShowDataDialog(false);
+    setCurrentPostType(null);
   };
 
   const getMatchStatus = (match) => {
@@ -331,12 +461,17 @@ const GenPosts = () => {
     }
   };
 
-  const getPostStatus = (match, postType) => {
-    const postUrl = match[`${postType}_post_url`];
-    return postUrl ? 'generated' : 'not-generated';
-  };
+  if (loading) {
+    return (
+      <AppTheme>
+        <CssBaseline enableColorScheme />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <CircularProgress size={60} />
+        </Box>
+      </AppTheme>
+    );
+  }
 
-  if (loading) return <p>Loading...</p>;
   if (!user) return null;
 
   return (
@@ -366,279 +501,348 @@ const GenPosts = () => {
           >
             <Header />
             <Container sx={{ py: 4, width: '100%' }}>
+              {/* Header */}
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <SportsSoccer sx={{ mr: 2, fontSize: 40, color: 'primary.main' }} />
+                  <PostAdd sx={{ mr: 2, fontSize: 40, color: 'primary.main' }} />
                   <Box>
                     <Typography variant="h4" gutterBottom>
-                      Social Media Posts
+                      Social Media Posts Generator
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                      Generate and manage social media content for all your matches
+                      Generate professional social media content for your matches
                     </Typography>
                   </Box>
                 </Box>
-                <Tooltip title="Refresh matches data">
-                  <IconButton 
-                    onClick={handleRefresh} 
-                    disabled={refreshing || rateLimited}
-                    sx={{ 
-                      backgroundColor: 'primary.main', 
-                      color: 'white',
-                      '&:hover': { backgroundColor: 'primary.dark' },
-                      '&:disabled': { backgroundColor: 'grey.400' }
-                    }}
-                  >
-                    {refreshing ? <CircularProgress size={24} color="inherit" /> : <Refresh />}
-                  </IconButton>
-                </Tooltip>
+                <Button
+                  variant="contained"
+                  startIcon={<Add />}
+                  onClick={() => setShowMatchDialog(true)}
+                  disabled={generating}
+                >
+                  Select Match
+                </Button>
               </Box>
 
               {rateLimited && (
                 <Alert severity="warning" sx={{ mb: 3 }}>
-                  You are currently rate limited. Please wait before making more requests to avoid being blocked.
+                  You are currently rate limited. Please wait before generating more posts.
                 </Alert>
               )}
 
-              <TableContainer component={Paper} elevation={2}>
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ backgroundColor: 'primary.main' }}>
-                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Match Details</TableCell>
-                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Posts Generated</TableCell>
-                      <TableCell align="right" sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {Array.isArray(matches) && matches.length > 0 ? (
-                      matches.map((match) => {
-                        const status = getMatchStatus(match);
-                        const postTypes = ['upcoming', 'matchday', 'startingxi', 'highlight', 'halftime', 'fulltime'];
-                        const generatedPosts = postTypes.filter(type => getPostStatus(match, type) === 'generated').length;
-                        
-                        return (
-                          <TableRow key={match.id} hover>
-                            <TableCell>
-                              <Box>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                  vs {match.opponent}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                  {new Date(match.date).toLocaleDateString('en-GB', { 
-                                    weekday: 'long', 
-                                    year: 'numeric', 
-                                    month: 'long', 
-                                    day: 'numeric' 
-                                  })}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                  {match.venue}
-                                </Typography>
-                              </Box>
-                            </TableCell>
-                            <TableCell>
-                              <Chip 
-                                label={status.label} 
-                                color={status.color} 
-                                size="small" 
-                                variant="outlined"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Typography variant="body2">
-                                  {generatedPosts}/{postTypes.length}
-                                </Typography>
-                                <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                  {postTypes.map((type) => (
-                                    <Tooltip key={type} title={`${type.charAt(0).toUpperCase() + type.slice(1)} Post`}>
-                                      <Box
-                                        sx={{
-                                          width: 8,
-                                          height: 8,
-                                          borderRadius: '50%',
-                                          backgroundColor: getPostStatus(match, type) === 'generated' ? 'success.main' : 'grey.300'
-                                        }}
-                                      />
-                                    </Tooltip>
-                                  ))}
-                                </Box>
-                              </Box>
-                            </TableCell>
-                            <TableCell align="right">
-                              <Button
-                                variant="contained"
-                                onClick={() => openMatchDialog(match)}
-                                startIcon={<Visibility />}
-                                size="small"
-                              >
-                                Manage Posts
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={4} align="center">
-                          <Typography color="text.secondary" sx={{ py: 4 }}>
-                            No matches available
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              {/* Match Selection */}
+              {selectedMatch && (
+                <Card sx={{ mb: 3 }}>
+                  <CardContent>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item xs={12} md={8}>
+                        <Typography variant="h6" gutterBottom>
+                          Selected Match: vs {selectedMatch.opponent}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {new Date(selectedMatch.date).toLocaleDateString('en-GB', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })} • {selectedMatch.venue}
+                        </Typography>
+                        <Chip 
+                          label={getMatchStatus(selectedMatch).label} 
+                          color={getMatchStatus(selectedMatch).color} 
+                          size="small" 
+                          sx={{ mt: 1 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <FormControl fullWidth>
+                          <InputLabel>Graphic Pack</InputLabel>
+                          <Select
+                            value={selectedGraphicPack?.id || ''}
+                            onChange={(e) => {
+                              const pack = graphicPacks.find(p => p.id === e.target.value);
+                              setSelectedGraphicPack(pack);
+                            }}
+                            label="Graphic Pack"
+                          >
+                            {graphicPacks.map((pack) => (
+                              <MenuItem key={pack.id} value={pack.id}>
+                                {pack.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              )}
 
-              {/* Match Detail Dialog */}
-              <Dialog 
-                open={dialogOpen} 
-                onClose={closeMatchDialog}
-                maxWidth="md"
-                fullWidth
-              >
-                <DialogTitle>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Typography variant="h6">
-                      {selectedMatch && `vs ${selectedMatch.opponent}`}
+              {/* Post Types Selection */}
+              {selectedMatch && (
+                <Card sx={{ mb: 3 }}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Select Post Types
                     </Typography>
-                    <IconButton onClick={closeMatchDialog}>
-                      <Refresh />
-                    </IconButton>
-                  </Box>
-                </DialogTitle>
-                <DialogContent>
-                  {selectedMatch && (
-                    <Box>
-                      {/* Match Info Card */}
-                      <Card sx={{ mb: 3, backgroundColor: 'grey.50' }}>
-                        <CardContent>
-                          <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={12} md={6}>
-                              <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                {selectedMatch.opponent}
+                    <Grid container spacing={2}>
+                      {POST_TYPES.map((postType) => (
+                        <Grid item xs={12} sm={6} md={4} key={postType.id}>
+                          <Card 
+                            sx={{ 
+                              cursor: 'pointer',
+                              border: selectedPostTypes.has(postType.id) ? 2 : 1,
+                              borderColor: selectedPostTypes.has(postType.id) ? `${postType.color}.main` : 'grey.300',
+                              '&:hover': { borderColor: `${postType.color}.main` }
+                            }}
+                            onClick={() => handlePostTypeToggle(postType.id)}
+                          >
+                            <CardContent sx={{ textAlign: 'center' }}>
+                              <Box sx={{ color: `${postType.color}.main`, mb: 1 }}>
+                                {postType.icon}
+                              </Box>
+                              <Typography variant="h6" sx={{ mb: 1 }}>
+                                {postType.label}
                               </Typography>
-                              <Typography variant="body1" color="text.secondary">
-                                {new Date(selectedMatch.date).toLocaleDateString('en-GB', { 
-                                  weekday: 'long', 
-                                  year: 'numeric', 
-                                  month: 'long', 
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                {postType.description}
+                              </Typography>
+                              <Checkbox 
+                                checked={selectedPostTypes.has(postType.id)}
+                                color={postType.color}
+                              />
+                              {postType.requiresData && (
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCustomDataInput(postType.id);
+                                  }}
+                                  sx={{ mt: 1 }}
+                                >
+                                  Add Data
+                                </Button>
+                              )}
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Generation Actions */}
+              {selectedMatch && selectedPostTypes.size > 0 && (
+                <Card sx={{ mb: 3 }}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Generate Posts
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                      <Button
+                        variant="contained"
+                        startIcon={<BatchPrediction />}
+                        onClick={generateBatch}
+                        disabled={generating || rateLimited}
+                        size="large"
+                      >
+                        {generating ? 'Generating...' : `Generate ${selectedPostTypes.size} Posts`}
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Refresh />}
+                        onClick={() => {
+                          setSelectedPostTypes(new Set());
+                          setCustomData({});
+                        }}
+                        disabled={generating}
+                      >
+                        Clear Selection
+                      </Button>
+                    </Stack>
+                    {generating && (
+                      <Box sx={{ mt: 2 }}>
+                        <LinearProgress />
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          Generating posts... Please wait.
+                        </Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Match List */}
+              {!selectedMatch && (
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Your Matches
+                    </Typography>
+                    
+                    {/* Stats */}
+                    <Box sx={{ mb: 3 }}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={3}>
+                          <Card sx={{ textAlign: 'center', p: 2 }}>
+                            <Typography variant="h4">{stats.total}</Typography>
+                            <Typography variant="body2">Total Matches</Typography>
+                          </Card>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Card sx={{ textAlign: 'center', p: 2 }}>
+                            <Typography variant="h4" color="info.main">{stats.upcoming}</Typography>
+                            <Typography variant="body2">Upcoming</Typography>
+                          </Card>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Card sx={{ textAlign: 'center', p: 2 }}>
+                            <Typography variant="h4" color="warning.main">{stats.today}</Typography>
+                            <Typography variant="body2">Today</Typography>
+                          </Card>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Card sx={{ textAlign: 'center', p: 2 }}>
+                            <Typography variant="h4" color="success.main">{stats.past}</Typography>
+                            <Typography variant="body2">Completed</Typography>
+                          </Card>
+                        </Grid>
+                      </Grid>
+                    </Box>
+
+                    {/* Tabs */}
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+                      <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+                        <Tab label={`All (${stats.total})`} />
+                        <Tab label={`Upcoming (${stats.upcoming})`} />
+                        <Tab label={`Today (${stats.today})`} />
+                        <Tab label={`Past (${stats.past})`} />
+                      </Tabs>
+                    </Box>
+
+                    {/* Match List */}
+                    <Grid container spacing={2}>
+                      {filteredMatches.map((match) => (
+                        <Grid item xs={12} sm={6} md={4} key={match.id}>
+                          <Card 
+                            sx={{ cursor: 'pointer', '&:hover': { boxShadow: 3 } }}
+                            onClick={() => handleMatchSelect(match)}
+                          >
+                            <CardContent>
+                              <Typography variant="h6" gutterBottom>
+                                vs {match.opponent}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" gutterBottom>
+                                {new Date(match.date).toLocaleDateString('en-GB', { 
+                                  weekday: 'short', 
+                                  month: 'short', 
                                   day: 'numeric' 
                                 })}
                               </Typography>
-                              <Typography variant="body1" color="text.secondary">
-                                {selectedMatch.venue}
+                              <Typography variant="body2" color="text.secondary" gutterBottom>
+                                {match.venue}
                               </Typography>
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Chip 
-                                  label={getMatchStatus(selectedMatch).label} 
-                                  color={getMatchStatus(selectedMatch).color} 
-                                  size="large"
-                                />
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </CardContent>
-                      </Card>
+                              <Chip 
+                                label={getMatchStatus(match).label} 
+                                color={getMatchStatus(match).color} 
+                                size="small" 
+                              />
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </CardContent>
+                </Card>
+              )}
 
-                      {/* Generation Options */}
-                      <Typography variant="h6" sx={{ mb: 2 }}>
-                        Generate Social Media Posts
-                      </Typography>
-                      <Grid container spacing={2}>
-                        {[
-                          { type: 'upcoming', label: 'Upcoming Fixture', icon: <Schedule />, color: 'primary' },
-                          { type: 'matchday', label: 'Matchday', icon: <Today />, color: 'secondary' },
-                          { type: 'startingxi', label: 'Starting XI', icon: <SportsSoccer />, color: 'success' },
-                          { type: 'highlight', label: 'Highlight', icon: <EmojiEvents />, color: 'warning' },
-                          { type: 'halftime', label: 'Half Time', icon: <AccessTime />, color: 'info' },
-                          { type: 'fulltime', label: 'Full Time', icon: <CheckCircle />, color: 'error' }
-                        ].map((option) => {
-                          const postStatus = getPostStatus(selectedMatch, option.type);
-                          const isGenerating = loadingId === `${selectedMatch.id}-${option.type}`;
-                          
-                          return (
-                            <Grid item xs={12} sm={6} md={4} key={option.type}>
-                              <Card 
-                                sx={{ 
-                                  height: '100%',
-                                  border: postStatus === 'generated' ? 2 : 1,
-                                  borderColor: postStatus === 'generated' ? 'success.main' : 'grey.300',
-                                  opacity: isGenerating ? 0.7 : 1,
-                                  transition: 'opacity 0.2s ease-in-out'
-                                }}
-                              >
-                                <CardContent sx={{ textAlign: 'center' }}>
-                                  <Box sx={{ color: `${option.color}.main`, mb: 1 }}>
-                                    {option.icon}
-                                  </Box>
-                                  <Typography variant="h6" sx={{ mb: 1 }}>
-                                    {option.label}
-                                  </Typography>
-                                  
-                                  {postStatus === 'generated' ? (
-                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
-                                      <Button
-                                        variant="outlined"
-                                        size="small"
-                                        startIcon={<Visibility />}
-                                        onClick={() => window.open(selectedMatch[`${option.type}_post_url`], '_blank')}
-                                      >
-                                        View
-                                      </Button>
-                                      <Button
-                                        variant="outlined"
-                                        size="small"
-                                        startIcon={<Download />}
-                                        onClick={() => {
-                                          const link = document.createElement('a');
-                                          link.href = selectedMatch[`${option.type}_post_url`];
-                                          link.download = `${option.type}_post.png`;
-                                          link.click();
-                                        }}
-                                      >
-                                        Download
-                                      </Button>
-                                      <Tooltip title={`Regenerate ${option.label} post`}>
-                                        <Button
-                                          variant="contained"
-                                          size="small"
-                                          color={option.color}
-                                          onClick={() => handleGenerate(selectedMatch.id, option.type)}
-                                          disabled={isGenerating}
-                                          startIcon={isGenerating ? <CircularProgress size={16} /> : <Refresh />}
-                                        >
-                                          {isGenerating ? 'Regenerating...' : 'Regenerate'}
-                                        </Button>
-                                      </Tooltip>
-                                    </Box>
-                                  ) : (
-                                    <Button
-                                      variant="contained"
-                                      color={option.color}
-                                      onClick={() => handleGenerate(selectedMatch.id, option.type)}
-                                      disabled={isGenerating}
-                                      startIcon={isGenerating ? <CircularProgress size={16} /> : <Share />}
-                                      fullWidth
-                                    >
-                                      {isGenerating ? 'Generating...' : 'Generate'}
-                                    </Button>
-                                  )}
-                                </CardContent>
-                              </Card>
-                            </Grid>
-                          );
-                        })}
+              {/* Dialogs */}
+              
+              {/* Match Selection Dialog */}
+              <Dialog 
+                open={showMatchDialog} 
+                onClose={() => setShowMatchDialog(false)}
+                maxWidth="md"
+                fullWidth
+              >
+                <DialogTitle>Select a Match</DialogTitle>
+                <DialogContent>
+                  <Grid container spacing={2}>
+                    {matches.map((match) => (
+                      <Grid item xs={12} sm={6} key={match.id}>
+                        <Card 
+                          sx={{ cursor: 'pointer', '&:hover': { boxShadow: 3 } }}
+                          onClick={() => handleMatchSelect(match)}
+                        >
+                          <CardContent>
+                            <Typography variant="h6" gutterBottom>
+                              vs {match.opponent}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {new Date(match.date).toLocaleDateString()}
+                            </Typography>
+                            <Chip 
+                              label={getMatchStatus(match).label} 
+                              color={getMatchStatus(match).color} 
+                              size="small" 
+                              sx={{ mt: 1 }}
+                            />
+                          </CardContent>
+                        </Card>
                       </Grid>
-                    </Box>
-                  )}
+                    ))}
+                  </Grid>
                 </DialogContent>
                 <DialogActions>
-                  <Button onClick={closeMatchDialog}>Close</Button>
+                  <Button onClick={() => setShowMatchDialog(false)}>Cancel</Button>
+                </DialogActions>
+              </Dialog>
+
+              {/* Custom Data Dialog */}
+              <Dialog 
+                open={showDataDialog} 
+                onClose={() => setShowDataDialog(false)}
+                maxWidth="sm"
+                fullWidth
+              >
+                <DialogTitle>
+                  Add Data for {currentPostType && POST_TYPES.find(pt => pt.id === currentPostType)?.label}
+                </DialogTitle>
+                <DialogContent>
+                  {currentPostType && (() => {
+                    const postConfig = POST_TYPES.find(pt => pt.id === currentPostType);
+                    if (!postConfig?.dataFields) return null;
+
+                    return (
+                      <Stack spacing={2} sx={{ mt: 1 }}>
+                        {postConfig.dataFields.map((field) => (
+                          <TextField
+                            key={field}
+                            label={field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            fullWidth
+                            value={customData[currentPostType]?.[field] || ''}
+                            onChange={(e) => {
+                              setCustomData(prev => ({
+                                ...prev,
+                                [currentPostType]: {
+                                  ...prev[currentPostType],
+                                  [field]: e.target.value
+                                }
+                              }));
+                            }}
+                          />
+                        ))}
+                      </Stack>
+                    );
+                  })()}
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setShowDataDialog(false)}>Cancel</Button>
+                  <Button onClick={() => handleCustomDataSave(customData[currentPostType] || {})}>
+                    Save
+                  </Button>
                 </DialogActions>
               </Dialog>
 

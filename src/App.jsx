@@ -105,6 +105,7 @@ function App() {
           <Route path="/gen/halftime" element={<PrivateRoute><GenHalfTime /></PrivateRoute>} />
           <Route path="/gen/fulltime" element={<PrivateRoute><GenFullTime /></PrivateRoute>} />
           <Route path="/gen/posts" element={<PrivateRoute><GenPosts /></PrivateRoute>} />
+          <Route path="/gen/posts/:matchId" element={<PrivateRoute><GenPosts /></PrivateRoute>} />
    
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
           <Route path="/profile" element={<Overview />} />
