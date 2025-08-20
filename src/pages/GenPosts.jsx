@@ -263,80 +263,74 @@ const GenPosts = () => {
     }
   }, [urlMatchId]); // Only depend on urlMatchId
 
-  const fetchGraphicPacks = useCallback(async () => {
+    const fetchGraphicPacks = useCallback(async () => {
     try {
       const token = localStorage.getItem("accessToken");
       
-             // First, get the user's club to find their selected graphic pack
-       const clubResponse = await axios.get(
-         "https://matchgen-backend-production.up.railway.app/api/users/me/",
-         { headers: { Authorization: `Bearer ${token}` } }
-       );
+      // First, get the user's club to find their selected graphic pack
+      const clubResponse = await axios.get(
+        "https://matchgen-backend-production.up.railway.app/api/users/me/",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       
       console.log('User data:', clubResponse.data);
       
-             // The /api/users/me/ endpoint doesn't include club data
-       // We need to fetch the user's club separately
-       try {
-         const myClubResponse = await axios.get(
-           "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
-           { headers: { Authorization: `Bearer ${token}` } }
-         );
+      // The /api/users/me/ endpoint doesn't include club data
+      // We need to fetch the user's club separately
+      let selectedPackId = null;
+      try {
+        const myClubResponse = await axios.get(
+          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         
-                 if (myClubResponse.data) {
-           const club = myClubResponse.data;
-           console.log('User club:', club);
-           console.log('Club selected_pack:', club.selected_pack);
-           
-                       if (club.selected_pack) {
-              // User has a selected pack, find the full pack object
-              const selectedPackId = club.selected_pack;
-              console.log('Selected graphic pack ID from club:', selectedPackId);
-              
-              // We'll set the full pack object after fetching available packs
-              // For now, store the ID
-              setSelectedGraphicPack({ id: selectedPackId });
-            } else {
-              // No selected pack, show message
-              setSelectedGraphicPack(null);
-              console.log('No graphic pack selected for club');
-            }
+        if (myClubResponse.data) {
+          const club = myClubResponse.data;
+          console.log('User club:', club);
+          console.log('Club selected_pack:', club.selected_pack);
+          
+          if (club.selected_pack) {
+            selectedPackId = club.selected_pack;
+            console.log('Selected graphic pack ID from club:', selectedPackId);
+          } else {
+            console.log('No graphic pack selected for club');
+          }
         } else {
           console.warn("No club found for user");
-          setSelectedGraphicPack(null);
         }
       } catch (clubError) {
         if (clubError.response?.status === 404) {
           console.warn("No club found for user - user needs to create a club first");
-          setSelectedGraphicPack(null);
         } else {
           console.error("Error fetching club:", clubError);
-          setSelectedGraphicPack(null);
         }
       }
       
-      // Also fetch all available packs for reference
+      // Fetch all available packs
       const response = await axios.get(
         "https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-             console.log('Available graphic packs:', response.data);
-       
-       if (response.data && response.data.results && Array.isArray(response.data.results)) {
-         setGraphicPacks(response.data.results);
-         
-         // If we have a selected pack ID, find the full pack object
-         if (selectedGraphicPack && selectedGraphicPack.id) {
-           const fullPack = response.data.results.find(pack => pack.id === selectedGraphicPack.id);
-           if (fullPack) {
-             setSelectedGraphicPack(fullPack);
-             console.log('Found full graphic pack:', fullPack);
-           } else {
-             console.warn(`Graphic pack with ID ${selectedGraphicPack.id} not found in available packs`);
-           }
-         }
-       }
+      console.log('Available graphic packs:', response.data);
+      
+      if (response.data && response.data.results && Array.isArray(response.data.results)) {
+        setGraphicPacks(response.data.results);
+        
+        // If we have a selected pack ID, find the full pack object
+        if (selectedPackId) {
+          const fullPack = response.data.results.find(pack => pack.id === selectedPackId);
+          if (fullPack) {
+            setSelectedGraphicPack(fullPack);
+            console.log('Found full graphic pack:', fullPack);
+          } else {
+            console.warn(`Graphic pack with ID ${selectedPackId} not found in available packs`);
+            setSelectedGraphicPack(null);
+          }
+        } else {
+          setSelectedGraphicPack(null);
+        }
+      }
     } catch (error) {
       console.warn("Failed to load graphic packs or club data", error);
       setSelectedGraphicPack(null);
