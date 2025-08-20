@@ -266,28 +266,50 @@ const GenPosts = () => {
   const fetchGraphicPacks = useCallback(async () => {
     try {
       const token = localStorage.getItem("accessToken");
+      
+      // First, get the user's club to find their selected graphic pack
+      const clubResponse = await axios.get(
+        "/api/users/me/",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      if (clubResponse.data && clubResponse.data.club) {
+        const club = clubResponse.data.club;
+        console.log('User club:', club);
+        
+        if (club.selected_pack) {
+          // User has a selected pack, use that
+          setSelectedGraphicPack(club.selected_pack);
+          console.log('Selected graphic pack from club:', club.selected_pack);
+        } else {
+          // No selected pack, show message
+          setSelectedGraphicPack(null);
+          console.log('No graphic pack selected for club');
+        }
+      } else {
+        console.warn("No club found for user");
+        setSelectedGraphicPack(null);
+      }
+      
+      // Also fetch all available packs for reference
       const response = await axios.get(
         "https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      console.log('Graphic packs response:', response.data);
+      console.log('Available graphic packs:', response.data);
       
       if (response.data && Array.isArray(response.data)) {
         setGraphicPacks(response.data);
-        if (response.data.length > 0) {
-          setSelectedGraphicPack(response.data[0]);
-          console.log('Selected graphic pack:', response.data[0]);
-        }
       }
     } catch (error) {
-      console.warn("Failed to load graphic packs, using fallback", error);
+      console.warn("Failed to load graphic packs or club data", error);
+      setSelectedGraphicPack(null);
       // Fallback graphic packs
       setGraphicPacks([
         { id: 1, name: "Default Pack", description: "Standard design" },
         { id: 2, name: "Premium Pack", description: "Enhanced design" }
       ]);
-      setSelectedGraphicPack({ id: 1, name: "Default Pack", description: "Standard design" });
     }
   }, []); // No dependencies
 
@@ -759,14 +781,18 @@ const GenPosts = () => {
                            <Typography variant="body2" color="text.secondary" gutterBottom>
                              Graphic Pack
                            </Typography>
-                           <Typography variant="h6" color="primary">
-                             {selectedGraphicPack?.name || 'No pack selected'}
-                           </Typography>
-                           {selectedGraphicPack?.description && (
-                             <Typography variant="body2" color="text.secondary">
-                               {selectedGraphicPack.description}
-                             </Typography>
-                           )}
+                                                       <Typography variant="h6" color={selectedGraphicPack ? "primary" : "error"}>
+                              {selectedGraphicPack?.name || 'No pack selected'}
+                            </Typography>
+                            {selectedGraphicPack?.description ? (
+                              <Typography variant="body2" color="text.secondary">
+                                {selectedGraphicPack.description}
+                              </Typography>
+                            ) : (
+                              <Typography variant="body2" color="error">
+                                Please select a graphic pack from the Templates page
+                              </Typography>
+                            )}
                          </Box>
                        </Grid>
                     </Grid>
