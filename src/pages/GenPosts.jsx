@@ -593,7 +593,7 @@ const GenPosts = () => {
                              } else {
                                setSnackbar({
                                  open: true,
-                                 message: `No matchday template found in ${selectedGraphicPack.name}. Please contact support to set up templates.`,
+                                 message: `No matchday template found in ${selectedGraphicPack.name}. Templates need to be set up in the database.`,
                                  severity: "warning"
                                });
                              }
@@ -623,7 +623,7 @@ const GenPosts = () => {
                              } else {
                                setSnackbar({
                                  open: true,
-                                 message: `No matchday template found in ${selectedGraphicPack.name}. Please contact support to set up templates.`,
+                                 message: `No matchday template found in ${selectedGraphicPack.name}. Templates need to be set up in the database.`,
                                  severity: "warning"
                                });
                              }
@@ -654,34 +654,73 @@ const GenPosts = () => {
                    >
                      Refresh
                    </Button>
-                   <Button
-                     variant="outlined"
-                     startIcon={<Settings />}
-                     onClick={async () => {
-                       try {
-                         const token = localStorage.getItem("accessToken");
-                         const response = await axios.get(
-                           "https://matchgen-backend-production.up.railway.app/api/graphicpack/debug/",
-                           { headers: { Authorization: `Bearer ${token}` } }
-                         );
-                         console.log('Debug response:', response.data);
-                         setSnackbar({
-                           open: true,
-                           message: `Debug: ${response.data.total_packs} packs found`,
-                           severity: "info"
-                         });
-                       } catch (error) {
-                         console.error('Debug error:', error);
-                         setSnackbar({
-                           open: true,
-                           message: `Debug error: ${error.message}`,
-                           severity: "error"
-                         });
-                       }
-                     }}
-                   >
-                     Debug
-                   </Button>
+                                       <Button
+                      variant="outlined"
+                      startIcon={<Settings />}
+                      onClick={async () => {
+                        try {
+                          const token = localStorage.getItem("accessToken");
+                          // First test the basic API
+                          const testResponse = await axios.get(
+                            "https://matchgen-backend-production.up.railway.app/api/graphicpack/test/",
+                            { headers: { Authorization: `Bearer ${token}` } }
+                          );
+                          console.log('Test response:', testResponse.data);
+                          
+                          // Then try the debug endpoint
+                          const response = await axios.get(
+                            "https://matchgen-backend-production.up.railway.app/api/graphicpack/debug/",
+                            { headers: { Authorization: `Bearer ${token}` } }
+                          );
+                          console.log('Debug response:', response.data);
+                          setSnackbar({
+                            open: true,
+                            message: `Debug: ${response.data.total_packs} packs found`,
+                            severity: "info"
+                          });
+                        } catch (error) {
+                          console.error('Debug error:', error);
+                          setSnackbar({
+                            open: true,
+                            message: `Debug error: ${error.message}`,
+                            severity: "error"
+                          });
+                        }
+                      }}
+                                         >
+                       Debug
+                     </Button>
+                     <Button
+                       variant="outlined"
+                       startIcon={<Add />}
+                       onClick={async () => {
+                         try {
+                           const token = localStorage.getItem("accessToken");
+                           const response = await axios.post(
+                             "https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/",
+                             {},
+                             { headers: { Authorization: `Bearer ${token}` } }
+                           );
+                           console.log('Create test data response:', response.data);
+                           setSnackbar({
+                             open: true,
+                             message: `Test data created: ${response.data.elements_created} elements`,
+                             severity: "success"
+                           });
+                           // Refresh the graphic packs
+                           fetchGraphicPacks();
+                         } catch (error) {
+                           console.error('Create test data error:', error);
+                           setSnackbar({
+                             open: true,
+                             message: `Create test data error: ${error.message}`,
+                             severity: "error"
+                           });
+                         }
+                       }}
+                     >
+                       Create Test Data
+                     </Button>
                 </Box>
               </Box>
 
