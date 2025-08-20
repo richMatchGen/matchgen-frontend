@@ -289,6 +289,30 @@ const MatchdayPostGenerator = () => {
     }
   };
 
+  const testSimple = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/simple-test/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log('Simple test result:', response.data);
+      setDebugData(response.data);
+      setSnackbar({
+        open: true,
+        message: 'Simple test successful!',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Simple test failed:', error);
+      setSnackbar({
+        open: true,
+        message: 'Simple test failed',
+        severity: 'error'
+      });
+    }
+  };
+
   const debugTemplates = async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -411,6 +435,13 @@ const MatchdayPostGenerator = () => {
             color="primary"
           >
             Run Diagnostic
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={testSimple}
+            color="secondary"
+          >
+            Simple Test
           </Button>
        </Box>
 
