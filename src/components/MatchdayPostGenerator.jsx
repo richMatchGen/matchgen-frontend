@@ -153,6 +153,34 @@ const MatchdayPostGenerator = () => {
     }
   };
 
+  const createTestData = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/',
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log('Test data created:', response.data);
+      setSnackbar({
+        open: true,
+        message: 'Test data created successfully!',
+        severity: 'success'
+      });
+      // Refresh debug data to show the new packs
+      setTimeout(() => {
+        debugTemplates();
+      }, 1000);
+    } catch (error) {
+      console.error('Error creating test data:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to create test data',
+        severity: 'error'
+      });
+    }
+  };
+
   const debugTemplates = async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -237,6 +265,13 @@ const MatchdayPostGenerator = () => {
            onClick={debugTemplates}
          >
            Debug Templates
+         </Button>
+         <Button
+           variant="outlined"
+           onClick={createTestData}
+           color="secondary"
+         >
+           Create Test Data
          </Button>
        </Box>
 
