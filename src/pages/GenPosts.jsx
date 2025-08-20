@@ -273,22 +273,41 @@ const GenPosts = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      if (clubResponse.data && clubResponse.data.club) {
-        const club = clubResponse.data.club;
-        console.log('User club:', club);
+      console.log('User data:', clubResponse.data);
+      
+      // The /api/users/me/ endpoint doesn't include club data
+      // We need to fetch the user's club separately
+      try {
+        const myClubResponse = await axios.get(
+          "/api/users/my-club/",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         
-        if (club.selected_pack) {
-          // User has a selected pack, use that
-          setSelectedGraphicPack(club.selected_pack);
-          console.log('Selected graphic pack from club:', club.selected_pack);
+        if (myClubResponse.data) {
+          const club = myClubResponse.data;
+          console.log('User club:', club);
+          
+          if (club.selected_pack) {
+            // User has a selected pack, use that
+            setSelectedGraphicPack(club.selected_pack);
+            console.log('Selected graphic pack from club:', club.selected_pack);
+          } else {
+            // No selected pack, show message
+            setSelectedGraphicPack(null);
+            console.log('No graphic pack selected for club');
+          }
         } else {
-          // No selected pack, show message
+          console.warn("No club found for user");
           setSelectedGraphicPack(null);
-          console.log('No graphic pack selected for club');
         }
-      } else {
-        console.warn("No club found for user");
-        setSelectedGraphicPack(null);
+      } catch (clubError) {
+        if (clubError.response?.status === 404) {
+          console.warn("No club found for user - user needs to create a club first");
+          setSelectedGraphicPack(null);
+        } else {
+          console.error("Error fetching club:", clubError);
+          setSelectedGraphicPack(null);
+        }
       }
       
       // Also fetch all available packs for reference
@@ -597,71 +616,81 @@ const GenPosts = () => {
                     </Typography>
                   </Box>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  {selectedMatch && (
-                    <>
-                                             <Button
-                         variant="outlined"
-                         startIcon={<Edit />}
-                         onClick={() => {
-                           // Get the matchday template ID for editing
-                           if (selectedGraphicPack) {
-                             console.log('Selected GraphicPack:', selectedGraphicPack);
-                             const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
-                             console.log('Matchday template:', matchdayTemplate);
-                             if (matchdayTemplate) {
-                               setCurrentTemplateId(matchdayTemplate.id);
-                               setShowQuickPositioner(true);
-                             } else {
-                               setSnackbar({
-                                 open: true,
-                                 message: `No matchday template found in ${selectedGraphicPack.name}. Templates need to be set up in the database.`,
-                                 severity: "warning"
-                               });
-                             }
-                           } else {
-                             setSnackbar({
-                               open: true,
-                               message: "Please select a graphic pack first",
-                               severity: "warning"
-                             });
-                           }
-                         }}
-                       >
-                         Quick Position Text
-                       </Button>
-                       <Button
-                         variant="outlined"
-                         startIcon={<Edit />}
-                         onClick={() => {
-                           // Get the matchday template ID for editing
-                           if (selectedGraphicPack) {
-                             console.log('Selected GraphicPack:', selectedGraphicPack);
-                             const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
-                             console.log('Matchday template:', matchdayTemplate);
-                             if (matchdayTemplate) {
-                               setCurrentTemplateId(matchdayTemplate.id);
-                               setShowTemplateEditor(true);
-                             } else {
-                               setSnackbar({
-                                 open: true,
-                                 message: `No matchday template found in ${selectedGraphicPack.name}. Templates need to be set up in the database.`,
-                                 severity: "warning"
-                               });
-                             }
-                           } else {
-                             setSnackbar({
-                               open: true,
-                               message: "Please select a graphic pack first",
-                               severity: "warning"
-                             });
-                           }
-                         }}
-                       >
-                         Advanced Editor
-                       </Button>
-                    </>
-                  )}
+                                 <Box sx={{ display: 'flex', gap: 2 }}>
+                   {!selectedGraphicPack && (
+                     <Button
+                       variant="contained"
+                       color="primary"
+                       startIcon={<Add />}
+                       onClick={() => navigate('/club/create')}
+                     >
+                       Create Club
+                     </Button>
+                   )}
+                   {selectedMatch && selectedGraphicPack && (
+                     <>
+                                              <Button
+                          variant="outlined"
+                          startIcon={<Edit />}
+                          onClick={() => {
+                            // Get the matchday template ID for editing
+                            if (selectedGraphicPack) {
+                              console.log('Selected GraphicPack:', selectedGraphicPack);
+                              const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
+                              console.log('Matchday template:', matchdayTemplate);
+                              if (matchdayTemplate) {
+                                setCurrentTemplateId(matchdayTemplate.id);
+                                setShowQuickPositioner(true);
+                              } else {
+                                setSnackbar({
+                                  open: true,
+                                  message: `No matchday template found in ${selectedGraphicPack.name}. Templates need to be set up in the database.`,
+                                  severity: "warning"
+                                });
+                              }
+                            } else {
+                              setSnackbar({
+                                open: true,
+                                message: "Please select a graphic pack first",
+                                severity: "warning"
+                              });
+                            }
+                          }}
+                        >
+                          Quick Position Text
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          startIcon={<Edit />}
+                          onClick={() => {
+                            // Get the matchday template ID for editing
+                            if (selectedGraphicPack) {
+                              console.log('Selected GraphicPack:', selectedGraphicPack);
+                              const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
+                              console.log('Matchday template:', matchdayTemplate);
+                              if (matchdayTemplate) {
+                                setCurrentTemplateId(matchdayTemplate.id);
+                                setShowTemplateEditor(true);
+                              } else {
+                                setSnackbar({
+                                  open: true,
+                                  message: `No matchday template found in ${selectedGraphicPack.name}. Templates need to be set up in the database.`,
+                                  severity: "warning"
+                                });
+                              }
+                            } else {
+                              setSnackbar({
+                                open: true,
+                                message: "Please select a graphic pack first",
+                                severity: "warning"
+                              });
+                            }
+                          }}
+                        >
+                          Advanced Editor
+                        </Button>
+                     </>
+                   )}
                                      <Button
                      variant="outlined"
                      startIcon={<Refresh />}
@@ -784,15 +813,19 @@ const GenPosts = () => {
                                                        <Typography variant="h6" color={selectedGraphicPack ? "primary" : "error"}>
                               {selectedGraphicPack?.name || 'No pack selected'}
                             </Typography>
-                            {selectedGraphicPack?.description ? (
-                              <Typography variant="body2" color="text.secondary">
-                                {selectedGraphicPack.description}
-                              </Typography>
-                            ) : (
-                              <Typography variant="body2" color="error">
-                                Please select a graphic pack from the Templates page
-                              </Typography>
-                            )}
+                                                         {selectedGraphicPack?.description ? (
+                               <Typography variant="body2" color="text.secondary">
+                                 {selectedGraphicPack.description}
+                               </Typography>
+                             ) : selectedGraphicPack ? (
+                               <Typography variant="body2" color="error">
+                                 Please select a graphic pack from the Templates page
+                               </Typography>
+                             ) : (
+                               <Typography variant="body2" color="error">
+                                 No club found. Please create a club first.
+                               </Typography>
+                             )}
                          </Box>
                        </Grid>
                     </Grid>
