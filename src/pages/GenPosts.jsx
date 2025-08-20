@@ -209,11 +209,11 @@ const GenPosts = () => {
       return;
     }
 
-    try {
-      const userRes = await axios.get("/api/users/me/", { 
-        headers: { Authorization: `Bearer ${token}` } 
-      });
-      setUser(userRes.data);
+         try {
+       const userRes = await axios.get("https://matchgen-backend-production.up.railway.app/api/users/me/", { 
+         headers: { Authorization: `Bearer ${token}` } 
+       });
+       setUser(userRes.data);
     } catch (error) {
       // Handle logout without dependency
       localStorage.removeItem("accessToken");
@@ -267,35 +267,36 @@ const GenPosts = () => {
     try {
       const token = localStorage.getItem("accessToken");
       
-      // First, get the user's club to find their selected graphic pack
-      const clubResponse = await axios.get(
-        "/api/users/me/",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+             // First, get the user's club to find their selected graphic pack
+       const clubResponse = await axios.get(
+         "https://matchgen-backend-production.up.railway.app/api/users/me/",
+         { headers: { Authorization: `Bearer ${token}` } }
+       );
       
       console.log('User data:', clubResponse.data);
       
-      // The /api/users/me/ endpoint doesn't include club data
-      // We need to fetch the user's club separately
-      try {
-        const myClubResponse = await axios.get(
-          "/api/users/my-club/",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+             // The /api/users/me/ endpoint doesn't include club data
+       // We need to fetch the user's club separately
+       try {
+         const myClubResponse = await axios.get(
+           "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
+           { headers: { Authorization: `Bearer ${token}` } }
+         );
         
-        if (myClubResponse.data) {
-          const club = myClubResponse.data;
-          console.log('User club:', club);
-          
-          if (club.selected_pack) {
-            // User has a selected pack, use that
-            setSelectedGraphicPack(club.selected_pack);
-            console.log('Selected graphic pack from club:', club.selected_pack);
-          } else {
-            // No selected pack, show message
-            setSelectedGraphicPack(null);
-            console.log('No graphic pack selected for club');
-          }
+                 if (myClubResponse.data) {
+           const club = myClubResponse.data;
+           console.log('User club:', club);
+           console.log('Club selected_pack:', club.selected_pack);
+           
+           if (club.selected_pack) {
+             // User has a selected pack, use that
+             setSelectedGraphicPack(club.selected_pack);
+             console.log('Selected graphic pack from club:', club.selected_pack);
+           } else {
+             // No selected pack, show message
+             setSelectedGraphicPack(null);
+             console.log('No graphic pack selected for club');
+           }
         } else {
           console.warn("No club found for user");
           setSelectedGraphicPack(null);
