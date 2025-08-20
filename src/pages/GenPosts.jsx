@@ -4,8 +4,6 @@ import axios from "axios";
 import useAuth from "../hooks/useAuth";
 import useClubSingleton from "../hooks/useClubSingleton";
 import { getMatches } from "../api/config";
-import TemplateEditor from "../components/TemplateEditor";
-import QuickTextPositioner from "../components/QuickTextPositioner";
 import {
   Container,
   Typography,
@@ -166,9 +164,6 @@ const GenPosts = () => {
   const [showDataDialog, setShowDataDialog] = useState(false);
   const [currentPostType, setCurrentPostType] = useState(null);
   const [rateLimited, setRateLimited] = useState(false);
-  const [showTemplateEditor, setShowTemplateEditor] = useState(false);
-  const [showQuickPositioner, setShowQuickPositioner] = useState(false);
-  const [currentTemplateId, setCurrentTemplateId] = useState(null);
 
   // Memoized values
   const filteredMatches = useMemo(() => {
@@ -210,7 +205,7 @@ const GenPosts = () => {
     }
 
     try {
-       const userRes = await axios.get("https://matchgen-backend-production.up.railway.app/api/users/me/", { 
+      const userRes = await axios.get("https://matchgen-backend-production.up.railway.app/api/users/me/", { 
         headers: { Authorization: `Bearer ${token}` } 
       });
       setUser(userRes.data);
@@ -348,16 +343,16 @@ const GenPosts = () => {
       setLoading(true);
       setError(null);
       try {
-      await Promise.all([
-        fetchUserData(),
-        fetchMatches(),
-        fetchGraphicPacks()
-      ]);
+        await Promise.all([
+          fetchUserData(),
+          fetchMatches(),
+          fetchGraphicPacks()
+        ]);
       } catch (error) {
         console.error("Error initializing data:", error);
         setError("Failed to load data. Please refresh the page.");
       } finally {
-      setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -626,190 +621,40 @@ const GenPosts = () => {
                     </Typography>
                   </Box>
                 </Box>
-                                 <Box sx={{ display: 'flex', gap: 2 }}>
-                   {!selectedGraphicPack && (
-                <Button
-                  variant="contained"
-                       color="primary"
-                  startIcon={<Add />}
-                       onClick={() => navigate('/club/create')}
-                     >
-                       Create Club
-                     </Button>
-                   )}
-                   {selectedMatch && selectedGraphicPack && (
-                     <>
-                                              <Button
-                          variant="outlined"
-                          startIcon={<Edit />}
-                          onClick={() => {
-                            // Get the matchday template ID for editing
-                            if (selectedGraphicPack) {
-                              console.log('Selected GraphicPack:', selectedGraphicPack);
-                              const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
-                              console.log('Matchday template:', matchdayTemplate);
-                              if (matchdayTemplate) {
-                                setCurrentTemplateId(matchdayTemplate.id);
-                                setShowQuickPositioner(true);
-                              } else {
-                                setSnackbar({
-                                  open: true,
-                                  message: `No matchday template found in ${selectedGraphicPack.name}. Templates need to be set up in the database.`,
-                                  severity: "warning"
-                                });
-                              }
-                            } else {
-                              setSnackbar({
-                                open: true,
-                                message: "Please select a graphic pack first",
-                                severity: "warning"
-                              });
-                            }
-                          }}
-                        >
-                          Quick Position Text
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          startIcon={<Edit />}
-                          onClick={() => {
-                            // Get the matchday template ID for editing
-                            if (selectedGraphicPack) {
-                              console.log('Selected GraphicPack:', selectedGraphicPack);
-                              const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
-                              console.log('Matchday template:', matchdayTemplate);
-                              if (matchdayTemplate) {
-                                setCurrentTemplateId(matchdayTemplate.id);
-                                setShowTemplateEditor(true);
-                              } else {
-                                setSnackbar({
-                                  open: true,
-                                  message: `No matchday template found in ${selectedGraphicPack.name}. Templates need to be set up in the database.`,
-                                  severity: "warning"
-                                });
-                              }
-                            } else {
-                              setSnackbar({
-                                open: true,
-                                message: "Please select a graphic pack first",
-                                severity: "warning"
-                              });
-                            }
-                          }}
-                        >
-                          Advanced Editor
-                        </Button>
-                     </>
-                   )}
-                                     <Button
-                     variant="outlined"
-                     startIcon={<Refresh />}
-                     onClick={() => {
-                       setLoading(true);
-                       Promise.all([
-                         fetchUserData(),
-                         fetchMatches(),
-                         fetchGraphicPacks()
-                       ]).finally(() => setLoading(false));
-                     }}
-                   >
-                     Refresh
-                   </Button>
-                                       <Button
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {!selectedGraphicPack && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<Add />}
+                      onClick={() => navigate('/club/create')}
+                    >
+                      Create Club
+                    </Button>
+                  )}
+                  {selectedGraphicPack && (
+                    <Button
                       variant="outlined"
                       startIcon={<Settings />}
-                      onClick={async () => {
-                        try {
-                          const token = localStorage.getItem("accessToken");
-                          // First test the basic API
-                          const testResponse = await axios.get(
-                            "https://matchgen-backend-production.up.railway.app/api/graphicpack/test/",
-                            { headers: { Authorization: `Bearer ${token}` } }
-                          );
-                          console.log('Test response:', testResponse.data);
-                          
-                          // Then try the debug endpoint
-                          const response = await axios.get(
-                            "https://matchgen-backend-production.up.railway.app/api/graphicpack/debug/",
-                            { headers: { Authorization: `Bearer ${token}` } }
-                          );
-                          console.log('Debug response:', response.data);
-                          setSnackbar({
-                            open: true,
-                            message: `Debug: ${response.data.total_packs} packs found`,
-                            severity: "info"
-                          });
-                        } catch (error) {
-                          console.error('Debug error:', error);
-                          setSnackbar({
-                            open: true,
-                            message: `Debug error: ${error.message}`,
-                            severity: "error"
-                          });
-                        }
-                      }}
-                                         >
-                       Debug
-                     </Button>
-                                           <Button
-                        variant="outlined"
-                        startIcon={<Add />}
-                        onClick={async () => {
-                          try {
-                            const token = localStorage.getItem("accessToken");
-                            const response = await axios.post(
-                              "https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/",
-                              {},
-                              { headers: { Authorization: `Bearer ${token}` } }
-                            );
-                            console.log('Create test data response:', response.data);
-                            setSnackbar({
-                              open: true,
-                              message: `Test data created: ${response.data.elements_created} elements`,
-                              severity: "success"
-                            });
-                            // Refresh the graphic packs
-                            fetchGraphicPacks();
-                          } catch (error) {
-                            console.error('Create test data error:', error);
-                            setSnackbar({
-                              open: true,
-                              message: `Create test data error: ${error.message}`,
-                              severity: "error"
-                            });
-                          }
-                        }}
-                      >
-                        Create Test Data
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        startIcon={<Settings />}
-                        onClick={async () => {
-                          try {
-                            const token = localStorage.getItem("accessToken");
-                            const response = await axios.get(
-                              "https://matchgen-backend-production.up.railway.app/api/graphicpack/debug-templates/?pack_id=7",
-                              { headers: { Authorization: `Bearer ${token}` } }
-                            );
-                            console.log('Debug templates response:', response.data);
-                            setSnackbar({
-                              open: true,
-                              message: `Pack 7 has ${response.data.templates_count} templates`,
-                              severity: "info"
-                            });
-                          } catch (error) {
-                            console.error('Debug templates error:', error);
-                            setSnackbar({
-                              open: true,
-                              message: `Debug templates error: ${error.message}`,
-                              severity: "error"
-                            });
-                          }
-                        }}
-                      >
-                        Debug Templates
-                      </Button>
+                      onClick={() => navigate('/templates')}
+                    >
+                      Manage Templates
+                    </Button>
+                  )}
+                  <Button
+                    variant="outlined"
+                    startIcon={<Refresh />}
+                    onClick={() => {
+                      setLoading(true);
+                      Promise.all([
+                        fetchUserData(),
+                        fetchMatches(),
+                        fetchGraphicPacks()
+                      ]).finally(() => setLoading(false));
+                    }}
+                  >
+                    Refresh
+                  </Button>
                 </Box>
               </Box>
 
@@ -844,27 +689,27 @@ const GenPosts = () => {
                         />
                       </Grid>
                       <Grid item xs={12} md={4}>
-                         <Box sx={{ textAlign: 'right' }}>
-                           <Typography variant="body2" color="text.secondary" gutterBottom>
-                             Graphic Pack
-                           </Typography>
-                                                       <Typography variant="h6" color={selectedGraphicPack ? "primary" : "error"}>
-                              {selectedGraphicPack?.name || 'No pack selected'}
+                        <Box sx={{ textAlign: 'right' }}>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            Graphic Pack
+                          </Typography>
+                          <Typography variant="h6" color={selectedGraphicPack ? "primary" : "error"}>
+                            {selectedGraphicPack?.name || 'No pack selected'}
+                          </Typography>
+                          {selectedGraphicPack?.description ? (
+                            <Typography variant="body2" color="text.secondary">
+                              {selectedGraphicPack.description}
                             </Typography>
-                                                         {selectedGraphicPack?.description ? (
-                               <Typography variant="body2" color="text.secondary">
-                                 {selectedGraphicPack.description}
-                               </Typography>
-                             ) : selectedGraphicPack ? (
-                               <Typography variant="body2" color="error">
-                                 Please select a graphic pack from the Templates page
-                               </Typography>
-                             ) : (
-                               <Typography variant="body2" color="error">
-                                 No club found. Please create a club first.
-                               </Typography>
-                             )}
-                         </Box>
+                          ) : selectedGraphicPack ? (
+                            <Typography variant="body2" color="error">
+                              Please select a graphic pack from the Templates page
+                            </Typography>
+                          ) : (
+                            <Typography variant="body2" color="error">
+                              No club found. Please create a club first.
+                            </Typography>
+                          )}
+                        </Box>
                       </Grid>
                     </Grid>
                   </CardContent>
@@ -1209,55 +1054,6 @@ const GenPosts = () => {
                   </Button>
                 </DialogActions>
               </Dialog>
-
-                             {/* Quick Text Positioner Dialog */}
-               {showQuickPositioner && currentTemplateId && (
-                 <QuickTextPositioner
-                   templateId={currentTemplateId}
-                   onSave={(elements) => {
-                     setSnackbar({
-                       open: true,
-                       message: "Text positions updated successfully!",
-                       severity: "success"
-                     });
-                     setShowQuickPositioner(false);
-                   }}
-                   onCancel={() => setShowQuickPositioner(false)}
-                 />
-               )}
-
-               {/* Template Editor Dialog */}
-               <Dialog 
-                 open={showTemplateEditor} 
-                 onClose={() => setShowTemplateEditor(false)}
-                 maxWidth="xl"
-                 fullWidth
-               >
-                 <DialogTitle>
-                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                     <Typography variant="h6">Advanced Template Editor</Typography>
-                     <IconButton onClick={() => setShowTemplateEditor(false)}>
-                       <Remove />
-                     </IconButton>
-                   </Box>
-                 </DialogTitle>
-                 <DialogContent sx={{ p: 0 }}>
-                   {currentTemplateId && (
-                     <TemplateEditor
-                       templateId={currentTemplateId}
-                       onSave={(elements) => {
-                         setSnackbar({
-                           open: true,
-                           message: "Template updated successfully!",
-                           severity: "success"
-                         });
-                         setShowTemplateEditor(false);
-                       }}
-                       onCancel={() => setShowTemplateEditor(false)}
-                     />
-                   )}
-                 </DialogContent>
-               </Dialog>
 
               {/* Snackbar */}
               <Snackbar

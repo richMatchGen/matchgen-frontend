@@ -36,6 +36,7 @@ const GenUpcomingPost = lazy(() => import("./pages/GenUpcomingPost"));
 const GenHalfTime = lazy(() => import("./pages/GenHalfTime"));
 const GenFullTime = lazy(() => import("./pages/GenFullTime"));
 const GenPosts = lazy(() => import("./pages/GenPosts"));
+const TemplateManagement = lazy(() => import("./pages/TemplateManagement"));
 
 function App() {
   const { auth, logout } = useAuth();
@@ -106,6 +107,7 @@ function App() {
           <Route path="/gen/fulltime" element={<PrivateRoute><GenFullTime /></PrivateRoute>} />
           <Route path="/gen/posts" element={<PrivateRoute><GenPosts /></PrivateRoute>} />
           <Route path="/gen/posts/:matchId" element={<PrivateRoute><GenPosts /></PrivateRoute>} />
+          <Route path="/templates" element={<PrivateRoute><TemplateManagement /></PrivateRoute>} />
    
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
           <Route path="/profile" element={<Overview />} />
