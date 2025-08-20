@@ -44,7 +44,8 @@ import {
   AccordionSummary,
   AccordionDetails,
   Badge,
-  RateLimit
+  RateLimit,
+  LinearProgress
 } from "@mui/material";
 import {
   PostAdd,
@@ -63,9 +64,15 @@ import {
   CheckCircle,
   Error,
   Warning,
-  Info
+  Info,
+  PersonAdd,
+  Schedule,
+  EmojiEvents,
+  SwapHoriz,
+  Timer,
+  Flag
 } from "@mui/icons-material";
-import AppTheme from "../components/AppTheme";
+import AppTheme from "../themes/AppTheme";
 import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
