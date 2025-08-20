@@ -21,23 +21,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Slider,
-  Switch,
-  FormControlLabel,
-  Divider,
-  Tabs,
-  Tab,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   Paper,
   Tooltip
 } from "@mui/material";
@@ -46,20 +29,8 @@ import {
   Edit,
   Save,
   Cancel,
-  Visibility,
-  VisibilityOff,
   Add,
-  Delete,
   Refresh,
-  Settings,
-  Palette,
-  TextFields,
-  CropFree,
-  Download,
-  Upload,
-  CheckCircle,
-  Error,
-  Warning,
   Info
 } from "@mui/icons-material";
 import AppTheme from "../themes/AppTheme";
@@ -80,9 +51,8 @@ const TemplateManagement = () => {
   
   // Template editing state
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [editingTemplate, setEditingTemplate] = useState(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
+  const [templateConfig, setTemplateConfig] = useState("");
   const [saving, setSaving] = useState(false);
 
   // Data fetching
@@ -99,9 +69,8 @@ const TemplateManagement = () => {
       });
       setUser(userRes.data);
     } catch (error) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      window.location.href = "/login";
+      console.error("Error fetching user data:", error);
+      setError("Failed to load user data");
     }
   }, []);
 
@@ -129,18 +98,18 @@ const TemplateManagement = () => {
         return;
       }
       
-             // Fetch the full graphic pack with templates
-       console.log('Fetching graphic pack with ID:', selectedPackId);
-       const response = await axios.get(
-         `https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/${selectedPackId}/`,
-         { headers: { Authorization: `Bearer ${token}` } }
-       );
-       
-       console.log('Graphic pack response:', response.data);
-       console.log('Templates in response:', response.data.templates);
-       
-       setSelectedGraphicPack(response.data);
-       setTemplates(response.data.templates || []);
+      // Fetch the full graphic pack with templates
+      console.log('Fetching graphic pack with ID:', selectedPackId);
+      const response = await axios.get(
+        `https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/${selectedPackId}/`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      console.log('Graphic pack response:', response.data);
+      console.log('Templates in response:', response.data.templates);
+      
+      setSelectedGraphicPack(response.data);
+      setTemplates(response.data.templates || []);
       
     } catch (error) {
       console.error("Error fetching graphic pack:", error);
@@ -148,60 +117,69 @@ const TemplateManagement = () => {
     }
   }, []);
 
-  // Initialize data
   useEffect(() => {
-    const initializeData = async () => {
+    const loadData = async () => {
       setLoading(true);
-      setError(null);
       try {
-        await Promise.all([
-          fetchUserData(),
-          fetchGraphicPack()
-        ]);
+        await Promise.all([fetchUserData(), fetchGraphicPack()]);
       } catch (error) {
-        console.error("Error initializing data:", error);
-        setError("Failed to load data. Please refresh the page.");
+        console.error("Error loading data:", error);
+        setError("Failed to load data");
       } finally {
         setLoading(false);
       }
     };
-
-    initializeData();
+    loadData();
   }, [fetchUserData, fetchGraphicPack]);
 
   // Template editing functions
   const handleEditTemplate = (template) => {
     setSelectedTemplate(template);
-    setEditingTemplate(JSON.parse(JSON.stringify(template))); // Deep copy
+    setTemplateConfig(JSON.stringify(template.template_config || {}, null, 2));
     setShowEditDialog(true);
   };
 
   const handleSaveTemplate = async () => {
-    if (!editingTemplate) return;
-    
-    setSaving(true);
+    if (!selectedTemplate) return;
+
     try {
+      setSaving(true);
       const token = localStorage.getItem("accessToken");
+      
+      // Parse the JSON configuration
+      let parsedConfig;
+      try {
+        parsedConfig = JSON.parse(templateConfig);
+      } catch (parseError) {
+        setSnackbar({
+          open: true,
+          message: "Invalid JSON format. Please check your configuration.",
+          severity: "error"
+        });
+        return;
+      }
+
+      // Update the template configuration
       const response = await axios.put(
-        `https://matchgen-backend-production.up.railway.app/api/graphicpack/template/${editingTemplate.id}/edit/`,
-        { elements: editingTemplate.elements },
+        `https://matchgen-backend-production.up.railway.app/api/graphicpack/template-editor/${selectedTemplate.id}/`,
+        { template_config: parsedConfig },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      // Update local state
-      setTemplates(prev => prev.map(t => 
-        t.id === editingTemplate.id ? editingTemplate : t
-      ));
-      
+
+      // Update the local state
+      const updatedTemplates = templates.map(t => 
+        t.id === selectedTemplate.id 
+          ? { ...t, template_config: parsedConfig }
+          : t
+      );
+      setTemplates(updatedTemplates);
+
       setSnackbar({
         open: true,
-        message: "Template updated successfully!",
+        message: "Template configuration saved successfully!",
         severity: "success"
       });
-      
       setShowEditDialog(false);
-      setEditingTemplate(null);
-      setSelectedTemplate(null);
       
     } catch (error) {
       console.error("Error saving template:", error);
@@ -215,590 +193,271 @@ const TemplateManagement = () => {
     }
   };
 
-  const handleCancelEdit = () => {
+  const handleCloseEditDialog = () => {
     setShowEditDialog(false);
-    setEditingTemplate(null);
     setSelectedTemplate(null);
-  };
-
-  const updateElement = (elementId, field, value) => {
-    if (!editingTemplate) return;
-    
-    setEditingTemplate(prev => ({
-      ...prev,
-      elements: prev.elements.map(el => 
-        el.id === elementId ? { ...el, [field]: value } : el
-      )
-    }));
-  };
-
-  const updateStringElement = (elementId, stringElementId, field, value) => {
-    if (!editingTemplate) return;
-    
-    setEditingTemplate(prev => ({
-      ...prev,
-      elements: prev.elements.map(el => 
-        el.id === elementId ? {
-          ...el,
-          string_elements: el.string_elements.map(se => 
-            se.id === stringElementId ? { ...se, [field]: value } : se
-          )
-        } : el
-      )
-    }));
-  };
-
-  const toggleElementVisibility = (elementId) => {
-    if (!editingTemplate) return;
-    
-    setEditingTemplate(prev => ({
-      ...prev,
-      elements: prev.elements.map(el => 
-        el.id === elementId ? { ...el, visible: !el.visible } : el
-      )
-    }));
-  };
-
-  const getContentTypeLabel = (contentType) => {
-    const labels = {
-      'matchday': 'Matchday',
-      'upcomingFixture': 'Upcoming Fixture',
-      'startingXI': 'Starting XI',
-      'goal': 'Goal Celebration',
-      'sub': 'Substitution',
-      'halftime': 'Halftime Score',
-      'fulltime': 'Full-time Result'
-    };
-    return labels[contentType] || contentType;
-  };
-
-  const getContentTypeColor = (contentType) => {
-    const colors = {
-      'matchday': 'primary',
-      'upcomingFixture': 'info',
-      'startingXI': 'secondary',
-      'goal': 'success',
-      'sub': 'warning',
-      'halftime': 'info',
-      'fulltime': 'error'
-    };
-    return colors[contentType] || 'default';
+    setTemplateConfig("");
   };
 
   if (loading) {
     return (
-      <AppTheme>
-        <CssBaseline enableColorScheme />
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <CircularProgress size={60} />
-        </Box>
-      </AppTheme>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <AppTheme>
-        <CssBaseline enableColorScheme />
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <Card sx={{ p: 4, maxWidth: 400 }}>
-            <Typography variant="h6" color="error" gutterBottom>
-              Error Loading Data
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              {error}
-            </Typography>
-            <Button 
-              variant="contained" 
-              onClick={() => window.location.reload()}
-              fullWidth
-            >
-              Retry
-            </Button>
-          </Card>
-        </Box>
-      </AppTheme>
+      <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+        <Button variant="contained" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
+      </Container>
     );
   }
 
-  if (!user) return null;
-
   return (
     <AppTheme>
-      <CssBaseline enableColorScheme />
+      <CssBaseline />
       <Box sx={{ display: 'flex' }}>
         <SideMenu />
-        <AppNavbar />
-        <Box
-          component="main"
-          sx={(theme) => ({
-            flexGrow: 1,
-            backgroundColor: theme.vars
-              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
-              : theme.palette.background.default,
-            overflow: 'auto',
-          })}
-        >
-          <Stack
-            spacing={2}
-            sx={{
-              alignItems: 'center',
-              mx: 3,
-              pb: 5,
-              mt: { xs: 8, md: 0 },
-            }}
-          >
-            <Header />
-            <Container sx={{ py: 4, width: '100%' }}>
-              {/* Header */}
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <IconButton 
-                    onClick={() => navigate('/gen/posts')}
-                    sx={{ mr: 2 }}
-                  >
-                    <ArrowBack />
-                  </IconButton>
-                  <Box>
-                    <Typography variant="h4" gutterBottom>
-                      Template Management
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary">
-                      Configure text positions, fonts, and styling for your templates
-                    </Typography>
-                  </Box>
-                </Box>
-                                 <Box sx={{ display: 'flex', gap: 2 }}>
-                   <Button
-                     variant="outlined"
-                     startIcon={<Refresh />}
-                     onClick={() => {
-                       setLoading(true);
-                       Promise.all([
-                         fetchUserData(),
-                         fetchGraphicPack()
-                       ]).finally(() => setLoading(false));
-                     }}
-                   >
-                     Refresh
-                   </Button>
-                   <Button
-                     variant="outlined"
-                     startIcon={<Info />}
-                     onClick={async () => {
-                       try {
-                         const token = localStorage.getItem("accessToken");
-                         const response = await axios.get(
-                           `https://matchgen-backend-production.up.railway.app/api/graphicpack/debug-templates/?pack_id=${selectedGraphicPack?.id || 7}`,
-                           { headers: { Authorization: `Bearer ${token}` } }
-                         );
-                         console.log('Debug Templates Response:', response.data);
-                         setSnackbar({
-                           open: true,
-                           message: `Debug info logged to console. Templates: ${response.data.templates_count}, All: ${response.data.all_templates_count}`,
-                           severity: "info"
-                         });
-                       } catch (error) {
-                         console.error('Debug error:', error);
-                         setSnackbar({
-                           open: true,
-                           message: `Debug failed: ${error.message}`,
-                           severity: "error"
-                         });
-                       }
-                     }}
-                   >
-                     Debug
-                   </Button>
-                   <Button
-                     variant="outlined"
-                     startIcon={<Info />}
-                     onClick={async () => {
-                       try {
-                         const token = localStorage.getItem("accessToken");
-                         const response = await axios.get(
-                           `https://matchgen-backend-production.up.railway.app/api/graphicpack/test-graphic-pack-detail/?pack_id=${selectedGraphicPack?.id || 8}`,
-                           { headers: { Authorization: `Bearer ${token}` } }
-                         );
-                         console.log('Test Graphic Pack Detail Response:', response.data);
-                         setSnackbar({
-                           open: true,
-                           message: `Test detail logged to console. Templates: ${response.data.templates_count}`,
-                           severity: "info"
-                         });
-                       } catch (error) {
-                         console.error('Test detail error:', error);
-                         setSnackbar({
-                           open: true,
-                           message: `Test detail failed: ${error.message}`,
-                           severity: "error"
-                         });
-                       }
-                     }}
-                   >
-                     Test Detail
-                   </Button>
-                   <Button
-                     variant="contained"
-                     color="secondary"
-                     startIcon={<Add />}
-                     onClick={async () => {
-                       try {
-                         const token = localStorage.getItem("accessToken");
-                         const response = await axios.post(
-                           "https://matchgen-backend-production.up.railway.app/api/graphicpack/create-missing-templates/",
-                           {},
-                           { headers: { Authorization: `Bearer ${token}` } }
-                         );
-                         console.log('Create Missing Templates Response:', response.data);
-                         setSnackbar({
-                           open: true,
-                           message: response.data.message,
-                           severity: "success"
-                         });
-                         
-                         // Refresh the data to show the new templates
-                         setTimeout(() => {
-                           setLoading(true);
-                           Promise.all([
-                             fetchUserData(),
-                             fetchGraphicPack()
-                           ]).finally(() => setLoading(false));
-                         }, 1000);
-                       } catch (error) {
-                         console.error('Create missing templates error:', error);
-                         setSnackbar({
-                           open: true,
-                           message: `Failed to create templates: ${error.response?.data?.error || error.message}`,
-                           severity: "error"
-                         });
-                       }
-                     }}
-                   >
-                     Create Missing Templates
-                   </Button>
-                 </Box>
+        <Box sx={{ flexGrow: 1 }}>
+          <AppNavbar />
+          <Header title="Template Management" />
+          
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            {/* Header */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Box>
+                <Typography variant="h4" gutterBottom>
+                  Template Management
+                </Typography>
+                {selectedGraphicPack && (
+                  <Typography variant="body1" color="text.secondary">
+                    Managing templates for: <strong>{selectedGraphicPack.name}</strong>
+                  </Typography>
+                )}
               </Box>
-
-              {/* Graphic Pack Info */}
-              {selectedGraphicPack && (
-                <Card sx={{ mb: 3 }}>
-                  <CardContent>
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item xs={12} md={8}>
-                        <Typography variant="h6" gutterBottom>
-                          {selectedGraphicPack.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {selectedGraphicPack.description}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Box sx={{ textAlign: 'right' }}>
-                          <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Templates
-                          </Typography>
-                          <Typography variant="h6" color="primary">
-                            {templates.length}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Templates List */}
-              {templates.length > 0 ? (
-                <Grid container spacing={3}>
-                  {templates.map((template) => (
-                    <Grid item xs={12} md={6} lg={4} key={template.id}>
-                      <Card 
-                        sx={{ 
-                          height: '100%',
-                          cursor: 'pointer',
-                          '&:hover': { boxShadow: 3 }
-                        }}
-                        onClick={() => handleEditTemplate(template)}
-                      >
-                        <CardContent>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                            <Typography variant="h6" gutterBottom>
-                              {getContentTypeLabel(template.content_type)}
-                            </Typography>
-                            <Chip 
-                              label={getContentTypeLabel(template.content_type)}
-                              color={getContentTypeColor(template.content_type)}
-                              size="small"
-                            />
-                          </Box>
-                          
-                          <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Template ID: {template.id}
-                          </Typography>
-                          
-                          <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Elements: {template.elements?.length || 0}
-                          </Typography>
-                          
-                          {template.sport && (
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
-                              Sport: {template.sport}
-                            </Typography>
-                          )}
-                          
-                          <Box sx={{ mt: 2 }}>
-                            <Button
-                              variant="outlined"
-                              startIcon={<Edit />}
-                              fullWidth
-                            >
-                              Edit Template
-                            </Button>
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
-              ) : (
-                <Card>
-                  <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                    <Typography variant="h6" color="text.secondary" gutterBottom>
-                      No Templates Found
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                      This graphic pack doesn't have any templates configured yet.
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      startIcon={<Add />}
-                      onClick={() => {
-                        setSnackbar({
-                          open: true,
-                          message: "Template creation feature coming soon!",
-                          severity: "info"
-                        });
-                      }}
-                    >
-                      Create Template
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Template Edit Dialog */}
-              <Dialog 
-                open={showEditDialog} 
-                onClose={handleCancelEdit}
-                maxWidth="xl"
-                fullWidth
-              >
-                <DialogTitle>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="h6">
-                      Edit Template: {selectedTemplate && getContentTypeLabel(selectedTemplate.content_type)}
-                    </Typography>
-                    <IconButton onClick={handleCancelEdit}>
-                      <Cancel />
-                    </IconButton>
-                  </Box>
-                </DialogTitle>
-                <DialogContent>
-                  {editingTemplate && (
-                    <Box sx={{ mt: 2 }}>
-                      <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
-                        <Tab label="Elements" />
-                        <Tab label="Preview" />
-                      </Tabs>
-                      
-                      <Box sx={{ mt: 2 }}>
-                        {activeTab === 0 && (
-                          <Grid container spacing={2}>
-                            {editingTemplate.elements?.map((element) => (
-                              <Grid item xs={12} key={element.id}>
-                                <Accordion>
-                                  <AccordionSummary>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                                      <Typography variant="subtitle1">
-                                        {element.content_key || `Element ${element.id}`}
-                                      </Typography>
-                                      <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
-                                        <FormControlLabel
-                                          control={
-                                            <Switch
-                                              checked={element.visible}
-                                              onChange={() => toggleElementVisibility(element.id)}
-                                            />
-                                          }
-                                          label="Visible"
-                                        />
-                                        <Chip 
-                                          label={element.type}
-                                          size="small"
-                                          sx={{ ml: 1 }}
-                                        />
-                                      </Box>
-                                    </Box>
-                                  </AccordionSummary>
-                                  <AccordionDetails>
-                                    <Grid container spacing={2}>
-                                      {/* Position */}
-                                      <Grid item xs={6}>
-                                        <Typography variant="subtitle2" gutterBottom>
-                                          Position
-                                        </Typography>
-                                        <TextField
-                                          label="X"
-                                          type="number"
-                                          value={element.x}
-                                          onChange={(e) => updateElement(element.id, 'x', parseFloat(e.target.value))}
-                                          fullWidth
-                                          size="small"
-                                          sx={{ mb: 1 }}
-                                        />
-                                        <TextField
-                                          label="Y"
-                                          type="number"
-                                          value={element.y}
-                                          onChange={(e) => updateElement(element.id, 'y', parseFloat(e.target.value))}
-                                          fullWidth
-                                          size="small"
-                                        />
-                                      </Grid>
-                                      
-                                      {/* Size */}
-                                      <Grid item xs={6}>
-                                        <Typography variant="subtitle2" gutterBottom>
-                                          Size
-                                        </Typography>
-                                        <TextField
-                                          label="Width"
-                                          type="number"
-                                          value={element.width || ''}
-                                          onChange={(e) => updateElement(element.id, 'width', parseFloat(e.target.value))}
-                                          fullWidth
-                                          size="small"
-                                          sx={{ mb: 1 }}
-                                        />
-                                        <TextField
-                                          label="Height"
-                                          type="number"
-                                          value={element.height || ''}
-                                          onChange={(e) => updateElement(element.id, 'height', parseFloat(e.target.value))}
-                                          fullWidth
-                                          size="small"
-                                        />
-                                      </Grid>
-                                      
-                                      {/* Text Elements */}
-                                      {element.type === 'text' && element.string_elements?.map((stringElement) => (
-                                        <Grid item xs={12} key={stringElement.id}>
-                                          <Divider sx={{ my: 2 }} />
-                                          <Typography variant="subtitle2" gutterBottom>
-                                            Text Styling
-                                          </Typography>
-                                          <Grid container spacing={2}>
-                                            <Grid item xs={6}>
-                                              <TextField
-                                                label="Font Family"
-                                                value={stringElement.font_family || ''}
-                                                onChange={(e) => updateStringElement(element.id, stringElement.id, 'font_family', e.target.value)}
-                                                fullWidth
-                                                size="small"
-                                              />
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                              <TextField
-                                                label="Font Size"
-                                                type="number"
-                                                value={stringElement.font_size || ''}
-                                                onChange={(e) => updateStringElement(element.id, stringElement.id, 'font_size', parseInt(e.target.value))}
-                                                fullWidth
-                                                size="small"
-                                              />
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                              <TextField
-                                                label="Color"
-                                                value={stringElement.color || ''}
-                                                onChange={(e) => updateStringElement(element.id, stringElement.id, 'color', e.target.value)}
-                                                fullWidth
-                                                size="small"
-                                              />
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                              <FormControl fullWidth size="small">
-                                                <InputLabel>Alignment</InputLabel>
-                                                <Select
-                                                  value={stringElement.alignment || 'left'}
-                                                  onChange={(e) => updateStringElement(element.id, stringElement.id, 'alignment', e.target.value)}
-                                                  label="Alignment"
-                                                >
-                                                  <MenuItem value="left">Left</MenuItem>
-                                                  <MenuItem value="center">Center</MenuItem>
-                                                  <MenuItem value="right">Right</MenuItem>
-                                                </Select>
-                                              </FormControl>
-                                            </Grid>
-                                          </Grid>
-                                        </Grid>
-                                      ))}
-                                    </Grid>
-                                  </AccordionDetails>
-                                </Accordion>
-                              </Grid>
-                            ))}
-                          </Grid>
-                        )}
-                        
-                        {activeTab === 1 && (
-                          <Box sx={{ textAlign: 'center', py: 4 }}>
-                            <Typography variant="h6" color="text.secondary" gutterBottom>
-                              Preview Coming Soon
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Live preview of template changes will be available in the next update.
-                            </Typography>
-                          </Box>
-                        )}
-                      </Box>
-                    </Box>
-                  )}
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleCancelEdit} disabled={saving}>
-                    Cancel
-                  </Button>
-                  <Button 
-                    onClick={handleSaveTemplate} 
-                    variant="contained"
-                    startIcon={<Save />}
-                    disabled={saving}
-                  >
-                    {saving ? 'Saving...' : 'Save Changes'}
-                  </Button>
-                </DialogActions>
-              </Dialog>
-
-              {/* Snackbar */}
-              <Snackbar
-                open={snackbar.open}
-                autoHideDuration={6000}
-                onClose={() => setSnackbar({ ...snackbar, open: false })}
-              >
-                <Alert
-                  onClose={() => setSnackbar({ ...snackbar, open: false })}
-                  severity={snackbar.severity}
-                  sx={{ width: "100%" }}
+              
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<Refresh />}
+                  onClick={() => {
+                    setLoading(true);
+                    Promise.all([
+                      fetchUserData(),
+                      fetchGraphicPack()
+                    ]).finally(() => setLoading(false));
+                  }}
                 >
-                  {snackbar.message}
-                </Alert>
-              </Snackbar>
-            </Container>
-          </Stack>
+                  Refresh
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<Info />}
+                  onClick={async () => {
+                    try {
+                      const token = localStorage.getItem("accessToken");
+                      const response = await axios.get(
+                        `https://matchgen-backend-production.up.railway.app/api/graphicpack/debug-templates/?pack_id=${selectedGraphicPack?.id || 7}`,
+                        { headers: { Authorization: `Bearer ${token}` } }
+                      );
+                      console.log('Debug Templates Response:', response.data);
+                      setSnackbar({
+                        open: true,
+                        message: `Debug info logged to console. Templates: ${response.data.templates_count}, All: ${response.data.all_templates_count}`,
+                        severity: "info"
+                      });
+                    } catch (error) {
+                      console.error('Debug error:', error);
+                      setSnackbar({
+                        open: true,
+                        message: `Debug failed: ${error.message}`,
+                        severity: "error"
+                      });
+                    }
+                  }}
+                >
+                  Debug
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<Info />}
+                  onClick={async () => {
+                    try {
+                      const token = localStorage.getItem("accessToken");
+                      const response = await axios.get(
+                        `https://matchgen-backend-production.up.railway.app/api/graphicpack/test-graphic-pack-detail/?pack_id=${selectedGraphicPack?.id || 8}`,
+                        { headers: { Authorization: `Bearer ${token}` } }
+                      );
+                      console.log('Test Graphic Pack Detail Response:', response.data);
+                      setSnackbar({
+                        open: true,
+                        message: `Test detail logged to console. Templates: ${response.data.templates_count}`,
+                        severity: "info"
+                      });
+                    } catch (error) {
+                      console.error('Test detail error:', error);
+                      setSnackbar({
+                        open: true,
+                        message: `Test detail failed: ${error.message}`,
+                        severity: "error"
+                      });
+                    }
+                  }}
+                >
+                  Test Detail
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<Add />}
+                  onClick={async () => {
+                    try {
+                      const token = localStorage.getItem("accessToken");
+                      const response = await axios.post(
+                        "https://matchgen-backend-production.up.railway.app/api/graphicpack/create-missing-templates/",
+                        {},
+                        { headers: { Authorization: `Bearer ${token}` } }
+                      );
+                      console.log('Create Missing Templates Response:', response.data);
+                      setSnackbar({
+                        open: true,
+                        message: response.data.message,
+                        severity: "success"
+                      });
+                      
+                      // Refresh the data to show the new templates
+                      setTimeout(() => {
+                        setLoading(true);
+                        Promise.all([
+                          fetchUserData(),
+                          fetchGraphicPack()
+                        ]).finally(() => setLoading(false));
+                      }, 1000);
+                    } catch (error) {
+                      console.error('Create missing templates error:', error);
+                      setSnackbar({
+                        open: true,
+                        message: `Failed to create templates: ${error.response?.data?.error || error.message}`,
+                        severity: "error"
+                      });
+                    }
+                  }}
+                >
+                  Create Missing Templates
+                </Button>
+              </Box>
+            </Box>
+
+            {/* Templates Grid */}
+            <Grid container spacing={3}>
+              {templates.map((template) => (
+                <Grid item xs={12} sm={6} md={4} key={template.id}>
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                        <Typography variant="h6" component="div">
+                          {template.content_type}
+                        </Typography>
+                        <Chip 
+                          label={`${Object.keys(template.template_config?.elements || {}).length} elements`}
+                          size="small"
+                          color="primary"
+                        />
+                      </Box>
+                      
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        Template ID: {template.id}
+                      </Typography>
+                      
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<Edit />}
+                          onClick={() => handleEditTemplate(template)}
+                        >
+                          Edit Configuration
+                        </Button>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+
+            {templates.length === 0 && (
+              <Paper sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  No templates found
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Click "Create Missing Templates" to generate default templates for this graphic pack.
+                </Typography>
+              </Paper>
+            )}
+          </Container>
         </Box>
       </Box>
+
+      {/* Edit Template Dialog */}
+      <Dialog 
+        open={showEditDialog} 
+        onClose={handleCloseEditDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          Edit Template Configuration: {selectedTemplate?.content_type}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Edit the JSON configuration for this template. The configuration defines the position and styling of text elements.
+          </Typography>
+          <TextField
+            multiline
+            rows={20}
+            fullWidth
+            value={templateConfig}
+            onChange={(e) => setTemplateConfig(e.target.value)}
+            placeholder="Enter JSON configuration..."
+            sx={{ fontFamily: 'monospace' }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog} disabled={saving}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSaveTemplate} 
+            variant="contained" 
+            disabled={saving}
+            startIcon={saving ? <CircularProgress size={16} /> : <Save />}
+          >
+            {saving ? 'Saving...' : 'Save Configuration'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert 
+          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+          severity={snackbar.severity}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </AppTheme>
   );
 };
