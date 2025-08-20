@@ -754,25 +754,21 @@ const GenPosts = () => {
                           sx={{ mt: 1 }}
                         />
                       </Grid>
-                      <Grid item xs={12} md={4}>
-                        <FormControl fullWidth>
-                          <InputLabel>Graphic Pack</InputLabel>
-                          <Select
-                            value={selectedGraphicPack?.id || ''}
-                            onChange={(e) => {
-                              const pack = graphicPacks.find(p => p.id === e.target.value);
-                              setSelectedGraphicPack(pack);
-                            }}
-                            label="Graphic Pack"
-                          >
-                            {graphicPacks.map((pack) => (
-                              <MenuItem key={pack.id} value={pack.id}>
-                                {pack.name}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
+                                             <Grid item xs={12} md={4}>
+                         <Box sx={{ textAlign: 'right' }}>
+                           <Typography variant="body2" color="text.secondary" gutterBottom>
+                             Graphic Pack
+                           </Typography>
+                           <Typography variant="h6" color="primary">
+                             {selectedGraphicPack?.name || 'No pack selected'}
+                           </Typography>
+                           {selectedGraphicPack?.description && (
+                             <Typography variant="body2" color="text.secondary">
+                               {selectedGraphicPack.description}
+                             </Typography>
+                           )}
+                         </Box>
+                       </Grid>
                     </Grid>
                   </CardContent>
                 </Card>
