@@ -364,21 +364,88 @@ const TemplateManagement = () => {
                     </Typography>
                   </Box>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<Refresh />}
-                    onClick={() => {
-                      setLoading(true);
-                      Promise.all([
-                        fetchUserData(),
-                        fetchGraphicPack()
-                      ]).finally(() => setLoading(false));
-                    }}
-                  >
-                    Refresh
-                  </Button>
-                </Box>
+                                 <Box sx={{ display: 'flex', gap: 2 }}>
+                   <Button
+                     variant="outlined"
+                     startIcon={<Refresh />}
+                     onClick={() => {
+                       setLoading(true);
+                       Promise.all([
+                         fetchUserData(),
+                         fetchGraphicPack()
+                       ]).finally(() => setLoading(false));
+                     }}
+                   >
+                     Refresh
+                   </Button>
+                   <Button
+                     variant="outlined"
+                     startIcon={<Info />}
+                     onClick={async () => {
+                       try {
+                         const token = localStorage.getItem("accessToken");
+                         const response = await axios.get(
+                           `https://matchgen-backend-production.up.railway.app/api/graphicpack/debug-templates/?pack_id=${selectedGraphicPack?.id || 7}`,
+                           { headers: { Authorization: `Bearer ${token}` } }
+                         );
+                         console.log('Debug Templates Response:', response.data);
+                         setSnackbar({
+                           open: true,
+                           message: `Debug info logged to console. Templates: ${response.data.templates_count}, All: ${response.data.all_templates_count}`,
+                           severity: "info"
+                         });
+                       } catch (error) {
+                         console.error('Debug error:', error);
+                         setSnackbar({
+                           open: true,
+                           message: `Debug failed: ${error.message}`,
+                           severity: "error"
+                         });
+                       }
+                     }}
+                   >
+                     Debug
+                   </Button>
+                   <Button
+                     variant="contained"
+                     color="secondary"
+                     startIcon={<Add />}
+                     onClick={async () => {
+                       try {
+                         const token = localStorage.getItem("accessToken");
+                         const response = await axios.post(
+                           "https://matchgen-backend-production.up.railway.app/api/graphicpack/create-missing-templates/",
+                           {},
+                           { headers: { Authorization: `Bearer ${token}` } }
+                         );
+                         console.log('Create Missing Templates Response:', response.data);
+                         setSnackbar({
+                           open: true,
+                           message: response.data.message,
+                           severity: "success"
+                         });
+                         
+                         // Refresh the data to show the new templates
+                         setTimeout(() => {
+                           setLoading(true);
+                           Promise.all([
+                             fetchUserData(),
+                             fetchGraphicPack()
+                           ]).finally(() => setLoading(false));
+                         }, 1000);
+                       } catch (error) {
+                         console.error('Create missing templates error:', error);
+                         setSnackbar({
+                           open: true,
+                           message: `Failed to create templates: ${error.response?.data?.error || error.message}`,
+                           severity: "error"
+                         });
+                       }
+                     }}
+                   >
+                     Create Missing Templates
+                   </Button>
+                 </Box>
               </Box>
 
               {/* Graphic Pack Info */}
