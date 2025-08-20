@@ -34,6 +34,7 @@ const MatchdayPostGenerator = () => {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [error, setError] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [debugData, setDebugData] = useState(null);
 
   // Fetch matches on component mount
   useEffect(() => {
@@ -131,6 +132,30 @@ const MatchdayPostGenerator = () => {
     }
   };
 
+  const debugTemplates = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/debug-templates/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setDebugData(response.data);
+      console.log('Debug data:', response.data);
+      setSnackbar({
+        open: true,
+        message: 'Debug data loaded successfully!',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Error fetching debug data:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to load debug data',
+        severity: 'error'
+      });
+    }
+  };
+
   const getSelectedMatchData = () => {
     return matches.find(match => match.id === selectedMatch);
   };
@@ -175,9 +200,17 @@ const MatchdayPostGenerator = () => {
         Generate Matchday Post
       </Typography>
       
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Select a fixture to generate a high-quality matchday post with fixture details overlaid on your club's template.
-      </Typography>
+             <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+         Select a fixture to generate a high-quality matchday post with fixture details overlaid on your club's template.
+       </Typography>
+
+       <Button
+         variant="outlined"
+         onClick={debugTemplates}
+         sx={{ mb: 2 }}
+       >
+         Debug Templates
+       </Button>
 
       <Grid container spacing={3}>
         {/* Fixture Selection */}
@@ -366,10 +399,20 @@ const MatchdayPostGenerator = () => {
           sx={{ width: '100%' }}
         >
           {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
-  );
-};
+                 </Alert>
+       </Snackbar>
+
+       {/* Debug Data Display */}
+       {debugData && (
+         <Box sx={{ mt: 4, p: 2, border: '1px solid #ccc', borderRadius: 1, backgroundColor: '#f5f5f5' }}>
+           <Typography variant="h6" gutterBottom>Debug Data:</Typography>
+           <pre style={{ fontSize: '12px', overflow: 'auto', maxHeight: '300px' }}>
+             {JSON.stringify(debugData, null, 2)}
+           </pre>
+         </Box>
+       )}
+     </Box>
+   );
+ };
 
 export default MatchdayPostGenerator;
