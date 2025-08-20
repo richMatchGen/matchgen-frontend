@@ -153,6 +153,27 @@ const MatchdayPostGenerator = () => {
     }
   };
 
+  const testDatabase = async () => {
+    try {
+      const response = await axios.post(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/test/'
+      );
+      console.log('Database test response:', response.data);
+      setSnackbar({
+        open: true,
+        message: response.data.message,
+        severity: response.data.status === 'success' ? 'success' : 'error'
+      });
+    } catch (error) {
+      console.error('Database test failed:', error);
+      setSnackbar({
+        open: true,
+        message: 'Database test failed',
+        severity: 'error'
+      });
+    }
+  };
+
   const createTestData = async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -259,6 +280,12 @@ const MatchdayPostGenerator = () => {
            onClick={testBackend}
          >
            Test Backend
+         </Button>
+         <Button
+           variant="outlined"
+           onClick={testDatabase}
+         >
+           Test Database
          </Button>
          <Button
            variant="outlined"
