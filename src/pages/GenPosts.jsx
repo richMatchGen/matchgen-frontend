@@ -271,14 +271,17 @@ const GenPosts = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
+      console.log('Graphic packs response:', response.data);
+      
       if (response.data && Array.isArray(response.data)) {
         setGraphicPacks(response.data);
         if (response.data.length > 0) {
           setSelectedGraphicPack(response.data[0]);
+          console.log('Selected graphic pack:', response.data[0]);
         }
       }
     } catch (error) {
-      console.warn("Failed to load graphic packs, using fallback");
+      console.warn("Failed to load graphic packs, using fallback", error);
       // Fallback graphic packs
       setGraphicPacks([
         { id: 1, name: "Default Pack", description: "Standard design" },
@@ -575,66 +578,110 @@ const GenPosts = () => {
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   {selectedMatch && (
                     <>
-                      <Button
-                        variant="outlined"
-                        startIcon={<Edit />}
-                        onClick={() => {
-                          // Get the matchday template ID for editing
-                          if (selectedGraphicPack) {
-                            const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
-                            if (matchdayTemplate) {
-                              setCurrentTemplateId(matchdayTemplate.id);
-                              setShowQuickPositioner(true);
-                            } else {
-                              setSnackbar({
-                                open: true,
-                                message: "No matchday template found for editing",
-                                severity: "warning"
-                              });
-                            }
-                          }
-                        }}
-                      >
-                        Quick Position Text
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        startIcon={<Edit />}
-                        onClick={() => {
-                          // Get the matchday template ID for editing
-                          if (selectedGraphicPack) {
-                            const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
-                            if (matchdayTemplate) {
-                              setCurrentTemplateId(matchdayTemplate.id);
-                              setShowTemplateEditor(true);
-                            } else {
-                              setSnackbar({
-                                open: true,
-                                message: "No matchday template found for editing",
-                                severity: "warning"
-                              });
-                            }
-                          }
-                        }}
-                      >
-                        Advanced Editor
-                      </Button>
+                                             <Button
+                         variant="outlined"
+                         startIcon={<Edit />}
+                         onClick={() => {
+                           // Get the matchday template ID for editing
+                           if (selectedGraphicPack) {
+                             console.log('Selected GraphicPack:', selectedGraphicPack);
+                             const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
+                             console.log('Matchday template:', matchdayTemplate);
+                             if (matchdayTemplate) {
+                               setCurrentTemplateId(matchdayTemplate.id);
+                               setShowQuickPositioner(true);
+                             } else {
+                               setSnackbar({
+                                 open: true,
+                                 message: `No matchday template found in ${selectedGraphicPack.name}. Please contact support to set up templates.`,
+                                 severity: "warning"
+                               });
+                             }
+                           } else {
+                             setSnackbar({
+                               open: true,
+                               message: "Please select a graphic pack first",
+                               severity: "warning"
+                             });
+                           }
+                         }}
+                       >
+                         Quick Position Text
+                       </Button>
+                       <Button
+                         variant="outlined"
+                         startIcon={<Edit />}
+                         onClick={() => {
+                           // Get the matchday template ID for editing
+                           if (selectedGraphicPack) {
+                             console.log('Selected GraphicPack:', selectedGraphicPack);
+                             const matchdayTemplate = selectedGraphicPack.templates?.find(t => t.content_type === 'matchday');
+                             console.log('Matchday template:', matchdayTemplate);
+                             if (matchdayTemplate) {
+                               setCurrentTemplateId(matchdayTemplate.id);
+                               setShowTemplateEditor(true);
+                             } else {
+                               setSnackbar({
+                                 open: true,
+                                 message: `No matchday template found in ${selectedGraphicPack.name}. Please contact support to set up templates.`,
+                                 severity: "warning"
+                               });
+                             }
+                           } else {
+                             setSnackbar({
+                               open: true,
+                               message: "Please select a graphic pack first",
+                               severity: "warning"
+                             });
+                           }
+                         }}
+                       >
+                         Advanced Editor
+                       </Button>
                     </>
                   )}
-                  <Button
-                    variant="outlined"
-                    startIcon={<Refresh />}
-                    onClick={() => {
-                      setLoading(true);
-                      Promise.all([
-                        fetchUserData(),
-                        fetchMatches(),
-                        fetchGraphicPacks()
-                      ]).finally(() => setLoading(false));
-                    }}
-                  >
-                    Refresh
-                  </Button>
+                                     <Button
+                     variant="outlined"
+                     startIcon={<Refresh />}
+                     onClick={() => {
+                       setLoading(true);
+                       Promise.all([
+                         fetchUserData(),
+                         fetchMatches(),
+                         fetchGraphicPacks()
+                       ]).finally(() => setLoading(false));
+                     }}
+                   >
+                     Refresh
+                   </Button>
+                   <Button
+                     variant="outlined"
+                     startIcon={<Settings />}
+                     onClick={async () => {
+                       try {
+                         const token = localStorage.getItem("accessToken");
+                         const response = await axios.get(
+                           "https://matchgen-backend-production.up.railway.app/api/graphicpack/debug/",
+                           { headers: { Authorization: `Bearer ${token}` } }
+                         );
+                         console.log('Debug response:', response.data);
+                         setSnackbar({
+                           open: true,
+                           message: `Debug: ${response.data.total_packs} packs found`,
+                           severity: "info"
+                         });
+                       } catch (error) {
+                         console.error('Debug error:', error);
+                         setSnackbar({
+                           open: true,
+                           message: `Debug error: ${error.message}`,
+                           severity: "error"
+                         });
+                       }
+                     }}
+                   >
+                     Debug
+                   </Button>
                 </Box>
               </Box>
 
