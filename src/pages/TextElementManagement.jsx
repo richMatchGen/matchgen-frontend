@@ -87,29 +87,43 @@ const TextElementManagement = () => {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       
-      // Fetch text elements
-      const elementsResponse = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/',
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setTextElements(elementsResponse.data);
+             // Fetch text elements
+       const elementsResponse = await axios.get(
+         'https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/',
+         { headers: { Authorization: `Bearer ${token}` } }
+       );
+       setTextElements(elementsResponse.data || []);
 
-      // Fetch graphic packs
-      const packsResponse = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/graphicpacks/',
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setGraphicPacks(packsResponse.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to fetch data',
-        severity: 'error'
-      });
-    } finally {
-      setLoading(false);
-    }
+       // Fetch graphic packs
+       const packsResponse = await axios.get(
+         'https://matchgen-backend-production.up.railway.app/api/graphicpack/packs/',
+         { headers: { Authorization: `Bearer ${token}` } }
+       );
+       setGraphicPacks(packsResponse.data || []);
+         } catch (error) {
+       console.error('Error fetching data:', error);
+       let errorMessage = 'Failed to fetch data';
+       
+       if (error.response?.status === 404) {
+         errorMessage = 'API endpoints not found. Please check if the backend is deployed correctly.';
+       } else if (error.response?.status === 401) {
+         errorMessage = 'Authentication required. Please log in again.';
+       } else if (error.response?.data?.error) {
+         errorMessage = error.response.data.error;
+       }
+       
+       setSnackbar({
+         open: true,
+         message: errorMessage,
+         severity: 'error'
+       });
+       
+       // Set empty arrays to prevent mapping errors
+       setTextElements([]);
+       setGraphicPacks([]);
+     } finally {
+       setLoading(false);
+     }
   };
 
   const handleOpenDialog = (element = null) => {
@@ -259,68 +273,78 @@ const TextElementManagement = () => {
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {textElements.map((element) => (
-                <TableRow key={element.id} hover>
-                  <TableCell>{element.graphic_pack_name}</TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={element.content_type} 
-                      size="small" 
-                      color="primary" 
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={element.element_name} 
-                      size="small" 
-                      color="secondary" 
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    ({element.position_x}, {element.position_y})
-                  </TableCell>
-                  <TableCell>{element.font_size}px</TableCell>
-                  <TableCell>{element.font_family}</TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        width: 20,
-                        height: 20,
-                        backgroundColor: element.font_color,
-                        border: '1px solid #ccc',
-                        borderRadius: 1
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={element.alignment} 
-                      size="small" 
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleOpenDialog(element)}
-                      color="primary"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDelete(element.id)}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+                                      <TableBody>
+               {Array.isArray(textElements) && textElements.length > 0 ? (
+                 textElements.map((element) => (
+                   <TableRow key={element.id} hover>
+                     <TableCell>{element.graphic_pack_name}</TableCell>
+                     <TableCell>
+                       <Chip 
+                         label={element.content_type} 
+                         size="small" 
+                         color="primary" 
+                         variant="outlined"
+                       />
+                     </TableCell>
+                     <TableCell>
+                       <Chip 
+                         label={element.element_name} 
+                         size="small" 
+                         color="secondary" 
+                         variant="outlined"
+                       />
+                     </TableCell>
+                     <TableCell>
+                       ({element.position_x}, {element.position_y})
+                     </TableCell>
+                     <TableCell>{element.font_size}px</TableCell>
+                     <TableCell>{element.font_family}</TableCell>
+                     <TableCell>
+                       <Box
+                         sx={{
+                           width: 20,
+                           height: 20,
+                           backgroundColor: element.font_color,
+                           border: '1px solid #ccc',
+                           borderRadius: 1
+                         }}
+                       />
+                     </TableCell>
+                     <TableCell>
+                       <Chip 
+                         label={element.alignment} 
+                         size="small" 
+                         variant="outlined"
+                       />
+                     </TableCell>
+                     <TableCell>
+                       <IconButton
+                         size="small"
+                         onClick={() => handleOpenDialog(element)}
+                         color="primary"
+                       >
+                         <EditIcon />
+                       </IconButton>
+                       <IconButton
+                         size="small"
+                         onClick={() => handleDelete(element.id)}
+                         color="error"
+                       >
+                         <DeleteIcon />
+                       </IconButton>
+                     </TableCell>
+                   </TableRow>
+                 ))
+               ) : (
+                 <TableRow>
+                   <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                     <Typography variant="body1" color="text.secondary">
+                       No text elements found. Click "Add Text Element" to create your first one.
+                     </Typography>
+                   </TableCell>
+                 </TableRow>
+               )}
+             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
@@ -339,7 +363,7 @@ const TextElementManagement = () => {
                 onChange={(e) => setFormData({ ...formData, graphic_pack: e.target.value })}
                 label="Graphic Pack"
               >
-                {graphicPacks.map((pack) => (
+                                 {Array.isArray(graphicPacks) && graphicPacks.map((pack) => (
                   <MenuItem key={pack.id} value={pack.id}>
                     {pack.name}
                   </MenuItem>
