@@ -457,3 +457,4 @@ const QuickTextPositioner = ({ templateId, onSave, onCancel }) => {
 };
 
 export default QuickTextPositioner;
+

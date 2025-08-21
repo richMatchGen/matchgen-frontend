@@ -14,7 +14,15 @@ import {
   Snackbar,
   Grid,
   Chip,
-  Paper
+  Paper,
+  TextField,
+  Slider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Divider
 } from '@mui/material';
 import {
   Download,
@@ -22,7 +30,9 @@ import {
   Schedule,
   LocationOn,
   SportsSoccer,
-  CheckCircle
+  CheckCircle,
+  Settings,
+  Close
 } from '@mui/icons-material';
 import axios from 'axios';
 
@@ -35,6 +45,14 @@ const MatchdayPostGenerator = () => {
   const [error, setError] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [debugData, setDebugData] = useState(null);
+  const [textSettings, setTextSettings] = useState({
+    date: { x: 400, y: 150, fontSize: 24, color: '#FFFFFF', fontFamily: 'Arial' },
+    time: { x: 400, y: 200, fontSize: 24, color: '#FFFFFF', fontFamily: 'Arial' },
+    venue: { x: 400, y: 250, fontSize: 18, color: '#FFFFFF', fontFamily: 'Arial' },
+    opponent: { x: 400, y: 100, fontSize: 28, color: '#FFFFFF', fontFamily: 'Arial' },
+    home_away: { x: 400, y: 50, fontSize: 16, color: '#FFD700', fontFamily: 'Arial' }
+  });
+  const [showTextSettings, setShowTextSettings] = useState(false);
 
   // Fetch matches on component mount
   useEffect(() => {
@@ -75,7 +93,10 @@ const MatchdayPostGenerator = () => {
       const token = localStorage.getItem('accessToken');
       const response = await axios.post(
         'https://matchgen-backend-production.up.railway.app/api/graphicpack/generate-matchday-post/',
-        { match_id: selectedMatch },
+        { 
+          match_id: selectedMatch,
+          text_settings: textSettings  // Send text settings to backend
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -542,22 +563,31 @@ const MatchdayPostGenerator = () => {
                 </Paper>
               )}
 
-              <Button
-                variant="contained"
-                fullWidth
-                size="large"
-                onClick={generateMatchdayPost}
-                disabled={!selectedMatch || generating}
-                startIcon={generating ? <CircularProgress size={20} /> : <Image />}
-                sx={{ 
-                  mt: 2,
-                  py: 1.5,
-                  fontWeight: 'bold',
-                  fontSize: '1.1rem'
-                }}
-              >
-                {generating ? 'Generating...' : 'Generate Matchday Post'}
-              </Button>
+                             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                 <Button
+                   variant="outlined"
+                   onClick={() => setShowTextSettings(true)}
+                   startIcon={<Settings />}
+                   sx={{ flex: 1 }}
+                 >
+                   Text Settings
+                 </Button>
+                 <Button
+                   variant="contained"
+                   fullWidth
+                   size="large"
+                   onClick={generateMatchdayPost}
+                   disabled={!selectedMatch || generating}
+                   startIcon={generating ? <CircularProgress size={20} /> : <Image />}
+                   sx={{ 
+                     py: 1.5,
+                     fontWeight: 'bold',
+                     fontSize: '1.1rem'
+                   }}
+                 >
+                   {generating ? 'Generating...' : 'Generate Matchday Post'}
+                 </Button>
+               </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -666,17 +696,146 @@ const MatchdayPostGenerator = () => {
                  </Alert>
        </Snackbar>
 
-       {/* Debug Data Display */}
-       {debugData && (
-         <Box sx={{ mt: 4, p: 2, border: '1px solid #ccc', borderRadius: 1, backgroundColor: '#f5f5f5' }}>
-           <Typography variant="h6" gutterBottom>Debug Data:</Typography>
-           <pre style={{ fontSize: '12px', overflow: 'auto', maxHeight: '300px' }}>
-             {JSON.stringify(debugData, null, 2)}
-           </pre>
-         </Box>
-       )}
-     </Box>
-   );
- };
+               {/* Debug Data Display */}
+        {debugData && (
+          <Box sx={{ mt: 4, p: 2, border: '1px solid #ccc', borderRadius: 1, backgroundColor: '#f5f5f5' }}>
+            <Typography variant="h6" gutterBottom>Debug Data:</Typography>
+            <pre style={{ fontSize: '12px', overflow: 'auto', maxHeight: '300px' }}>
+              {JSON.stringify(debugData, null, 2)}
+            </pre>
+          </Box>
+        )}
+
+        {/* Text Settings Dialog */}
+        <Dialog 
+          open={showTextSettings} 
+          onClose={() => setShowTextSettings(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="h6">Text Settings</Typography>
+              <IconButton onClick={() => setShowTextSettings(false)}>
+                <Close />
+              </IconButton>
+            </Box>
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Customize the position, size, and style of text elements on your matchday post.
+            </Typography>
+            
+            {Object.entries(textSettings).map(([element, settings]) => (
+              <Box key={element} sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ textTransform: 'capitalize', mb: 2 }}>
+                  {element.replace('_', ' ')}
+                </Typography>
+                
+                <Grid container spacing={2}>
+                  {/* Position */}
+                  <Grid item xs={6}>
+                    <Typography variant="body2" gutterBottom>X Position</Typography>
+                    <Slider
+                      value={settings.x}
+                      onChange={(e, value) => setTextSettings(prev => ({
+                        ...prev,
+                        [element]: { ...prev[element], x: value }
+                      }))}
+                      min={0}
+                      max={800}
+                      valueLabelDisplay="auto"
+                    />
+                    <TextField
+                      size="small"
+                      value={settings.x}
+                      onChange={(e) => setTextSettings(prev => ({
+                        ...prev,
+                        [element]: { ...prev[element], x: parseInt(e.target.value) || 0 }
+                      }))}
+                      sx={{ width: 80 }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={6}>
+                    <Typography variant="body2" gutterBottom>Y Position</Typography>
+                    <Slider
+                      value={settings.y}
+                      onChange={(e, value) => setTextSettings(prev => ({
+                        ...prev,
+                        [element]: { ...prev[element], y: value }
+                      }))}
+                      min={0}
+                      max={600}
+                      valueLabelDisplay="auto"
+                    />
+                    <TextField
+                      size="small"
+                      value={settings.y}
+                      onChange={(e) => setTextSettings(prev => ({
+                        ...prev,
+                        [element]: { ...prev[element], y: parseInt(e.target.value) || 0 }
+                      }))}
+                      sx={{ width: 80 }}
+                    />
+                  </Grid>
+                  
+                  {/* Font Size */}
+                  <Grid item xs={6}>
+                    <Typography variant="body2" gutterBottom>Font Size</Typography>
+                    <Slider
+                      value={settings.fontSize}
+                      onChange={(e, value) => setTextSettings(prev => ({
+                        ...prev,
+                        [element]: { ...prev[element], fontSize: value }
+                      }))}
+                      min={12}
+                      max={48}
+                      valueLabelDisplay="auto"
+                    />
+                    <TextField
+                      size="small"
+                      value={settings.fontSize}
+                      onChange={(e) => setTextSettings(prev => ({
+                        ...prev,
+                        [element]: { ...prev[element], fontSize: parseInt(e.target.value) || 12 }
+                      }))}
+                      sx={{ width: 80 }}
+                    />
+                  </Grid>
+                  
+                  {/* Color */}
+                  <Grid item xs={6}>
+                    <Typography variant="body2" gutterBottom>Color</Typography>
+                    <TextField
+                      size="small"
+                      type="color"
+                      value={settings.color}
+                      onChange={(e) => setTextSettings(prev => ({
+                        ...prev,
+                        [element]: { ...prev[element], color: e.target.value }
+                      }))}
+                      sx={{ width: 100 }}
+                    />
+                  </Grid>
+                </Grid>
+                
+                <Divider sx={{ mt: 2 }} />
+              </Box>
+            ))}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowTextSettings(false)}>Cancel</Button>
+            <Button 
+              variant="contained" 
+              onClick={() => setShowTextSettings(false)}
+            >
+              Apply Settings
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    );
+  };
 
 export default MatchdayPostGenerator;
