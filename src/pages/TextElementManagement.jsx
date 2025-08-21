@@ -77,10 +77,15 @@ const TextElementManagement = () => {
     { value: 'competition', label: 'Competition' }
   ];
 
-  // Fetch data on component mount
-  useEffect(() => {
-    fetchData();
-  }, []);
+     // Fetch data on component mount
+   useEffect(() => {
+     fetchData();
+   }, []);
+
+   // Debug effect to log when graphicPacks changes
+   useEffect(() => {
+     console.log('graphicPacks state changed:', graphicPacks);
+   }, [graphicPacks]);
 
   const fetchData = async () => {
     try {
@@ -101,7 +106,16 @@ const TextElementManagement = () => {
          { headers: { Authorization: `Bearer ${token}` } }
        );
        console.log('Graphic packs response:', packsResponse.data);
-       setGraphicPacks(packsResponse.data || []);
+       console.log('Graphic packs type:', typeof packsResponse.data);
+       console.log('Graphic packs length:', Array.isArray(packsResponse.data) ? packsResponse.data.length : 'Not an array');
+       
+       if (Array.isArray(packsResponse.data)) {
+         setGraphicPacks(packsResponse.data);
+         console.log('Set graphic packs:', packsResponse.data);
+       } else {
+         console.error('Graphic packs response is not an array:', packsResponse.data);
+         setGraphicPacks([]);
+       }
          } catch (error) {
        console.error('Error fetching data:', error);
        let errorMessage = 'Failed to fetch data';
@@ -414,15 +428,24 @@ const TextElementManagement = () => {
                  onChange={(e) => setFormData({ ...formData, graphic_pack: e.target.value })}
                  label="Graphic Pack"
                >
-                 {Array.isArray(graphicPacks) && graphicPacks.length > 0 ? (
-                   graphicPacks.map((pack) => (
-                     <MenuItem key={pack.id} value={pack.id}>
-                       {pack.name}
-                     </MenuItem>
-                   ))
-                 ) : (
-                   <MenuItem disabled>No graphic packs available</MenuItem>
-                 )}
+                 {(() => {
+                   console.log('Rendering dropdown with graphicPacks:', graphicPacks);
+                   console.log('graphicPacks is array:', Array.isArray(graphicPacks));
+                   console.log('graphicPacks length:', graphicPacks.length);
+                   
+                   if (Array.isArray(graphicPacks) && graphicPacks.length > 0) {
+                     return graphicPacks.map((pack) => {
+                       console.log('Rendering pack:', pack);
+                       return (
+                         <MenuItem key={pack.id} value={pack.id}>
+                           {pack.name}
+                         </MenuItem>
+                       );
+                     });
+                   } else {
+                     return <MenuItem disabled>No graphic packs available ({graphicPacks.length})</MenuItem>;
+                   }
+                 })()}
                </Select>
             </FormControl>
 
