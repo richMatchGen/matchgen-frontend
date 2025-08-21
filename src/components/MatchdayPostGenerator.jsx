@@ -313,6 +313,30 @@ const MatchdayPostGenerator = () => {
     }
   };
 
+  const testTemplateDebug = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/template-debug/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log('Template debug result:', response.data);
+      setDebugData(response.data);
+      setSnackbar({
+        open: true,
+        message: 'Template debug successful!',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Template debug failed:', error);
+      setSnackbar({
+        open: true,
+        message: 'Template debug failed',
+        severity: 'error'
+      });
+    }
+  };
+
   const debugTemplates = async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -442,6 +466,13 @@ const MatchdayPostGenerator = () => {
             color="secondary"
           >
             Simple Test
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={testTemplateDebug}
+            color="warning"
+          >
+            Template Debug
           </Button>
        </Box>
 
