@@ -95,10 +95,12 @@ const TextElementManagement = () => {
        setTextElements(elementsResponse.data || []);
 
        // Fetch graphic packs
+       console.log('Fetching graphic packs...');
        const packsResponse = await axios.get(
          'https://matchgen-backend-production.up.railway.app/api/graphicpack/packs/',
          { headers: { Authorization: `Bearer ${token}` } }
        );
+       console.log('Graphic packs response:', packsResponse.data);
        setGraphicPacks(packsResponse.data || []);
          } catch (error) {
        console.error('Error fetching data:', error);
@@ -206,33 +208,60 @@ const TextElementManagement = () => {
     }
   };
 
-  const handleDelete = async (elementId) => {
-    if (!window.confirm('Are you sure you want to delete this text element?')) {
-      return;
-    }
+     const handleDelete = async (elementId) => {
+     if (!window.confirm('Are you sure you want to delete this text element?')) {
+       return;
+     }
 
-    try {
-      const token = localStorage.getItem('accessToken');
-      await axios.delete(
-        `https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/${elementId}/delete/`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      setSnackbar({
-        open: true,
-        message: 'Text element deleted successfully',
-        severity: 'success'
-      });
-      fetchData(); // Refresh the list
-    } catch (error) {
-      console.error('Error deleting text element:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to delete text element',
-        severity: 'error'
-      });
-    }
-  };
+     try {
+       const token = localStorage.getItem('accessToken');
+       await axios.delete(
+         `https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/${elementId}/delete/`,
+         { headers: { Authorization: `Bearer ${token}` } }
+       );
+       
+       setSnackbar({
+         open: true,
+         message: 'Text element deleted successfully',
+         severity: 'success'
+       });
+       fetchData(); // Refresh the list
+     } catch (error) {
+       console.error('Error deleting text element:', error);
+       setSnackbar({
+         open: true,
+         message: 'Failed to delete text element',
+         severity: 'error'
+       });
+     }
+   };
+
+   const createTestData = async () => {
+     try {
+       const token = localStorage.getItem('accessToken');
+       const response = await axios.post(
+         'https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/',
+         {},
+         { headers: { Authorization: `Bearer ${token}` } }
+       );
+       
+       setSnackbar({
+         open: true,
+         message: 'Test data created successfully',
+         severity: 'success'
+       });
+       
+       // Refresh data after creating test data
+       fetchData();
+     } catch (error) {
+       console.error('Error creating test data:', error);
+       setSnackbar({
+         open: true,
+         message: error.response?.data?.error || 'Failed to create test data',
+         severity: 'error'
+       });
+     }
+   };
 
   if (loading) {
     return (
@@ -244,18 +273,40 @@ const TextElementManagement = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
-          Text Element Management
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-        >
-          Add Text Element
-        </Button>
-      </Box>
+             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+         <Typography variant="h4" component="h1">
+           Text Element Management
+         </Typography>
+         <Box sx={{ display: 'flex', gap: 2 }}>
+           <Button
+             variant="outlined"
+             onClick={fetchData}
+           >
+             Refresh Data
+           </Button>
+           <Button
+             variant="outlined"
+             color="secondary"
+             onClick={createTestData}
+           >
+             Create Test Data
+           </Button>
+           <Button
+             variant="contained"
+             startIcon={<AddIcon />}
+             onClick={() => handleOpenDialog()}
+           >
+             Add Text Element
+           </Button>
+         </Box>
+       </Box>
+       
+       {/* Debug info */}
+       <Box sx={{ mb: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+         <Typography variant="body2" color="text.secondary">
+           Debug: Graphic Packs loaded: {graphicPacks.length} | Text Elements loaded: {textElements.length}
+         </Typography>
+       </Box>
 
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer>
@@ -358,17 +409,21 @@ const TextElementManagement = () => {
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
             <FormControl fullWidth>
               <InputLabel>Graphic Pack</InputLabel>
-              <Select
-                value={formData.graphic_pack}
-                onChange={(e) => setFormData({ ...formData, graphic_pack: e.target.value })}
-                label="Graphic Pack"
-              >
-                                 {Array.isArray(graphicPacks) && graphicPacks.map((pack) => (
-                  <MenuItem key={pack.id} value={pack.id}>
-                    {pack.name}
-                  </MenuItem>
-                ))}
-              </Select>
+                             <Select
+                 value={formData.graphic_pack}
+                 onChange={(e) => setFormData({ ...formData, graphic_pack: e.target.value })}
+                 label="Graphic Pack"
+               >
+                 {Array.isArray(graphicPacks) && graphicPacks.length > 0 ? (
+                   graphicPacks.map((pack) => (
+                     <MenuItem key={pack.id} value={pack.id}>
+                       {pack.name}
+                     </MenuItem>
+                   ))
+                 ) : (
+                   <MenuItem disabled>No graphic packs available</MenuItem>
+                 )}
+               </Select>
             </FormControl>
 
             <FormControl fullWidth>
