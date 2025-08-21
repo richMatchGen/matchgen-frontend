@@ -25,6 +25,7 @@ const Results = lazy(() => import("./pages/results"));
 const ClubOverview = lazy(() => import("./pages/ClubOverview"));
 const ChoosePackPage = lazy(() => import("./pages/ChoosePackage"));
 const MatchdayPosts = lazy(() => import("./pages/MatchdayPosts"));
+const TextElementManagement = lazy(() => import("./pages/TextElementManagement"));
 
 
 function App() {
@@ -87,6 +88,7 @@ function App() {
 
           {/* Social Media Post Generation */}
           <Route path="/matchday-posts" element={<PrivateRoute><MatchdayPosts /></PrivateRoute>} />
+          <Route path="/text-elements" element={<PrivateRoute><TextElementManagement /></PrivateRoute>} />
 
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
         </Routes>
