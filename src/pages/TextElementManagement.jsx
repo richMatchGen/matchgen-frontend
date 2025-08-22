@@ -107,15 +107,24 @@ const TextElementManagement = () => {
        );
        console.log('Graphic packs response:', packsResponse.data);
        console.log('Graphic packs type:', typeof packsResponse.data);
-       console.log('Graphic packs length:', Array.isArray(packsResponse.data) ? packsResponse.data.length : 'Not an array');
        
-       if (Array.isArray(packsResponse.data)) {
-         setGraphicPacks(packsResponse.data);
-         console.log('Set graphic packs:', packsResponse.data);
+       // Handle paginated response
+       let graphicPacksData = [];
+       if (packsResponse.data && packsResponse.data.results) {
+         // Paginated response - extract results
+         graphicPacksData = packsResponse.data.results;
+         console.log('Extracted results from paginated response:', graphicPacksData);
+       } else if (Array.isArray(packsResponse.data)) {
+         // Direct array response
+         graphicPacksData = packsResponse.data;
+         console.log('Direct array response:', graphicPacksData);
        } else {
-         console.error('Graphic packs response is not an array:', packsResponse.data);
-         setGraphicPacks([]);
+         console.error('Unexpected response format:', packsResponse.data);
+         graphicPacksData = [];
        }
+       
+       console.log('Final graphic packs data:', graphicPacksData);
+       setGraphicPacks(graphicPacksData);
          } catch (error) {
        console.error('Error fetching data:', error);
        let errorMessage = 'Failed to fetch data';
