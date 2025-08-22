@@ -93,11 +93,31 @@ const TextElementManagement = () => {
       const token = localStorage.getItem('accessToken');
       
              // Fetch text elements
+       console.log('Fetching text elements...');
        const elementsResponse = await axios.get(
          'https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/',
          { headers: { Authorization: `Bearer ${token}` } }
        );
-       setTextElements(elementsResponse.data || []);
+       console.log('Text elements response:', elementsResponse.data);
+       console.log('Text elements type:', typeof elementsResponse.data);
+       
+       // Handle paginated response for text elements too
+       let textElementsData = [];
+       if (elementsResponse.data && elementsResponse.data.results) {
+         // Paginated response - extract results
+         textElementsData = elementsResponse.data.results;
+         console.log('Extracted text elements from paginated response:', textElementsData);
+       } else if (Array.isArray(elementsResponse.data)) {
+         // Direct array response
+         textElementsData = elementsResponse.data;
+         console.log('Direct text elements array response:', textElementsData);
+       } else {
+         console.error('Unexpected text elements response format:', elementsResponse.data);
+         textElementsData = [];
+       }
+       
+       console.log('Final text elements data:', textElementsData);
+       setTextElements(textElementsData);
 
        // Fetch graphic packs
        console.log('Fetching graphic packs...');
