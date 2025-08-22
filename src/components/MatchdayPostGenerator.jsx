@@ -69,15 +69,24 @@ const MatchdayPostGenerator = () => {
     }
 
     try {
+      console.log('=== FRONTEND: Starting matchday post generation ===');
+      console.log('Selected match ID:', selectedMatch);
+      
       setGenerating(true);
       setError(null);
       
       const token = localStorage.getItem('accessToken');
+      console.log('Making API request to generate matchday post...');
+      
       const response = await axios.post(
         'https://matchgen-backend-production.up.railway.app/api/graphicpack/generate-matchday-post/',
         { match_id: selectedMatch },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
+      console.log('=== FRONTEND: API Response ===');
+      console.log('Response status:', response.status);
+      console.log('Response data:', response.data);
 
       if (response.data.success) {
         setGeneratedImage(response.data.image_url);
@@ -90,7 +99,11 @@ const MatchdayPostGenerator = () => {
         throw new Error(response.data.error || 'Failed to generate post');
       }
     } catch (error) {
+      console.log('=== FRONTEND: Error occurred ===');
       console.error('Error generating matchday post:', error);
+      console.log('Error response:', error.response);
+      console.log('Error message:', error.message);
+      
       setError(error.response?.data?.error || error.message || 'Failed to generate matchday post');
       setSnackbar({
         open: true,
