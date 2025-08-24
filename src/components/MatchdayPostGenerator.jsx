@@ -54,14 +54,14 @@ const POST_TYPES = [
     color: 'primary'
   },
   { 
-    id: 'upcoming', 
+    id: 'upcomingFixture', 
     label: 'Upcoming Fixture', 
     icon: <Schedule />, 
     description: 'Future fixture announcement',
     color: 'info'
   },
   { 
-    id: 'startingxi', 
+    id: 'startingXI', 
     label: 'Starting XI', 
     icon: <Group />, 
     description: 'Team lineup announcement',
@@ -82,21 +82,21 @@ const POST_TYPES = [
     color: 'secondary'
   },
   { 
-    id: 'player_of_match', 
+    id: 'player', 
     label: 'Player of the Match', 
     icon: <EmojiEvents />, 
     description: 'Man of the match announcement',
     color: 'warning'
   },
   { 
-    id: 'half_time', 
+    id: 'halftime', 
     label: 'Half Time', 
     icon: <Timer />, 
     description: 'Half-time score update',
     color: 'info'
   },
   { 
-    id: 'full_time', 
+    id: 'fulltime', 
     label: 'Full Time', 
     icon: <Flag />, 
     description: 'Final result announcement',

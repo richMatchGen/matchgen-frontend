@@ -68,7 +68,7 @@ export default function HighlightedCard() {
           endIcon={<ChevronRightRoundedIcon />}
           fullWidth={isSmallScreen}
           component={RouterLink} 
-          to={match ? `/gen/posts/${match.id}/full_time` : "/gen/posts"}
+          to={match ? `/gen/posts/${match.id}/fulltime` : "/gen/posts"}
         >
           Generate Post
         </Button>

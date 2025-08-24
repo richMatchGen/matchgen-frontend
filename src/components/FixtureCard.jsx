@@ -81,7 +81,7 @@ export default function FixtureCard() {
       endIcon={<ChevronRightRoundedIcon />}
       fullWidth={isSmallScreen}
       component={RouterLink}
-      to={match ? `/gen/posts/${match.id}/upcoming` : "/gen/posts"}
+      to={match ? `/gen/posts/${match.id}/upcomingFixture` : "/gen/posts"}
     >
       Generate Post
     </Button>
