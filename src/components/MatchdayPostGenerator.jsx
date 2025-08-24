@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -22,14 +23,16 @@ import {
   Schedule,
   LocationOn,
   SportsSoccer,
-  CheckCircle
+  CheckCircle,
+  ArrowBack
 } from '@mui/icons-material';
 import axios from 'axios';
 
 const MatchdayPostGenerator = () => {
+  const { fixtureId } = useParams(); // Get fixture ID from URL
+  const navigate = useNavigate();
   const [matches, setMatches] = useState([]);
-  const [selectedMatch, setSelectedMatch] = useState('');
-  // Removed homeAway state - home/away is handled by text elements positioning
+  const [selectedMatch, setSelectedMatch] = useState(fixtureId || '');
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null);
@@ -491,42 +494,53 @@ const MatchdayPostGenerator = () => {
        </Box>
 
       <Grid container spacing={3}>
-        {/* Fixture Selection */}
+        {/* Fixture Selection or Display */}
         <Grid item xs={12} md={6}>
           <Card elevation={3}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Select Fixture
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                {fixtureId && (
+                  <Button
+                    startIcon={<ArrowBack />}
+                    onClick={() => navigate('/dashboard')}
+                    sx={{ mr: 2 }}
+                  >
+                    Back to Dashboard
+                  </Button>
+                )}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  {fixtureId ? 'Generate Matchday Post' : 'Select Fixture'}
+                </Typography>
+              </Box>
               
-              <FormControl fullWidth sx={{ mb: 3 }}>
-                <InputLabel>Choose a fixture</InputLabel>
-                <Select
-                  value={selectedMatch}
-                  onChange={(e) => setSelectedMatch(e.target.value)}
-                  label="Choose a fixture"
-                >
-                  {matches.map((match) => (
-                    <MenuItem key={match.id} value={match.id}>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                          {match.opponent || 'Opponent TBC'}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {formatDate(match.date)} at {formatTime(match.time_start)}
-                        </Typography>
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {/* Home/Away selection removed - handled by text elements positioning */}
+              {!fixtureId && (
+                <FormControl fullWidth sx={{ mb: 3 }}>
+                  <InputLabel>Choose a fixture</InputLabel>
+                  <Select
+                    value={selectedMatch}
+                    onChange={(e) => setSelectedMatch(e.target.value)}
+                    label="Choose a fixture"
+                  >
+                    {matches.map((match) => (
+                      <MenuItem key={match.id} value={match.id}>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                            {match.opponent || 'Opponent TBC'}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatDate(match.date)} at {formatTime(match.time_start)}
+                          </Typography>
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
 
               {selectedMatch && (
                 <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'grey.50' }}>
                   <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 'bold' }}>
-                    Selected Fixture:
+                    {fixtureId ? 'Fixture Details:' : 'Selected Fixture:'}
                   </Typography>
                   {(() => {
                     const match = getSelectedMatchData();
@@ -558,22 +572,22 @@ const MatchdayPostGenerator = () => {
                 </Paper>
               )}
 
-                             <Button
-                 variant="contained"
-                 fullWidth
-                 size="large"
-                 onClick={generateMatchdayPost}
-                 disabled={!selectedMatch || generating}
-                 startIcon={generating ? <CircularProgress size={20} /> : <Image />}
-                 sx={{ 
-                   mt: 2,
-                   py: 1.5,
-                   fontWeight: 'bold',
-                   fontSize: '1.1rem'
-                 }}
-               >
-                 {generating ? 'Generating...' : 'Generate Matchday Post'}
-               </Button>
+              <Button
+                variant="contained"
+                fullWidth
+                size="large"
+                onClick={generateMatchdayPost}
+                disabled={!selectedMatch || generating}
+                startIcon={generating ? <CircularProgress size={20} /> : <Image />}
+                sx={{ 
+                  mt: 2,
+                  py: 1.5,
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem'
+                }}
+              >
+                {generating ? 'Generating...' : 'Generate Matchday Post'}
+              </Button>
             </CardContent>
           </Card>
         </Grid>

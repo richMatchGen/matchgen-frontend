@@ -85,7 +85,7 @@ export default function MatchDayCard() {
       component={RouterLink}
       to={match ? `/gen/posts/${match.id}` : "/gen/posts"}
     >
-      Gen Posts
+      Generate Post
     </Button>
   </CardContent>
 </Card>
