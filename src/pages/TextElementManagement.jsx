@@ -47,13 +47,18 @@ const TextElementManagement = () => {
     graphic_pack: '',
     content_type: '',
     element_name: '',
+    element_type: 'text', // New field for element type
     position_x: 400,
     position_y: 150,
     font_size: 24,
     font_family: 'Arial',
     font_color: '#FFFFFF',
     alignment: 'center',
-    font_weight: 'normal'
+    font_weight: 'normal',
+    // Image-specific fields
+    image_width: 100,
+    image_height: 100,
+    maintain_aspect_ratio: true
   });
 
   // Content type options
@@ -71,6 +76,7 @@ const TextElementManagement = () => {
     { value: 'time', label: 'Time' },
     { value: 'venue', label: 'Venue' },
     { value: 'opponent', label: 'Opponent' },
+    { value: 'opponent_logo', label: 'Opponent Logo' }, // New image element
     { value: 'home_away', label: 'Home/Away' },
     { value: 'score', label: 'Score' },
     { value: 'team_name', label: 'Team Name' },
@@ -178,13 +184,17 @@ const TextElementManagement = () => {
         graphic_pack: element.graphic_pack,
         content_type: element.content_type,
         element_name: element.element_name,
+        element_type: element.element_type || 'text',
         position_x: element.position_x,
         position_y: element.position_y,
         font_size: element.font_size,
         font_family: element.font_family,
         font_color: element.font_color,
         alignment: element.alignment,
-        font_weight: element.font_weight
+        font_weight: element.font_weight,
+        image_width: element.image_width || 100,
+        image_height: element.image_height || 100,
+        maintain_aspect_ratio: element.maintain_aspect_ratio !== undefined ? element.maintain_aspect_ratio : true
       });
     } else {
       setEditingElement(null);
@@ -192,13 +202,17 @@ const TextElementManagement = () => {
         graphic_pack: '',
         content_type: '',
         element_name: '',
+        element_type: 'text',
         position_x: 400,
         position_y: 150,
         font_size: 24,
         font_family: 'Arial',
         font_color: '#FFFFFF',
         alignment: 'center',
-        font_weight: 'normal'
+        font_weight: 'normal',
+        image_width: 100,
+        image_height: 100,
+        maintain_aspect_ratio: true
       });
     }
     setDialogOpen(true);
@@ -339,7 +353,7 @@ const TextElementManagement = () => {
              startIcon={<AddIcon />}
              onClick={() => handleOpenDialog()}
            >
-             Add Text Element
+             Add Element
            </Button>
          </Box>
        </Box>
@@ -359,6 +373,7 @@ const TextElementManagement = () => {
                 <TableCell>Graphic Pack</TableCell>
                 <TableCell>Content Type</TableCell>
                 <TableCell>Element Name</TableCell>
+                <TableCell>Type</TableCell>
                 <TableCell>Position (X, Y)</TableCell>
                 <TableCell>Font Size</TableCell>
                 <TableCell>Font Family</TableCell>
@@ -389,20 +404,41 @@ const TextElementManagement = () => {
                        />
                      </TableCell>
                      <TableCell>
+                       <Chip 
+                         label={element.element_type || 'text'} 
+                         size="small" 
+                         color={element.element_type === 'image' ? 'success' : 'primary'} 
+                         variant="outlined"
+                       />
+                     </TableCell>
+                     <TableCell>
                        ({element.position_x}, {element.position_y})
                      </TableCell>
-                     <TableCell>{element.font_size}px</TableCell>
-                     <TableCell>{element.font_family}</TableCell>
                      <TableCell>
-                       <Box
-                         sx={{
-                           width: 20,
-                           height: 20,
-                           backgroundColor: element.font_color,
-                           border: '1px solid #ccc',
-                           borderRadius: 1
-                         }}
-                       />
+                       {element.element_type === 'image' ? 
+                         `${element.image_width || 100}x${element.image_height || 100}px` : 
+                         `${element.font_size}px`
+                       }
+                     </TableCell>
+                     <TableCell>
+                       {element.element_type === 'image' ? 
+                         'Image' : 
+                         element.font_family
+                       }
+                     </TableCell>
+                     <TableCell>
+                       {element.element_type === 'image' ? 
+                         <Chip label="Image" size="small" color="success" variant="outlined" /> :
+                         <Box
+                           sx={{
+                             width: 20,
+                             height: 20,
+                             backgroundColor: element.font_color,
+                             border: '1px solid #ccc',
+                             borderRadius: 1
+                           }}
+                         />
+                       }
                      </TableCell>
                      <TableCell>
                        <Chip 
@@ -431,7 +467,7 @@ const TextElementManagement = () => {
                  ))
                ) : (
                  <TableRow>
-                   <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                   <TableCell colSpan={10} align="center" sx={{ py: 4 }}>
                      <Typography variant="body1" color="text.secondary">
                        No text elements found. Click "Add Text Element" to create your first one.
                      </Typography>
@@ -446,36 +482,48 @@ const TextElementManagement = () => {
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle>
-          {editingElement ? 'Edit Text Element' : 'Add Text Element'}
+          {editingElement ? 'Edit Element' : 'Add Element'}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
             <FormControl fullWidth>
               <InputLabel>Graphic Pack</InputLabel>
-                             <Select
-                 value={formData.graphic_pack}
-                 onChange={(e) => setFormData({ ...formData, graphic_pack: e.target.value })}
-                 label="Graphic Pack"
-               >
-                 {(() => {
-                   console.log('Rendering dropdown with graphicPacks:', graphicPacks);
-                   console.log('graphicPacks is array:', Array.isArray(graphicPacks));
-                   console.log('graphicPacks length:', graphicPacks.length);
-                   
-                   if (Array.isArray(graphicPacks) && graphicPacks.length > 0) {
-                     return graphicPacks.map((pack) => {
-                       console.log('Rendering pack:', pack);
-                       return (
-                         <MenuItem key={pack.id} value={pack.id}>
-                           {pack.name}
-                         </MenuItem>
-                       );
-                     });
-                   } else {
-                     return <MenuItem disabled>No graphic packs available ({graphicPacks.length})</MenuItem>;
-                   }
-                 })()}
-               </Select>
+              <Select
+                value={formData.graphic_pack}
+                onChange={(e) => setFormData({ ...formData, graphic_pack: e.target.value })}
+                label="Graphic Pack"
+              >
+                {(() => {
+                  console.log('Rendering dropdown with graphicPacks:', graphicPacks);
+                  console.log('graphicPacks is array:', Array.isArray(graphicPacks));
+                  console.log('graphicPacks length:', graphicPacks.length);
+                  
+                  if (Array.isArray(graphicPacks) && graphicPacks.length > 0) {
+                    return graphicPacks.map((pack) => {
+                      console.log('Rendering pack:', pack);
+                      return (
+                        <MenuItem key={pack.id} value={pack.id}>
+                          {pack.name}
+                        </MenuItem>
+                      );
+                    });
+                  } else {
+                    return <MenuItem disabled>No graphic packs available ({graphicPacks.length})</MenuItem>;
+                  }
+                })()}
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel>Element Type</InputLabel>
+              <Select
+                value={formData.element_type}
+                onChange={(e) => setFormData({ ...formData, element_type: e.target.value })}
+                label="Element Type"
+              >
+                <MenuItem value="text">Text</MenuItem>
+                <MenuItem value="image">Image</MenuItem>
+              </Select>
             </FormControl>
 
             <FormControl fullWidth>
@@ -571,6 +619,41 @@ const TextElementManagement = () => {
                 <MenuItem value="bold">Bold</MenuItem>
               </Select>
             </FormControl>
+
+            {/* Image-specific fields - only show for image elements */}
+            {formData.element_type === 'image' && (
+              <>
+                <TextField
+                  label="Image Width"
+                  type="number"
+                  value={formData.image_width}
+                  onChange={(e) => setFormData({ ...formData, image_width: parseInt(e.target.value) || 100 })}
+                  fullWidth
+                  helperText="Width in pixels"
+                />
+
+                <TextField
+                  label="Image Height"
+                  type="number"
+                  value={formData.image_height}
+                  onChange={(e) => setFormData({ ...formData, image_height: parseInt(e.target.value) || 100 })}
+                  fullWidth
+                  helperText="Height in pixels"
+                />
+
+                <FormControl fullWidth>
+                  <InputLabel>Maintain Aspect Ratio</InputLabel>
+                  <Select
+                    value={formData.maintain_aspect_ratio}
+                    onChange={(e) => setFormData({ ...formData, maintain_aspect_ratio: e.target.value })}
+                    label="Maintain Aspect Ratio"
+                  >
+                    <MenuItem value={true}>Yes</MenuItem>
+                    <MenuItem value={false}>No</MenuItem>
+                  </Select>
+                </FormControl>
+              </>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>
@@ -581,7 +664,7 @@ const TextElementManagement = () => {
             onClick={handleSubmit} 
             variant="contained" 
             startIcon={<SaveIcon />}
-            disabled={!formData.graphic_pack || !formData.content_type || !formData.element_name}
+            disabled={!formData.graphic_pack || !formData.content_type || !formData.element_name || !formData.element_type}
           >
             {editingElement ? 'Update' : 'Create'}
           </Button>
