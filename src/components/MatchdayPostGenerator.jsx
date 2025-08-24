@@ -15,7 +15,10 @@ import {
   Snackbar,
   Grid,
   Chip,
-  Paper
+  Paper,
+  Tabs,
+  Tab,
+  Divider
 } from '@mui/material';
 import {
   Download,
@@ -24,15 +27,83 @@ import {
   LocationOn,
   SportsSoccer,
   CheckCircle,
-  ArrowBack
+  ArrowBack,
+  Group,
+  Event,
+  EmojiEvents,
+  SwapHoriz,
+  Person,
+  Timer,
+  Flag
 } from '@mui/icons-material';
 import axios from 'axios';
 
-const MatchdayPostGenerator = () => {
-  const { fixtureId } = useParams(); // Get fixture ID from URL
+// Post type definitions
+const POST_TYPES = [
+  { 
+    id: 'matchday', 
+    label: 'Matchday', 
+    icon: <Event />, 
+    description: 'Pre-match announcement with fixture details',
+    color: 'primary'
+  },
+  { 
+    id: 'upcoming', 
+    label: 'Upcoming Fixture', 
+    icon: <Schedule />, 
+    description: 'Future fixture announcement',
+    color: 'info'
+  },
+  { 
+    id: 'startingxi', 
+    label: 'Starting XI', 
+    icon: <Group />, 
+    description: 'Team lineup announcement',
+    color: 'success'
+  },
+  { 
+    id: 'goal', 
+    label: 'Goal', 
+    icon: <SportsSoccer />, 
+    description: 'Goal celebration post',
+    color: 'warning'
+  },
+  { 
+    id: 'sub', 
+    label: 'Substitution', 
+    icon: <SwapHoriz />, 
+    description: 'Player substitution announcement',
+    color: 'secondary'
+  },
+  { 
+    id: 'player_of_match', 
+    label: 'Player of the Match', 
+    icon: <EmojiEvents />, 
+    description: 'Man of the match announcement',
+    color: 'warning'
+  },
+  { 
+    id: 'half_time', 
+    label: 'Half Time', 
+    icon: <Timer />, 
+    description: 'Half-time score update',
+    color: 'info'
+  },
+  { 
+    id: 'full_time', 
+    label: 'Full Time', 
+    icon: <Flag />, 
+    description: 'Final result announcement',
+    color: 'success'
+  }
+];
+
+const SocialMediaPostGenerator = () => {
+  const { fixtureId, postType } = useParams(); // Get fixture ID and post type from URL
   const navigate = useNavigate();
   const [matches, setMatches] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState(fixtureId || '');
+  const [selectedPostType, setSelectedPostType] = useState(postType || 'matchday');
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null);
@@ -62,7 +133,7 @@ const MatchdayPostGenerator = () => {
     }
   };
 
-  const generateMatchdayPost = async () => {
+  const generatePost = async () => {
     if (!selectedMatch) {
       setSnackbar({
         open: true,
@@ -73,17 +144,23 @@ const MatchdayPostGenerator = () => {
     }
 
     try {
-      console.log('=== FRONTEND: Starting matchday post generation ===');
+      console.log('=== FRONTEND: Starting post generation ===');
       console.log('Selected match ID:', selectedMatch);
+      console.log('Selected post type:', selectedPostType);
       
       setGenerating(true);
       setError(null);
       
       const token = localStorage.getItem('accessToken');
-      console.log('Making API request to generate matchday post...');
+      console.log('Making API request to generate post...');
+      
+      // Use the appropriate endpoint based on post type
+      const endpoint = selectedPostType === 'matchday' 
+        ? '/api/graphicpack/generate-matchday-post/'
+        : `/api/graphicpack/generate-${selectedPostType}-post/`;
       
       const response = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/generate-matchday-post/',
+        `https://matchgen-backend-production.up.railway.app${endpoint}`,
         { match_id: selectedMatch },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -96,7 +173,7 @@ const MatchdayPostGenerator = () => {
         setGeneratedImage(response.data.image_url);
         setSnackbar({
           open: true,
-          message: 'Matchday post generated successfully!',
+          message: `${POST_TYPES.find(pt => pt.id === selectedPostType)?.label} post generated successfully!`,
           severity: 'success'
         });
       } else {
@@ -104,14 +181,14 @@ const MatchdayPostGenerator = () => {
       }
     } catch (error) {
       console.log('=== FRONTEND: Error occurred ===');
-      console.error('Error generating matchday post:', error);
+      console.error('Error generating post:', error);
       console.log('Error response:', error.response);
       console.log('Error message:', error.message);
       
-      setError(error.response?.data?.error || error.message || 'Failed to generate matchday post');
+      setError(error.response?.data?.error || error.message || 'Failed to generate post');
       setSnackbar({
         open: true,
-        message: error.response?.data?.error || error.message || 'Failed to generate matchday post',
+        message: error.response?.data?.error || error.message || 'Failed to generate post',
         severity: 'error'
       });
     } finally {
@@ -128,7 +205,7 @@ const MatchdayPostGenerator = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `matchday-post-${selectedMatch}.png`;
+      a.download = `${selectedPostType}-post-${selectedMatch}.png`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -144,235 +221,6 @@ const MatchdayPostGenerator = () => {
       setSnackbar({
         open: true,
         message: 'Failed to download image',
-        severity: 'error'
-      });
-    }
-  };
-
-  const testBackend = async () => {
-    try {
-      const response = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/test/'
-      );
-      console.log('Test response:', response.data);
-      setSnackbar({
-        open: true,
-        message: 'Backend test successful!',
-        severity: 'success'
-      });
-    } catch (error) {
-      console.error('Backend test failed:', error);
-      setSnackbar({
-        open: true,
-        message: 'Backend test failed',
-        severity: 'error'
-      });
-    }
-  };
-
-  const testBasicFunctionality = async () => {
-    try {
-      const response = await axios.put(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/test/'
-      );
-      console.log('Basic functionality test response:', response.data);
-      setSnackbar({
-        open: true,
-        message: response.data.message,
-        severity: response.data.status === 'success' ? 'success' : 'error'
-      });
-    } catch (error) {
-      console.error('Basic functionality test failed:', error);
-      setSnackbar({
-        open: true,
-        message: 'Basic functionality test failed',
-        severity: 'error'
-      });
-    }
-  };
-
-  const testDatabaseConnection = async () => {
-    try {
-      const response = await axios.patch(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/test/'
-      );
-      console.log('Database connection test response:', response.data);
-      setSnackbar({
-        open: true,
-        message: response.data.message,
-        severity: response.data.status === 'success' ? 'success' : 'error'
-      });
-    } catch (error) {
-      console.error('Database connection test failed:', error);
-      setSnackbar({
-        open: true,
-        message: 'Database connection test failed',
-        severity: 'error'
-      });
-    }
-  };
-
-  const testViewFunctionality = async () => {
-    try {
-      const response = await axios.delete(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/test/'
-      );
-      console.log('View functionality test response:', response.data);
-      setSnackbar({
-        open: true,
-        message: response.data.message,
-        severity: response.data.status === 'success' ? 'success' : 'error'
-      });
-    } catch (error) {
-      console.error('View functionality test failed:', error);
-      setSnackbar({
-        open: true,
-        message: 'View functionality test failed',
-        severity: 'error'
-      });
-    }
-  };
-
-  const testDatabase = async () => {
-    try {
-      const response = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/test/'
-      );
-      console.log('Database test response:', response.data);
-      setSnackbar({
-        open: true,
-        message: response.data.message,
-        severity: response.data.status === 'success' ? 'success' : 'error'
-      });
-    } catch (error) {
-      console.error('Database test failed:', error);
-      setSnackbar({
-        open: true,
-        message: 'Database test failed',
-        severity: 'error'
-      });
-    }
-  };
-
-  const createTestData = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/',
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log('Test data created:', response.data);
-      setSnackbar({
-        open: true,
-        message: 'Test data created successfully!',
-        severity: 'success'
-      });
-      // Refresh debug data to show the new packs
-      setTimeout(() => {
-        debugTemplates();
-      }, 1000);
-    } catch (error) {
-      console.error('Error creating test data:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to create test data',
-        severity: 'error'
-      });
-    }
-  };
-
-  const runDiagnostic = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/diagnostic/',
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log('Diagnostic result:', response.data);
-      setDebugData(response.data);
-      setSnackbar({
-        open: true,
-        message: response.data.status === 'ready' ? 'System ready for matchday posts!' : 'System needs setup',
-        severity: response.data.status === 'ready' ? 'success' : 'warning'
-      });
-    } catch (error) {
-      console.error('Diagnostic failed:', error);
-      setSnackbar({
-        open: true,
-        message: 'Diagnostic failed',
-        severity: 'error'
-      });
-    }
-  };
-
-  const testSimple = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/simple-test/',
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log('Simple test result:', response.data);
-      setDebugData(response.data);
-      setSnackbar({
-        open: true,
-        message: 'Simple test successful!',
-        severity: 'success'
-      });
-    } catch (error) {
-      console.error('Simple test failed:', error);
-      setSnackbar({
-        open: true,
-        message: 'Simple test failed',
-        severity: 'error'
-      });
-    }
-  };
-
-  const testTemplateDebug = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/template-debug/',
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log('Template debug result:', response.data);
-      setDebugData(response.data);
-      setSnackbar({
-        open: true,
-        message: 'Template debug successful!',
-        severity: 'success'
-      });
-    } catch (error) {
-      console.error('Template debug failed:', error);
-      setSnackbar({
-        open: true,
-        message: 'Template debug failed',
-        severity: 'error'
-      });
-    }
-  };
-
-  const debugTemplates = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/debug-templates/',
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setDebugData(response.data);
-      console.log('Debug data:', response.data);
-      setSnackbar({
-        open: true,
-        message: 'Debug data loaded successfully!',
-        severity: 'success'
-      });
-    } catch (error) {
-      console.error('Error fetching debug data:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to load debug data',
         severity: 'error'
       });
     }
@@ -396,7 +244,6 @@ const MatchdayPostGenerator = () => {
   const formatTime = (timeString) => {
     if (!timeString) return 'Time TBC';
     try {
-      // time_start is a string like "15:00", convert to time object for formatting
       const [hours, minutes] = timeString.split(':');
       const time = new Date(2000, 0, 1, parseInt(hours), parseInt(minutes));
       return time.toLocaleTimeString('en-GB', {
@@ -404,8 +251,13 @@ const MatchdayPostGenerator = () => {
         minute: '2-digit'
       });
     } catch (error) {
-      return timeString; // Return as-is if parsing fails
+      return timeString;
     }
+  };
+
+  const handlePostTypeChange = (event, newValue) => {
+    setSelectedPostType(newValue);
+    setGeneratedImage(null); // Clear previous generated image
   };
 
   if (loading) {
@@ -418,100 +270,85 @@ const MatchdayPostGenerator = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-        Generate Matchday Post
-      </Typography>
-      
-             <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-         Select a fixture to generate a high-quality matchday post with fixture details overlaid on your club's template.
-       </Typography>
-
-       <Box sx={{ mb: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-         <Button
-           variant="outlined"
-           onClick={testBackend}
-         >
-           Test Backend
-         </Button>
-         <Button
-           variant="outlined"
-           onClick={testBasicFunctionality}
-         >
-           Test Basic
-         </Button>
-         <Button
-           variant="outlined"
-           onClick={testViewFunctionality}
-         >
-           Test View
-         </Button>
-         <Button
-           variant="outlined"
-           onClick={testDatabaseConnection}
-         >
-           Test DB Connection
-         </Button>
-         <Button
-           variant="outlined"
-           onClick={testDatabase}
-         >
-           Test Database
-         </Button>
-         <Button
-           variant="outlined"
-           onClick={debugTemplates}
-         >
-           Debug Templates
-         </Button>
-                   <Button
-            variant="outlined"
-            onClick={createTestData}
-            color="secondary"
-          >
-            Create Test Data
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={runDiagnostic}
-            color="primary"
-          >
-            Run Diagnostic
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={testSimple}
-            color="secondary"
-          >
-            Simple Test
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={testTemplateDebug}
-            color="warning"
-          >
-            Template Debug
-          </Button>
-       </Box>
+      {/* Header */}
+      <Box sx={{ mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          {fixtureId && (
+            <Button
+              startIcon={<ArrowBack />}
+              onClick={() => navigate('/dashboard')}
+              sx={{ mr: 2 }}
+            >
+              Back to Dashboard
+            </Button>
+          )}
+          <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            Social Media Post Generator
+          </Typography>
+        </Box>
+        
+        <Typography variant="body1" color="text.secondary">
+          Generate professional social media posts for your club's matches and events.
+        </Typography>
+      </Box>
 
       <Grid container spacing={3}>
-        {/* Fixture Selection or Display */}
-        <Grid item xs={12} md={6}>
+        {/* Left Panel - Post Type Selection */}
+        <Grid item xs={12} md={4}>
           <Card elevation={3}>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                {fixtureId && (
-                  <Button
-                    startIcon={<ArrowBack />}
-                    onClick={() => navigate('/dashboard')}
-                    sx={{ mr: 2 }}
-                  >
-                    Back to Dashboard
-                  </Button>
-                )}
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                  {fixtureId ? 'Generate Matchday Post' : 'Select Fixture'}
-                </Typography>
-              </Box>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                Post Type
+              </Typography>
+              
+              <Tabs
+                value={selectedPostType}
+                onChange={handlePostTypeChange}
+                orientation="vertical"
+                variant="scrollable"
+                sx={{ borderRight: 1, borderColor: 'divider', minHeight: 400 }}
+              >
+                {POST_TYPES.map((postType) => (
+                  <Tab
+                    key={postType.id}
+                    value={postType.id}
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
+                        <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
+                          {postType.icon}
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                            {postType.label}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {postType.description}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    }
+                    sx={{ 
+                      alignItems: 'flex-start',
+                      minHeight: 60,
+                      '&.Mui-selected': {
+                        backgroundColor: `${postType.color}.50`,
+                        color: `${postType.color}.main`
+                      }
+                    }}
+                  />
+                ))}
+              </Tabs>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Center Panel - Fixture Selection & Details */}
+        <Grid item xs={12} md={4}>
+          <Card elevation={3}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                {fixtureId ? 'Fixture Details' : 'Select Fixture'}
+              </Typography>
               
               {!fixtureId && (
                 <FormControl fullWidth sx={{ mb: 3 }}>
@@ -539,9 +376,6 @@ const MatchdayPostGenerator = () => {
 
               {selectedMatch && (
                 <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'grey.50' }}>
-                  <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 'bold' }}>
-                    {fixtureId ? 'Fixture Details:' : 'Selected Fixture:'}
-                  </Typography>
                   {(() => {
                     const match = getSelectedMatchData();
                     return (
@@ -576,24 +410,23 @@ const MatchdayPostGenerator = () => {
                 variant="contained"
                 fullWidth
                 size="large"
-                onClick={generateMatchdayPost}
+                onClick={generatePost}
                 disabled={!selectedMatch || generating}
                 startIcon={generating ? <CircularProgress size={20} /> : <Image />}
                 sx={{ 
-                  mt: 2,
                   py: 1.5,
                   fontWeight: 'bold',
                   fontSize: '1.1rem'
                 }}
               >
-                {generating ? 'Generating...' : 'Generate Matchday Post'}
+                {generating ? 'Generating...' : `Generate ${POST_TYPES.find(pt => pt.id === selectedPostType)?.label} Post`}
               </Button>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Generated Image */}
-        <Grid item xs={12} md={6}>
+        {/* Right Panel - Generated Image */}
+        <Grid item xs={12} md={4}>
           <Card elevation={3}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
@@ -611,7 +444,7 @@ const MatchdayPostGenerator = () => {
                   <Paper elevation={2} sx={{ p: 1, mb: 2, backgroundColor: 'grey.50' }}>
                     <img 
                       src={generatedImage} 
-                      alt="Generated matchday post"
+                      alt="Generated social media post"
                       style={{ 
                         width: '100%', 
                         height: 'auto', 
@@ -653,35 +486,25 @@ const MatchdayPostGenerator = () => {
                   </Box>
                 </Box>
               ) : (
-                <Paper 
-                  elevation={1}
-                  sx={{ 
-                    height: 300, 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    border: '2px dashed #ccc',
-                    borderRadius: 2,
-                    backgroundColor: 'grey.50'
-                  }}
-                >
-                  <Box textAlign="center">
-                    <Image sx={{ fontSize: 48, color: 'grey.400', mb: 2 }} />
-                    <Typography variant="body2" color="text.secondary">
-                      Generated image will appear here
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Select a fixture and click generate
-                    </Typography>
-                  </Box>
-                </Paper>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  minHeight: 300,
+                  backgroundColor: 'grey.50',
+                  borderRadius: 2,
+                  border: '2px dashed #ccc'
+                }}>
+                  <Typography variant="body1" color="text.secondary">
+                    Generated post will appear here
+                  </Typography>
+                </Box>
               )}
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -690,25 +513,12 @@ const MatchdayPostGenerator = () => {
         <Alert 
           onClose={() => setSnackbar({ ...snackbar, open: false })} 
           severity={snackbar.severity}
-          sx={{ width: '100%' }}
         >
           {snackbar.message}
-                 </Alert>
-       </Snackbar>
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
+};
 
-               {/* Debug Data Display */}
-        {debugData && (
-          <Box sx={{ mt: 4, p: 2, border: '1px solid #ccc', borderRadius: 1, backgroundColor: '#f5f5f5' }}>
-            <Typography variant="h6" gutterBottom>Debug Data:</Typography>
-            <pre style={{ fontSize: '12px', overflow: 'auto', maxHeight: '300px' }}>
-              {JSON.stringify(debugData, null, 2)}
-            </pre>
-          </Box>
-        )}
-
-
-      </Box>
-    );
-  };
-
-export default MatchdayPostGenerator;
+export default SocialMediaPostGenerator;

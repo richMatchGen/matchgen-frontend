@@ -25,7 +25,7 @@ const Results = lazy(() => import("./pages/results"));
 const ClubOverview = lazy(() => import("./pages/ClubOverview"));
 const ChoosePackPage = lazy(() => import("./pages/ChoosePackage"));
 const MatchdayPosts = lazy(() => import("./pages/MatchdayPosts"));
-const MatchdayPostGenerator = lazy(() => import("./components/MatchdayPostGenerator"));
+const SocialMediaPostGenerator = lazy(() => import("./components/MatchdayPostGenerator"));
 const TextElementManagement = lazy(() => import("./pages/TextElementManagement"));
 const FixturesManagement = lazy(() => import("./pages/FixturesManagement"));
 
@@ -91,8 +91,9 @@ function App() {
 
           {/* Social Media Post Generation */}
           <Route path="/matchday-posts" element={<PrivateRoute><MatchdayPosts /></PrivateRoute>} />
-          <Route path="/gen/posts" element={<PrivateRoute><MatchdayPostGenerator /></PrivateRoute>} />
-          <Route path="/gen/posts/:fixtureId" element={<PrivateRoute><MatchdayPostGenerator /></PrivateRoute>} />
+          <Route path="/gen/posts" element={<PrivateRoute><SocialMediaPostGenerator /></PrivateRoute>} />
+          <Route path="/gen/posts/:fixtureId" element={<PrivateRoute><SocialMediaPostGenerator /></PrivateRoute>} />
+          <Route path="/gen/posts/:fixtureId/:postType" element={<PrivateRoute><SocialMediaPostGenerator /></PrivateRoute>} />
           <Route path="/text-elements" element={<PrivateRoute><TextElementManagement /></PrivateRoute>} />
 
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />

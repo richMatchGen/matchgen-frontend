@@ -83,7 +83,7 @@ export default function MatchDayCard() {
       endIcon={<ChevronRightRoundedIcon />}
       fullWidth={isSmallScreen}
       component={RouterLink}
-      to={match ? `/gen/posts/${match.id}` : "/gen/posts"}
+      to={match ? `/gen/posts/${match.id}/matchday` : "/gen/posts"}
     >
       Generate Post
     </Button>
