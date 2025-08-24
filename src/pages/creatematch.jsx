@@ -22,6 +22,7 @@ const CreateMatch = () => {
     club: "",
     match_type: "",
     opponent: "",
+    home_away: "HOME", // Add home/away field
     club_logo: null,
     opponent_logo: null,
     sponsor: null,
@@ -154,6 +155,7 @@ const CreateMatch = () => {
       const matchData = {
         match_type: form.match_type.trim(),
         opponent: form.opponent.trim(),
+        home_away: form.home_away, // Add home/away to the data
         date: form.date?.toISOString().split("T")[0],
         time_start: form.time_start.trim(),
         venue: form.venue.trim(),
@@ -192,6 +194,7 @@ const CreateMatch = () => {
         club: userClub?.id || userClub?.name || "",
         match_type: "",
         opponent: "",
+        home_away: "HOME", // Reset home/away field
         club_logo: null,
         opponent_logo: null,
         sponsor: null,
@@ -288,6 +291,20 @@ const CreateMatch = () => {
         required
         placeholder="e.g., Manchester United"
       />
+
+      {/* Home/Away Selection */}
+      <FormControl fullWidth margin="normal">
+        <InputLabel>Fixture Type</InputLabel>
+        <Select
+          name="home_away"
+          value={form.home_away}
+          onChange={handleChange}
+          label="Fixture Type"
+        >
+          <MenuItem value="HOME">Home Fixture</MenuItem>
+          <MenuItem value="AWAY">Away Fixture</MenuItem>
+        </Select>
+      </FormControl>
 
       {/* Opponent Logo Upload */}
       <Button component="label" fullWidth variant="outlined" sx={{ mt: 2 }}>

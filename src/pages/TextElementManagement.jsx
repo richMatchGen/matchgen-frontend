@@ -50,6 +50,11 @@ const TextElementManagement = () => {
     element_type: 'text', // New field for element type
     position_x: 400,
     position_y: 150,
+    // Home/Away positioning fields
+    home_position_x: 400,
+    home_position_y: 150,
+    away_position_x: 400,
+    away_position_y: 150,
     font_size: 24,
     font_family: 'Arial',
     font_color: '#FFFFFF',
@@ -187,6 +192,10 @@ const TextElementManagement = () => {
         element_type: element.element_type || 'text',
         position_x: element.position_x,
         position_y: element.position_y,
+        home_position_x: element.home_position_x || element.position_x,
+        home_position_y: element.home_position_y || element.position_y,
+        away_position_x: element.away_position_x || element.position_x,
+        away_position_y: element.away_position_y || element.position_y,
         font_size: element.font_size,
         font_family: element.font_family,
         font_color: element.font_color,
@@ -205,6 +214,10 @@ const TextElementManagement = () => {
         element_type: 'text',
         position_x: 400,
         position_y: 150,
+        home_position_x: 400,
+        home_position_y: 150,
+        away_position_x: 400,
+        away_position_y: 150,
         font_size: 24,
         font_family: 'Arial',
         font_color: '#FFFFFF',
@@ -375,6 +388,7 @@ const TextElementManagement = () => {
                 <TableCell>Element Name</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Position (X, Y)</TableCell>
+                <TableCell>Home/Away Position</TableCell>
                 <TableCell>Font Size</TableCell>
                 <TableCell>Font Family</TableCell>
                 <TableCell>Color</TableCell>
@@ -413,6 +427,16 @@ const TextElementManagement = () => {
                      </TableCell>
                      <TableCell>
                        ({element.position_x}, {element.position_y})
+                     </TableCell>
+                     <TableCell>
+                       <Box>
+                         <Typography variant="caption" display="block">
+                           Home: ({element.home_position_x || element.position_x}, {element.home_position_y || element.position_y})
+                         </Typography>
+                         <Typography variant="caption" display="block">
+                           Away: ({element.away_position_x || element.position_x}, {element.away_position_y || element.position_y})
+                         </Typography>
+                       </Box>
                      </TableCell>
                      <TableCell>
                        {element.element_type === 'image' ? 
@@ -577,6 +601,43 @@ const TextElementManagement = () => {
               value={formData.position_y}
               onChange={(e) => setFormData({ ...formData, position_y: parseInt(e.target.value) || 0 })}
               fullWidth
+            />
+
+            {/* Home/Away positioning fields */}
+            <TextField
+              label="Home Position X"
+              type="number"
+              value={formData.home_position_x}
+              onChange={(e) => setFormData({ ...formData, home_position_x: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="X position for home fixtures"
+            />
+
+            <TextField
+              label="Home Position Y"
+              type="number"
+              value={formData.home_position_y}
+              onChange={(e) => setFormData({ ...formData, home_position_y: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Y position for home fixtures"
+            />
+
+            <TextField
+              label="Away Position X"
+              type="number"
+              value={formData.away_position_x}
+              onChange={(e) => setFormData({ ...formData, away_position_x: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="X position for away fixtures"
+            />
+
+            <TextField
+              label="Away Position Y"
+              type="number"
+              value={formData.away_position_y}
+              onChange={(e) => setFormData({ ...formData, away_position_y: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Y position for away fixtures"
             />
 
             <TextField
