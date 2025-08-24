@@ -81,7 +81,8 @@ const TextElementManagement = () => {
     { value: 'time', label: 'Time' },
     { value: 'venue', label: 'Venue' },
     { value: 'opponent', label: 'Opponent' },
-    { value: 'opponent_logo', label: 'Opponent Logo' }, // New image element
+    { value: 'opponent_logo', label: 'Opponent Logo' }, // Image element
+    { value: 'club_logo', label: 'Club Logo' }, // New club logo element
     { value: 'home_away', label: 'Home/Away' },
     { value: 'score', label: 'Score' },
     { value: 'team_name', label: 'Team Name' },
@@ -306,32 +307,59 @@ const TextElementManagement = () => {
      }
    };
 
-   const createTestData = async () => {
-     try {
-       const token = localStorage.getItem('accessToken');
-       const response = await axios.post(
-         'https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/',
-         {},
-         { headers: { Authorization: `Bearer ${token}` } }
-       );
-       
-       setSnackbar({
-         open: true,
-         message: 'Test data created successfully',
-         severity: 'success'
-       });
-       
-       // Refresh data after creating test data
-       fetchData();
-     } catch (error) {
-       console.error('Error creating test data:', error);
-       setSnackbar({
-         open: true,
-         message: error.response?.data?.error || 'Failed to create test data',
-         severity: 'error'
-       });
-     }
-   };
+     const createTestData = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/',
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setSnackbar({
+        open: true,
+        message: 'Test data created successfully',
+        severity: 'success'
+      });
+      
+      // Refresh data after creating test data
+      fetchData();
+    } catch (error) {
+      console.error('Error creating test data:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.error || 'Failed to create test data',
+        severity: 'error'
+      });
+    }
+  };
+
+  const createClubLogoElement = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/add-club-logo-element/',
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setSnackbar({
+        open: true,
+        message: response.data.message || 'Club logo element created successfully',
+        severity: 'success'
+      });
+      
+      // Refresh data after creating club logo element
+      fetchData();
+    } catch (error) {
+      console.error('Error creating club logo element:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.error || 'Failed to create club logo element',
+        severity: 'error'
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -347,28 +375,35 @@ const TextElementManagement = () => {
          <Typography variant="h4" component="h1">
            Text Element Management
          </Typography>
-         <Box sx={{ display: 'flex', gap: 2 }}>
-           <Button
-             variant="outlined"
-             onClick={fetchData}
-           >
-             Refresh Data
-           </Button>
-           <Button
-             variant="outlined"
-             color="secondary"
-             onClick={createTestData}
-           >
-             Create Test Data
-           </Button>
-           <Button
-             variant="contained"
-             startIcon={<AddIcon />}
-             onClick={() => handleOpenDialog()}
-           >
-             Add Element
-           </Button>
-         </Box>
+                   <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="outlined"
+              onClick={fetchData}
+            >
+              Refresh Data
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={createTestData}
+            >
+              Create Test Data
+            </Button>
+            <Button
+              variant="outlined"
+              color="info"
+              onClick={createClubLogoElement}
+            >
+              Add Club Logo
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenDialog()}
+            >
+              Add Element
+            </Button>
+          </Box>
        </Box>
        
        {/* Debug info */}
