@@ -18,7 +18,9 @@ import {
   Paper,
   Tabs,
   Tab,
-  Divider
+  Divider,
+  Container,
+  CssBaseline
 } from '@mui/material';
 import {
   Download,
@@ -37,6 +39,10 @@ import {
   Flag
 } from '@mui/icons-material';
 import axios from 'axios';
+import AppTheme from '../themes/AppTheme';
+import SideMenu from './SideMenu';
+import AppNavbar from './AppNavBar';
+import Header from './Header';
 
 // Post type definitions
 const POST_TYPES = [
@@ -262,262 +268,282 @@ const SocialMediaPostGenerator = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
-      </Box>
+      <AppTheme>
+        <CssBaseline />
+        <Box sx={{ display: 'flex' }}>
+          <SideMenu />
+          <Box sx={{ flexGrow: 1 }}>
+            <AppNavbar />
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+              <CircularProgress />
+            </Box>
+          </Box>
+        </Box>
+      </AppTheme>
     );
   }
 
   return (
-    <Box>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          {fixtureId && (
-            <Button
-              startIcon={<ArrowBack />}
-              onClick={() => navigate('/dashboard')}
-              sx={{ mr: 2 }}
-            >
-              Back to Dashboard
-            </Button>
-          )}
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-            Social Media Post Generator
-          </Typography>
-        </Box>
-        
-        <Typography variant="body1" color="text.secondary">
-          Generate professional social media posts for your club's matches and events.
-        </Typography>
-      </Box>
-
-      <Grid container spacing={3}>
-        {/* Left Panel - Post Type Selection */}
-        <Grid item xs={12} md={4}>
-          <Card elevation={3}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Post Type
-              </Typography>
-              
-              <Tabs
-                value={selectedPostType}
-                onChange={handlePostTypeChange}
-                orientation="vertical"
-                variant="scrollable"
-                sx={{ borderRight: 1, borderColor: 'divider', minHeight: 400 }}
-              >
-                {POST_TYPES.map((postType) => (
-                  <Tab
-                    key={postType.id}
-                    value={postType.id}
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
-                        <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
-                          {postType.icon}
-                        </Box>
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {postType.label}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {postType.description}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    }
-                    sx={{ 
-                      alignItems: 'flex-start',
-                      minHeight: 60,
-                      '&.Mui-selected': {
-                        backgroundColor: `${postType.color}.50`,
-                        color: `${postType.color}.main`
-                      }
-                    }}
-                  />
-                ))}
-              </Tabs>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Center Panel - Fixture Selection & Details */}
-        <Grid item xs={12} md={4}>
-          <Card elevation={3}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-                {fixtureId ? 'Fixture Details' : 'Select Fixture'}
-              </Typography>
-              
-              {!fixtureId && (
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel>Choose a fixture</InputLabel>
-                  <Select
-                    value={selectedMatch}
-                    onChange={(e) => setSelectedMatch(e.target.value)}
-                    label="Choose a fixture"
+    <AppTheme>
+      <CssBaseline />
+      <Box sx={{ display: 'flex' }}>
+        <SideMenu />
+        <Box sx={{ flexGrow: 1 }}>
+          <AppNavbar />
+          <Header title="Social Media Post Generator" />
+          
+          <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+            {/* Header */}
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                {fixtureId && (
+                  <Button
+                    startIcon={<ArrowBack />}
+                    onClick={() => navigate('/dashboard')}
+                    sx={{ mr: 2 }}
                   >
-                    {matches.map((match) => (
-                      <MenuItem key={match.id} value={match.id}>
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                            {match.opponent || 'Opponent TBC'}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {formatDate(match.date)} at {formatTime(match.time_start)}
-                          </Typography>
-                        </Box>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-
-              {selectedMatch && (
-                <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'grey.50' }}>
-                  {(() => {
-                    const match = getSelectedMatchData();
-                    return (
-                      <Box>
-                        <Chip 
-                          icon={<SportsSoccer />}
-                          label={`${match?.home_away || 'HOME'} vs ${match?.opponent || 'Opponent TBC'}`}
-                          color={match?.home_away === 'HOME' ? 'primary' : 'secondary'}
-                          sx={{ mb: 2, fontWeight: 'bold' }}
-                        />
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                          <Schedule sx={{ mr: 1, fontSize: 16, color: 'primary.main' }} />
-                          <Typography variant="body2">
-                            {formatDate(match?.date)} at {formatTime(match?.time_start)}
-                          </Typography>
-                        </Box>
-                        {match?.venue && (
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <LocationOn sx={{ mr: 1, fontSize: 16, color: 'primary.main' }} />
-                            <Typography variant="body2">
-                              {match.venue}
-                            </Typography>
-                          </Box>
-                        )}
-                      </Box>
-                    );
-                  })()}
-                </Paper>
-              )}
-
-              <Button
-                variant="contained"
-                fullWidth
-                size="large"
-                onClick={generatePost}
-                disabled={!selectedMatch || generating}
-                startIcon={generating ? <CircularProgress size={20} /> : <Image />}
-                sx={{ 
-                  py: 1.5,
-                  fontWeight: 'bold',
-                  fontSize: '1.1rem'
-                }}
-              >
-                {generating ? 'Generating...' : `Generate ${POST_TYPES.find(pt => pt.id === selectedPostType)?.label} Post`}
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Right Panel - Generated Image */}
-        <Grid item xs={12} md={4}>
-          <Card elevation={3}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Generated Post
-              </Typography>
+                    Back to Dashboard
+                  </Button>
+                )}
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                  Social Media Post Generator
+                </Typography>
+              </Box>
               
-              {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
+              <Typography variant="body1" color="text.secondary">
+                Generate professional social media posts for your club's matches and events.
+              </Typography>
+            </Box>
 
-              {generatedImage ? (
-                <Box>
-                  <Paper elevation={2} sx={{ p: 1, mb: 2, backgroundColor: 'grey.50' }}>
-                    <img 
-                      src={generatedImage} 
-                      alt="Generated social media post"
-                      style={{ 
-                        width: '100%', 
-                        height: 'auto', 
-                        maxHeight: '400px',
-                        objectFit: 'contain',
-                        borderRadius: '8px',
-                        border: '2px solid #e0e0e0'
-                      }}
-                    />
-                  </Paper>
-                  
-                  <Box sx={{ display: 'flex', gap: 2 }}>
+            <Grid container spacing={3}>
+              {/* Left Panel - Post Type Selection */}
+              <Grid item xs={12} md={4}>
+                <Card elevation={3}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                      Post Type
+                    </Typography>
+                    
+                    <Tabs
+                      value={selectedPostType}
+                      onChange={handlePostTypeChange}
+                      orientation="vertical"
+                      variant="scrollable"
+                      sx={{ borderRight: 1, borderColor: 'divider', minHeight: 400 }}
+                    >
+                      {POST_TYPES.map((postType) => (
+                        <Tab
+                          key={postType.id}
+                          value={postType.id}
+                          label={
+                            <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
+                              <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
+                                {postType.icon}
+                              </Box>
+                              <Box>
+                                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                  {postType.label}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {postType.description}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          }
+                          sx={{ 
+                            alignItems: 'flex-start',
+                            minHeight: 60,
+                            '&.Mui-selected': {
+                              backgroundColor: `${postType.color}.50`,
+                              color: `${postType.color}.main`
+                            }
+                          }}
+                        />
+                      ))}
+                    </Tabs>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Center Panel - Fixture Selection & Details */}
+              <Grid item xs={12} md={4}>
+                <Card elevation={3}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                      {fixtureId ? 'Fixture Details' : 'Select Fixture'}
+                    </Typography>
+                    
+                    {!fixtureId && (
+                      <FormControl fullWidth sx={{ mb: 3 }}>
+                        <InputLabel>Choose a fixture</InputLabel>
+                        <Select
+                          value={selectedMatch}
+                          onChange={(e) => setSelectedMatch(e.target.value)}
+                          label="Choose a fixture"
+                        >
+                          {matches.map((match) => (
+                            <MenuItem key={match.id} value={match.id}>
+                              <Box>
+                                <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                                  {match.opponent || 'Opponent TBC'}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {formatDate(match.date)} at {formatTime(match.time_start)}
+                                </Typography>
+                              </Box>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+
+                    {selectedMatch && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'grey.50' }}>
+                        {(() => {
+                          const match = getSelectedMatchData();
+                          return (
+                            <Box>
+                              <Chip 
+                                icon={<SportsSoccer />}
+                                label={`${match?.home_away || 'HOME'} vs ${match?.opponent || 'Opponent TBC'}`}
+                                color={match?.home_away === 'HOME' ? 'primary' : 'secondary'}
+                                sx={{ mb: 2, fontWeight: 'bold' }}
+                              />
+                              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                <Schedule sx={{ mr: 1, fontSize: 16, color: 'primary.main' }} />
+                                <Typography variant="body2">
+                                  {formatDate(match?.date)} at {formatTime(match?.time_start)}
+                                </Typography>
+                              </Box>
+                              {match?.venue && (
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                  <LocationOn sx={{ mr: 1, fontSize: 16, color: 'primary.main' }} />
+                                  <Typography variant="body2">
+                                    {match.venue}
+                                  </Typography>
+                                </Box>
+                              )}
+                            </Box>
+                          );
+                        })()}
+                      </Paper>
+                    )}
+
                     <Button
                       variant="contained"
                       fullWidth
-                      onClick={downloadImage}
-                      startIcon={<Download />}
+                      size="large"
+                      onClick={generatePost}
+                      disabled={!selectedMatch || generating}
+                      startIcon={generating ? <CircularProgress size={20} /> : <Image />}
                       sx={{ 
                         py: 1.5,
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        fontSize: '1.1rem'
                       }}
                     >
-                      Download Image
+                      {generating ? 'Generating...' : `Generate ${POST_TYPES.find(pt => pt.id === selectedPostType)?.label} Post`}
                     </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() => {
-                        setGeneratedImage(null);
-                        setSelectedMatch('');
-                      }}
-                      startIcon={<CheckCircle />}
-                      sx={{ 
-                        py: 1.5,
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      Generate Another
-                    </Button>
-                  </Box>
-                </Box>
-              ) : (
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  minHeight: 300,
-                  backgroundColor: 'grey.50',
-                  borderRadius: 2,
-                  border: '2px dashed #ccc'
-                }}>
-                  <Typography variant="body1" color="text.secondary">
-                    Generated post will appear here
-                  </Typography>
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
-          severity={snackbar.severity}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+              {/* Right Panel - Generated Image */}
+              <Grid item xs={12} md={4}>
+                <Card elevation={3}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                      Generated Post
+                    </Typography>
+                    
+                    {error && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                      </Alert>
+                    )}
+
+                    {generatedImage ? (
+                      <Box>
+                        <Paper elevation={2} sx={{ p: 1, mb: 2, backgroundColor: 'grey.50' }}>
+                          <img 
+                            src={generatedImage} 
+                            alt="Generated social media post"
+                            style={{ 
+                              width: '100%', 
+                              height: 'auto', 
+                              maxHeight: '400px',
+                              objectFit: 'contain',
+                              borderRadius: '8px',
+                              border: '2px solid #e0e0e0'
+                            }}
+                          />
+                        </Paper>
+                        
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                          <Button
+                            variant="contained"
+                            fullWidth
+                            onClick={downloadImage}
+                            startIcon={<Download />}
+                            sx={{ 
+                              py: 1.5,
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            Download Image
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={() => {
+                              setGeneratedImage(null);
+                              setSelectedMatch('');
+                            }}
+                            startIcon={<CheckCircle />}
+                            sx={{ 
+                              py: 1.5,
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            Generate Another
+                          </Button>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        minHeight: 300,
+                        backgroundColor: 'grey.50',
+                        borderRadius: 2,
+                        border: '2px dashed #ccc'
+                      }}>
+                        <Typography variant="body1" color="text.secondary">
+                          Generated post will appear here
+                        </Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+
+            <Snackbar
+              open={snackbar.open}
+              autoHideDuration={6000}
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+              <Alert 
+                onClose={() => setSnackbar({ ...snackbar, open: false })} 
+                severity={snackbar.severity}
+              >
+                {snackbar.message}
+              </Alert>
+            </Snackbar>
+          </Container>
+        </Box>
+      </Box>
+    </AppTheme>
   );
 };
 
