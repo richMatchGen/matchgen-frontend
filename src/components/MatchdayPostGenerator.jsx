@@ -29,6 +29,7 @@ import axios from 'axios';
 const MatchdayPostGenerator = () => {
   const [matches, setMatches] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState('');
+  const [homeAway, setHomeAway] = useState('HOME'); // Add home/away state
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null);
@@ -80,7 +81,7 @@ const MatchdayPostGenerator = () => {
       
       const response = await axios.post(
         'https://matchgen-backend-production.up.railway.app/api/graphicpack/generate-matchday-post/',
-        { match_id: selectedMatch },
+        { match_id: selectedMatch, home_away: homeAway },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
@@ -520,6 +521,19 @@ const MatchdayPostGenerator = () => {
                 </Select>
               </FormControl>
 
+              {/* Home/Away Selection */}
+              <FormControl fullWidth sx={{ mb: 3 }}>
+                <InputLabel>Fixture Type</InputLabel>
+                <Select
+                  value={homeAway}
+                  onChange={(e) => setHomeAway(e.target.value)}
+                  label="Fixture Type"
+                >
+                  <MenuItem value="HOME">Home Fixture</MenuItem>
+                  <MenuItem value="AWAY">Away Fixture</MenuItem>
+                </Select>
+              </FormControl>
+
               {selectedMatch && (
                 <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'grey.50' }}>
                   <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 'bold' }}>
@@ -531,8 +545,8 @@ const MatchdayPostGenerator = () => {
                       <Box>
                         <Chip 
                           icon={<SportsSoccer />}
-                          label={`HOME vs ${match?.opponent || 'Opponent TBC'}`}
-                          color="primary"
+                          label={`${homeAway} vs ${match?.opponent || 'Opponent TBC'}`}
+                          color={homeAway === 'HOME' ? 'primary' : 'secondary'}
                           sx={{ mb: 2, fontWeight: 'bold' }}
                         />
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
