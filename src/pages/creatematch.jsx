@@ -17,7 +17,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import axios from "axios";
 
-const CreateMatch = () => {
+const CreateMatch = ({ onFixtureAdded }) => {
   const [form, setForm] = useState({
     club: "",
     match_type: "",
@@ -190,6 +190,12 @@ const CreateMatch = () => {
       console.log("Match creation response:", response.data);
 
       setSuccess("Match created successfully!");
+      
+      // Call the callback if provided
+      if (onFixtureAdded) {
+        onFixtureAdded(response.data);
+      }
+      
       setForm({
         club: userClub?.id || userClub?.name || "",
         match_type: "",

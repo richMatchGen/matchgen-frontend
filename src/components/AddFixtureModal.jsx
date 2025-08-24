@@ -62,7 +62,7 @@ function ChildModal() {
   );
 }
 
-export default function AddFixtureModal() {
+export default function AddFixtureModal({ onFixtureAdded }) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [newPlayer, setNewPlayer] = useState({ name: "", position: "" });
@@ -103,7 +103,7 @@ export default function AddFixtureModal() {
           {/* <p id="parent-modal-description">
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
           </p> */}
-            <CreateMatch/>
+            <CreateMatch onFixtureAdded={onFixtureAdded} />
             
             {/* <Divider />
           <ChildModal /> */}

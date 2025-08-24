@@ -26,6 +26,7 @@ const ClubOverview = lazy(() => import("./pages/ClubOverview"));
 const ChoosePackPage = lazy(() => import("./pages/ChoosePackage"));
 const MatchdayPosts = lazy(() => import("./pages/MatchdayPosts"));
 const TextElementManagement = lazy(() => import("./pages/TextElementManagement"));
+const FixturesManagement = lazy(() => import("./pages/FixturesManagement"));
 
 
 function App() {
@@ -83,6 +84,7 @@ function App() {
           <Route path="/edit-club/:clubId" element={<EditClub />} />
           <Route path="/results" element={<PrivateRoute><Results /></PrivateRoute>} />
           <Route path="/fixtures" element={<PrivateRoute><Fixtures /></PrivateRoute>} />
+          <Route path="/fixtures-management" element={<PrivateRoute><FixturesManagement /></PrivateRoute>} />
 
           <Route path="/profile" element={<Overview />} />
 
