@@ -96,7 +96,9 @@ const TextElementManagement = () => {
     { value: 'home_score_ht', label: 'Home Score (Half Time)' },
     { value: 'away_score_ht', label: 'Away Score (Half Time)' },
     { value: 'home_score_ft', label: 'Home Score (Full Time)' },
-    { value: 'away_score_ft', label: 'Away Score (Full Time)' }
+    { value: 'away_score_ft', label: 'Away Score (Full Time)' },
+    { value: 'starting_lineup', label: 'Starting Lineup' },
+    { value: 'substitutes', label: 'Substitutes' }
   ];
 
      // Fetch data on component mount

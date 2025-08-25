@@ -128,6 +128,10 @@ const SocialMediaPostGenerator = () => {
   const [awayScoreHt, setAwayScoreHt] = useState('0');
   const [homeScoreFt, setHomeScoreFt] = useState('0');
   const [awayScoreFt, setAwayScoreFt] = useState('0');
+  
+  // Starting XI state
+  const [startingLineup, setStartingLineup] = useState([]);
+  const [substitutes, setSubstitutes] = useState([]);
 
   // Fetch matches and players on component mount
   useEffect(() => {
@@ -212,6 +216,12 @@ const SocialMediaPostGenerator = () => {
       if (selectedPostType === 'fulltime') {
         requestData.home_score_ft = homeScoreFt || '0';
         requestData.away_score_ft = awayScoreFt || '0';
+      }
+      
+      // Add starting XI data if post type is 'startingXI'
+      if (selectedPostType === 'startingXI') {
+        requestData.starting_lineup = startingLineup || [];
+        requestData.substitutes = substitutes || [];
       }
       
       const response = await axios.post(
@@ -610,6 +620,89 @@ const SocialMediaPostGenerator = () => {
                               ))}
                             </Select>
                           </FormControl>
+                        </Box>
+                      </Paper>
+                    )}
+
+                    {/* Starting XI Form - Only show for starting XI posts */}
+                    {selectedPostType === 'startingXI' && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'purple.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Starting XI & Substitutes
+                        </Typography>
+                        
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+                          {/* Starting Lineup */}
+                          <Box>
+                            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                              Starting Lineup (Select 11 players)
+                            </Typography>
+                            <FormControl fullWidth>
+                              <Select
+                                multiple
+                                value={startingLineup}
+                                onChange={(e) => {
+                                  const selected = e.target.value;
+                                  // Limit to 11 players
+                                  if (selected.length <= 11) {
+                                    setStartingLineup(selected);
+                                  }
+                                }}
+                                renderValue={(selected) => (
+                                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selected.map((value) => (
+                                      <Chip key={value} label={value} size="small" />
+                                    ))}
+                                  </Box>
+                                )}
+                              >
+                                {players.map((player) => (
+                                  <MenuItem key={player.id} value={player.name}>
+                                    {player.name} ({player.squad_no}) - {player.position}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              {startingLineup.length}/11 players selected
+                            </Typography>
+                          </Box>
+
+                          {/* Substitutes */}
+                          <Box>
+                            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                              Substitutes (Select up to 7 players)
+                            </Typography>
+                            <FormControl fullWidth>
+                              <Select
+                                multiple
+                                value={substitutes}
+                                onChange={(e) => {
+                                  const selected = e.target.value;
+                                  // Limit to 7 substitutes
+                                  if (selected.length <= 7) {
+                                    setSubstitutes(selected);
+                                  }
+                                }}
+                                renderValue={(selected) => (
+                                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selected.map((value) => (
+                                      <Chip key={value} label={value} size="small" />
+                                    ))}
+                                  </Box>
+                                )}
+                              >
+                                {players.map((player) => (
+                                  <MenuItem key={player.id} value={player.name}>
+                                    {player.name} ({player.squad_no}) - {player.position}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              {substitutes.length}/7 substitutes selected
+                            </Typography>
+                          </Box>
                         </Box>
                       </Paper>
                     )}
