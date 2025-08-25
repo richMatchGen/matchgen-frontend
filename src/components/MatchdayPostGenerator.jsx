@@ -656,11 +656,13 @@ const SocialMediaPostGenerator = () => {
                                   </Box>
                                 )}
                               >
-                                {players.map((player) => (
-                                  <MenuItem key={player.id} value={player.name}>
-                                    {player.name} ({player.squad_no}) - {player.position}
-                                  </MenuItem>
-                                ))}
+                                {players
+                                  .filter(player => !substitutes.includes(player.name))
+                                  .map((player) => (
+                                    <MenuItem key={player.id} value={player.name}>
+                                      {player.name} ({player.squad_no}) - {player.position}
+                                    </MenuItem>
+                                  ))}
                               </Select>
                             </FormControl>
                             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
@@ -692,11 +694,13 @@ const SocialMediaPostGenerator = () => {
                                   </Box>
                                 )}
                               >
-                                {players.map((player) => (
-                                  <MenuItem key={player.id} value={player.name}>
-                                    {player.name} ({player.squad_no}) - {player.position}
-                                  </MenuItem>
-                                ))}
+                                {players
+                                  .filter(player => !startingLineup.includes(player.name))
+                                  .map((player) => (
+                                    <MenuItem key={player.id} value={player.name}>
+                                      {player.name} ({player.squad_no}) - {player.position}
+                                    </MenuItem>
+                                  ))}
                               </Select>
                             </FormControl>
                             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
