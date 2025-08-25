@@ -122,6 +122,12 @@ const SocialMediaPostGenerator = () => {
   const [playerOff, setPlayerOff] = useState('');
   const [minute, setMinute] = useState('');
   const [players, setPlayers] = useState([]);
+  
+  // Score-specific state
+  const [homeScoreHt, setHomeScoreHt] = useState('0');
+  const [awayScoreHt, setAwayScoreHt] = useState('0');
+  const [homeScoreFt, setHomeScoreFt] = useState('0');
+  const [awayScoreFt, setAwayScoreFt] = useState('0');
 
   // Fetch matches and players on component mount
   useEffect(() => {
@@ -194,6 +200,18 @@ const SocialMediaPostGenerator = () => {
         requestData.player_on = playerOn || 'Player On';
         requestData.player_off = playerOff || 'Player Off';
         requestData.minute = minute || 'Minute';
+      }
+      
+      // Add halftime score data if post type is 'halftime'
+      if (selectedPostType === 'halftime') {
+        requestData.home_score_ht = homeScoreHt || '0';
+        requestData.away_score_ht = awayScoreHt || '0';
+      }
+      
+      // Add fulltime score data if post type is 'fulltime'
+      if (selectedPostType === 'fulltime') {
+        requestData.home_score_ft = homeScoreFt || '0';
+        requestData.away_score_ft = awayScoreFt || '0';
       }
       
       const response = await axios.post(
@@ -511,6 +529,88 @@ const SocialMediaPostGenerator = () => {
                             ))}
                           </Select>
                         </FormControl>
+                      </Paper>
+                    )}
+
+                    {/* Halftime Score Form - Only show for halftime posts */}
+                    {selectedPostType === 'halftime' && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'orange.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Half Time Score
+                        </Typography>
+                        
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                          <FormControl fullWidth>
+                            <InputLabel>Home Team Score</InputLabel>
+                            <Select
+                              value={homeScoreHt}
+                              onChange={(e) => setHomeScoreHt(e.target.value)}
+                              label="Home Team Score"
+                            >
+                              {Array.from({ length: 21 }, (_, i) => i).map((score) => (
+                                <MenuItem key={score} value={score.toString()}>
+                                  {score}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+
+                          <FormControl fullWidth>
+                            <InputLabel>Away Team Score</InputLabel>
+                            <Select
+                              value={awayScoreHt}
+                              onChange={(e) => setAwayScoreHt(e.target.value)}
+                              label="Away Team Score"
+                            >
+                              {Array.from({ length: 21 }, (_, i) => i).map((score) => (
+                                <MenuItem key={score} value={score.toString()}>
+                                  {score}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </Paper>
+                    )}
+
+                    {/* Fulltime Score Form - Only show for fulltime posts */}
+                    {selectedPostType === 'fulltime' && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'green.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Full Time Score
+                        </Typography>
+                        
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                          <FormControl fullWidth>
+                            <InputLabel>Home Team Score</InputLabel>
+                            <Select
+                              value={homeScoreFt}
+                              onChange={(e) => setHomeScoreFt(e.target.value)}
+                              label="Home Team Score"
+                            >
+                              {Array.from({ length: 21 }, (_, i) => i).map((score) => (
+                                <MenuItem key={score} value={score.toString()}>
+                                  {score}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+
+                          <FormControl fullWidth>
+                            <InputLabel>Away Team Score</InputLabel>
+                            <Select
+                              value={awayScoreFt}
+                              onChange={(e) => setAwayScoreFt(e.target.value)}
+                              label="Away Team Score"
+                            >
+                              {Array.from({ length: 21 }, (_, i) => i).map((score) => (
+                                <MenuItem key={score} value={score.toString()}>
+                                  {score}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Box>
                       </Paper>
                     )}
 
