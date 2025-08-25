@@ -121,10 +121,12 @@ const SocialMediaPostGenerator = () => {
   const [playerOn, setPlayerOn] = useState('');
   const [playerOff, setPlayerOff] = useState('');
   const [minute, setMinute] = useState('');
+  const [players, setPlayers] = useState([]);
 
-  // Fetch matches on component mount
+  // Fetch matches and players on component mount
   useEffect(() => {
     fetchMatches();
+    fetchPlayers();
   }, []);
 
   const fetchMatches = async () => {
@@ -141,6 +143,20 @@ const SocialMediaPostGenerator = () => {
       setError('Failed to load matches');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPlayers = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(
+        'https://matchgen-backend-production.up.railway.app/api/content/players/substitution/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setPlayers(response.data || []);
+    } catch (error) {
+      console.error('Error fetching players:', error);
+      // Don't set error here as it's not critical for the main functionality
     }
   };
 
@@ -458,11 +474,11 @@ const SocialMediaPostGenerator = () => {
                             onChange={(e) => setPlayerOn(e.target.value)}
                             label="Player Coming On"
                           >
-                            <MenuItem value="John Smith">John Smith</MenuItem>
-                            <MenuItem value="Mike Johnson">Mike Johnson</MenuItem>
-                            <MenuItem value="David Wilson">David Wilson</MenuItem>
-                            <MenuItem value="Tom Brown">Tom Brown</MenuItem>
-                            <MenuItem value="James Davis">James Davis</MenuItem>
+                            {players.map((player) => (
+                              <MenuItem key={player.id} value={player.name}>
+                                {player.name} ({player.squad_no}) - {player.position}
+                              </MenuItem>
+                            ))}
                           </Select>
                         </FormControl>
 
@@ -473,11 +489,11 @@ const SocialMediaPostGenerator = () => {
                             onChange={(e) => setPlayerOff(e.target.value)}
                             label="Player Going Off"
                           >
-                            <MenuItem value="Alex Thompson">Alex Thompson</MenuItem>
-                            <MenuItem value="Chris Lee">Chris Lee</MenuItem>
-                            <MenuItem value="Ryan Garcia">Ryan Garcia</MenuItem>
-                            <MenuItem value="Sam Martinez">Sam Martinez</MenuItem>
-                            <MenuItem value="Jordan Taylor">Jordan Taylor</MenuItem>
+                            {players.map((player) => (
+                              <MenuItem key={player.id} value={player.name}>
+                                {player.name} ({player.squad_no}) - {player.position}
+                              </MenuItem>
+                            ))}
                           </Select>
                         </FormControl>
 
