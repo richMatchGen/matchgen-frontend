@@ -253,11 +253,13 @@ const TextElementManagement = () => {
       
       if (editingElement) {
         // Update existing element
-        await axios.put(
+        console.log('Updating text element with data:', formData);
+        const response = await axios.put(
           `https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/${editingElement.id}/update/`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        console.log('Update response:', response.data);
         setSnackbar({
           open: true,
           message: 'Text element updated successfully',
@@ -265,11 +267,13 @@ const TextElementManagement = () => {
         });
       } else {
         // Create new element
-        await axios.post(
+        console.log('Creating text element with data:', formData);
+        const response = await axios.post(
           'https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/create/',
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        console.log('Create response:', response.data);
         setSnackbar({
           open: true,
           message: 'Text element created successfully',
@@ -281,9 +285,10 @@ const TextElementManagement = () => {
       fetchData(); // Refresh the list
     } catch (error) {
       console.error('Error saving text element:', error);
+      console.error('Error response data:', error.response?.data);
       setSnackbar({
         open: true,
-        message: error.response?.data?.error || 'Failed to save text element',
+        message: error.response?.data?.error || error.response?.data || 'Failed to save text element',
         severity: 'error'
       });
     }
