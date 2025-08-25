@@ -69,10 +69,13 @@ const TextElementManagement = () => {
   // Content type options
   const contentTypes = [
     { value: 'matchday', label: 'Matchday' },
-    { value: 'upcoming', label: 'Upcoming Fixture' },
-    { value: 'startingxi', label: 'Starting XI' },
-    { value: 'substitution', label: 'Substitution' },
-    { value: 'result', label: 'Match Result' }
+    { value: 'upcomingFixture', label: 'Upcoming Fixture' },
+    { value: 'startingXI', label: 'Starting XI' },
+    { value: 'sub', label: 'Substitution' },
+    { value: 'goal', label: 'Goal' },
+    { value: 'halftime', label: 'Half Time' },
+    { value: 'fulltime', label: 'Full Time' },
+    { value: 'player', label: 'Player of the Match' }
   ];
 
   // Element name options
