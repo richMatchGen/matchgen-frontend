@@ -116,6 +116,11 @@ const SocialMediaPostGenerator = () => {
   const [error, setError] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [debugData, setDebugData] = useState(null);
+  
+  // Substitution-specific state
+  const [playerOn, setPlayerOn] = useState('');
+  const [playerOff, setPlayerOff] = useState('');
+  const [minute, setMinute] = useState('');
 
   // Fetch matches on component mount
   useEffect(() => {
@@ -165,9 +170,19 @@ const SocialMediaPostGenerator = () => {
         ? '/api/graphicpack/generate-matchday-post/'
         : `/api/graphicpack/generate-${selectedPostType}-post/`;
       
+      // Prepare request data
+      const requestData = { match_id: selectedMatch };
+      
+      // Add substitution-specific data if post type is 'sub'
+      if (selectedPostType === 'sub') {
+        requestData.player_on = playerOn || 'Player On';
+        requestData.player_off = playerOff || 'Player Off';
+        requestData.minute = minute || 'Minute';
+      }
+      
       const response = await axios.post(
         `https://matchgen-backend-production.up.railway.app${endpoint}`,
-        { match_id: selectedMatch },
+        requestData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
@@ -426,6 +441,60 @@ const SocialMediaPostGenerator = () => {
                             </Box>
                           );
                         })()}
+                      </Paper>
+                    )}
+
+                    {/* Substitution Form - Only show for substitution posts */}
+                    {selectedPostType === 'sub' && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'blue.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Substitution Details
+                        </Typography>
+                        
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                          <InputLabel>Player Coming On</InputLabel>
+                          <Select
+                            value={playerOn}
+                            onChange={(e) => setPlayerOn(e.target.value)}
+                            label="Player Coming On"
+                          >
+                            <MenuItem value="John Smith">John Smith</MenuItem>
+                            <MenuItem value="Mike Johnson">Mike Johnson</MenuItem>
+                            <MenuItem value="David Wilson">David Wilson</MenuItem>
+                            <MenuItem value="Tom Brown">Tom Brown</MenuItem>
+                            <MenuItem value="James Davis">James Davis</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                          <InputLabel>Player Going Off</InputLabel>
+                          <Select
+                            value={playerOff}
+                            onChange={(e) => setPlayerOff(e.target.value)}
+                            label="Player Going Off"
+                          >
+                            <MenuItem value="Alex Thompson">Alex Thompson</MenuItem>
+                            <MenuItem value="Chris Lee">Chris Lee</MenuItem>
+                            <MenuItem value="Ryan Garcia">Ryan Garcia</MenuItem>
+                            <MenuItem value="Sam Martinez">Sam Martinez</MenuItem>
+                            <MenuItem value="Jordan Taylor">Jordan Taylor</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                          <InputLabel>Minute</InputLabel>
+                          <Select
+                            value={minute}
+                            onChange={(e) => setMinute(e.target.value)}
+                            label="Minute"
+                          >
+                            {Array.from({ length: 90 }, (_, i) => i + 1).map((min) => (
+                              <MenuItem key={min} value={min.toString()}>
+                                {min}'
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                       </Paper>
                     )}
 
