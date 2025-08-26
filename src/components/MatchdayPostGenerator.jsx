@@ -404,35 +404,6 @@ const SocialMediaPostGenerator = () => {
                           key={postType.id}
                           featureCode={postType.featureCode}
                           showUpgradeDialog={true}
-                          fallback={
-                            <Tab
-                              value={postType.id}
-                              label={
-                                <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
-                                  <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
-                                    {postType.icon}
-                                  </Box>
-                                  <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                                      {postType.label}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                      {postType.description}
-                                    </Typography>
-                                  </Box>
-                                </Box>
-                              }
-                              sx={{ 
-                                alignItems: 'flex-start',
-                                minHeight: 60,
-                                opacity: 0.6,
-                                '&.Mui-selected': {
-                                  backgroundColor: `${postType.color}.50`,
-                                  color: `${postType.color}.main`
-                                }
-                              }}
-                            />
-                          }
                         >
                           <Tab
                             value={postType.id}
