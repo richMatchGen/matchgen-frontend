@@ -64,8 +64,7 @@ const FeatureGate = ({
   const fetchClubId = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      console.log('Fetching club ID...');
-      console.log('Token exists:', !!token);
+      // Fetch club ID
       
       const response = await axios.get(
         `${API_BASE_URL}users/my-club/`,
@@ -74,10 +73,8 @@ const FeatureGate = ({
         }
       );
       
-      console.log('Club response:', response.data);
       if (response.data && response.data.id) {
         localStorage.setItem('selectedClubId', response.data.id.toString());
-        console.log('Stored club ID:', response.data.id.toString());
         checkFeatureAccess();
       }
     } catch (error) {
@@ -91,9 +88,7 @@ const FeatureGate = ({
     try {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
-      console.log('Checking feature access for:', featureCode);
-      console.log('Club ID:', selectedClubId);
-      console.log('Token exists:', !!token);
+      // Feature access check
       
       const response = await axios.get(
         `${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}`,
@@ -102,13 +97,8 @@ const FeatureGate = ({
         }
       );
       
-      console.log('Feature access response:', response.data);
       const { feature_access, subscription_tier, subscription_active } = response.data;
-      console.log('Checking access for feature code:', featureCode);
-      console.log('Feature access for this code:', feature_access[featureCode]);
-      const hasAccessValue = feature_access[featureCode] || false;
-      console.log('Setting hasAccess to:', hasAccessValue);
-      setHasAccess(hasAccessValue);
+      setHasAccess(feature_access[featureCode] || false);
       setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
       
       // Get feature info for upgrade dialog
@@ -219,9 +209,7 @@ const FeatureGate = ({
     );
   }
 
-  console.log('FeatureGate render - hasAccess:', hasAccess, 'loading:', loading, 'featureCode:', featureCode);
   if (hasAccess) {
-    console.log('Rendering children for feature:', featureCode);
     return children;
   }
 
