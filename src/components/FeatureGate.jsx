@@ -106,7 +106,9 @@ const FeatureGate = ({
       const { feature_access, subscription_tier, subscription_active } = response.data;
       console.log('Checking access for feature code:', featureCode);
       console.log('Feature access for this code:', feature_access[featureCode]);
-      setHasAccess(feature_access[featureCode] || false);
+      const hasAccessValue = feature_access[featureCode] || false;
+      console.log('Setting hasAccess to:', hasAccessValue);
+      setHasAccess(hasAccessValue);
       setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
       
       // Get feature info for upgrade dialog
@@ -217,7 +219,9 @@ const FeatureGate = ({
     );
   }
 
+  console.log('FeatureGate render - hasAccess:', hasAccess, 'loading:', loading, 'featureCode:', featureCode);
   if (hasAccess) {
+    console.log('Rendering children for feature:', featureCode);
     return children;
   }
 
