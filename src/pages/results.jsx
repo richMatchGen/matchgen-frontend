@@ -56,6 +56,10 @@ const Results = () => {
           { headers }
         );
         setClub(clubRes.data);
+        // Store club ID in localStorage for feature gating
+        if (clubRes.data && clubRes.data.id) {
+          localStorage.setItem('selectedClubId', clubRes.data.id.toString());
+        }
 
       } catch {
         console.warn("User might not have a club yet.");

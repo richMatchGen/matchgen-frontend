@@ -29,9 +29,14 @@ export const usePageAuth = () => {
         try {
           const clubRes = await apiClient.get("/users/my-club/");
           setClub(clubRes.data);
+          // Store club ID in localStorage for feature gating
+          if (clubRes.data && clubRes.data.id) {
+            localStorage.setItem('selectedClubId', clubRes.data.id.toString());
+          }
         } catch (clubError) {
           console.warn("User might not have a club yet:", clubError);
           setClub(null);
+          localStorage.removeItem('selectedClubId');
         }
       } catch (error) {
         const errorMessage = handleApiError(error, "Failed to load user data");
