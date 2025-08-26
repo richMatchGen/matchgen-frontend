@@ -55,6 +55,9 @@ const FeatureGate = ({
   const fetchClubId = async () => {
     try {
       const token = localStorage.getItem('accessToken');
+      console.log('Fetching club ID...');
+      console.log('Token exists:', !!token);
+      
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/users/my-club/`,
         {
@@ -62,12 +65,15 @@ const FeatureGate = ({
         }
       );
       
+      console.log('Club response:', response.data);
       if (response.data && response.data.id) {
         localStorage.setItem('selectedClubId', response.data.id.toString());
+        console.log('Stored club ID:', response.data.id.toString());
         checkFeatureAccess();
       }
     } catch (error) {
       console.error('Error fetching club ID:', error);
+      console.error('Error details:', error.response?.data);
       setLoading(false);
     }
   };
@@ -76,6 +82,10 @@ const FeatureGate = ({
     try {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
+      console.log('Checking feature access for:', featureCode);
+      console.log('Club ID:', selectedClubId);
+      console.log('Token exists:', !!token);
+      
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/users/feature-access/?club_id=${selectedClubId}`,
         {
@@ -83,6 +93,7 @@ const FeatureGate = ({
         }
       );
       
+      console.log('Feature access response:', response.data);
       const { feature_access, subscription_tier, subscription_active } = response.data;
       setHasAccess(feature_access[featureCode] || false);
       setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
@@ -93,6 +104,7 @@ const FeatureGate = ({
       }
     } catch (error) {
       console.error('Error checking feature access:', error);
+      console.error('Error details:', error.response?.data);
       setHasAccess(false);
     } finally {
       setLoading(false);
