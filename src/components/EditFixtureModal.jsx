@@ -383,3 +383,4 @@ export default function EditFixtureModal({ open, onClose, fixture, onUpdate }) {
     </Modal>
   );
 }
+

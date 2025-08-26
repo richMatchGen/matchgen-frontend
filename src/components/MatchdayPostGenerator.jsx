@@ -43,6 +43,7 @@ import AppTheme from '../themes/AppTheme';
 import SideMenu from './SideMenu';
 import AppNavbar from './AppNavBar';
 import Header from './Header';
+import FeatureGate from './FeatureGate';
 
 // Post type definitions
 const POST_TYPES = [
@@ -51,53 +52,60 @@ const POST_TYPES = [
     label: 'Matchday', 
     icon: <Event />, 
     description: 'Pre-match announcement with fixture details',
-    color: 'primary'
+    color: 'primary',
+    featureCode: 'post.matchday'
   },
   { 
     id: 'upcomingFixture', 
     label: 'Upcoming Fixture', 
     icon: <Schedule />, 
     description: 'Future fixture announcement',
-    color: 'info'
+    color: 'info',
+    featureCode: 'post.upcoming'
   },
   { 
     id: 'startingXI', 
     label: 'Starting XI', 
     icon: <Group />, 
     description: 'Team lineup announcement',
-    color: 'success'
+    color: 'success',
+    featureCode: 'post.startingxi'
   },
   { 
     id: 'goal', 
     label: 'Goal', 
     icon: <SportsSoccer />, 
     description: 'Goal celebration post',
-    color: 'warning'
+    color: 'warning',
+    featureCode: 'post.goal'
   },
   { 
     id: 'sub', 
     label: 'Substitution', 
     icon: <SwapHoriz />, 
     description: 'Player substitution announcement',
-    color: 'secondary'
+    color: 'secondary',
+    featureCode: 'post.substitution'
   },
   { 
     id: 'player', 
     label: 'Player of the Match', 
     icon: <EmojiEvents />, 
     description: 'Man of the match announcement',
-    color: 'warning'
+    color: 'warning',
+    featureCode: 'post.potm'
   },
   { 
     id: 'halftime', 
     label: 'Half Time', 
     icon: <Timer />, 
     description: 'Half-time score update',
-    color: 'info'
+    color: 'info',
+    featureCode: 'post.halftime'
   },
   { 
     id: 'fulltime', 
-    label: 'Full Time', 
+    label: 'Full Time',
     icon: <Flag />, 
     description: 'Final result announcement',
     color: 'success'
@@ -391,33 +399,67 @@ const SocialMediaPostGenerator = () => {
                       sx={{ borderRight: 1, borderColor: 'divider', minHeight: 400 }}
                     >
                       {POST_TYPES.map((postType) => (
-                        <Tab
+                        <FeatureGate
                           key={postType.id}
-                          value={postType.id}
-                          label={
-                            <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
-                              <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
-                                {postType.icon}
-                              </Box>
-                              <Box>
-                                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                                  {postType.label}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  {postType.description}
-                                </Typography>
-                              </Box>
-                            </Box>
+                          featureCode={postType.featureCode}
+                          showUpgradeDialog={true}
+                          fallback={
+                            <Tab
+                              value={postType.id}
+                              label={
+                                <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
+                                  <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
+                                    {postType.icon}
+                                  </Box>
+                                  <Box>
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                      {postType.label}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {postType.description}
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              }
+                              sx={{ 
+                                alignItems: 'flex-start',
+                                minHeight: 60,
+                                opacity: 0.6,
+                                '&.Mui-selected': {
+                                  backgroundColor: `${postType.color}.50`,
+                                  color: `${postType.color}.main`
+                                }
+                              }}
+                            />
                           }
-                          sx={{ 
-                            alignItems: 'flex-start',
-                            minHeight: 60,
-                            '&.Mui-selected': {
-                              backgroundColor: `${postType.color}.50`,
-                              color: `${postType.color}.main`
+                        >
+                          <Tab
+                            value={postType.id}
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
+                                <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
+                                  {postType.icon}
+                                </Box>
+                                <Box>
+                                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                    {postType.label}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    {postType.description}
+                                  </Typography>
+                                </Box>
+                              </Box>
                             }
-                          }}
-                        />
+                            sx={{ 
+                              alignItems: 'flex-start',
+                              minHeight: 60,
+                              '&.Mui-selected': {
+                                backgroundColor: `${postType.color}.50`,
+                                color: `${postType.color}.main`
+                              }
+                            }}
+                          />
+                        </FeatureGate>
                       ))}
                     </Tabs>
                   </CardContent>
