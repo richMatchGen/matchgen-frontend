@@ -29,6 +29,9 @@ const TextElementManagement = lazy(() => import("./pages/TextElementManagement")
 const FixturesManagement = lazy(() => import("./pages/FixturesManagement"));
 const TeamManagement = lazy(() => import("./pages/TeamManagement"));
 const SubscriptionManagement = lazy(() => import("./pages/SubscriptionManagement"));
+const Settings = lazy(() => import("./pages/Settings"));
+const UserProfile = lazy(() => import("./pages/UserProfile"));
+const Account = lazy(() => import("./pages/Account"));
 
 
 function App() {
@@ -97,6 +100,12 @@ function App() {
           <Route path="/text-elements" element={<PrivateRoute><TextElementManagement /></PrivateRoute>} />
           <Route path="/team-management" element={<PrivateRoute><TeamManagement /></PrivateRoute>} />
           <Route path="/subscription" element={<PrivateRoute><SubscriptionManagement /></PrivateRoute>} />
+
+          {/* Settings and Profile Routes */}
+          <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+          <Route path="/settings/account" element={<PrivateRoute><Account /></PrivateRoute>} />
+          <Route path="/settings/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
 
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
         </Routes>

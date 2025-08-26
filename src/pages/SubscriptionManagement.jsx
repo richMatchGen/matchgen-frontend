@@ -51,8 +51,13 @@ const SubscriptionManagement = () => {
       const token = localStorage.getItem('accessToken');
       const clubId = localStorage.getItem('selectedClubId');
       
+      // API Configuration - same as other components
+      const API_BASE_URL = import.meta.env.MODE === 'production' 
+        ? 'https://matchgen-backend-production.up.railway.app/api/'
+        : 'http://localhost:8000/api/';
+        
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/users/feature-access/?club_id=${clubId}`,
+        `${API_BASE_URL}users/feature-access/?club_id=${clubId}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }

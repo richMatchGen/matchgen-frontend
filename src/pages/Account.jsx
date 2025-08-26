@@ -1,0 +1,553 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  TextField,
+  Button,
+  Alert,
+  CircularProgress,
+  Container,
+  Paper,
+  Divider,
+  Switch,
+  FormControlLabel,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemSecondaryAction,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton
+} from '@mui/material';
+import {
+  Security as SecurityIcon,
+  Notifications as NotificationsIcon,
+  Language as LanguageIcon,
+  Palette as PaletteIcon,
+  Delete as DeleteIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon
+} from '@mui/icons-material';
+import axios from 'axios';
+import AppTheme from '../themes/AppTheme';
+import SideMenu from '../components/SideMenu';
+import AppNavbar from '../components/AppNavBar';
+import Header from '../components/Header';
+
+const Account = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  
+  // Password change form
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  
+  // Account preferences
+  const [preferences, setPreferences] = useState({
+    email_notifications: true,
+    push_notifications: false,
+    dark_mode: false,
+    language: 'en'
+  });
+
+  // API Configuration
+  const API_BASE_URL = import.meta.env.MODE === 'production' 
+    ? 'https://matchgen-backend-production.up.railway.app/api/'
+    : 'http://localhost:8000/api/';
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      
+      const response = await axios.get(`${API_BASE_URL}users/profile/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setUser(response.data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Failed to load user data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      setError('New passwords do not match');
+      return;
+    }
+
+    if (passwordForm.new_password.length < 8) {
+      setError('New password must be at least 8 characters long');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      
+      await axios.post(`${API_BASE_URL}users/change-password/`, {
+        current_password: passwordForm.current_password,
+        new_password: passwordForm.new_password
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setPasswordDialogOpen(false);
+      setPasswordForm({
+        current_password: '',
+        new_password: '',
+        confirm_password: ''
+      });
+      setSuccess('Password changed successfully!');
+      
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setError(error.response?.data?.detail || 'Failed to change password');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePreferenceChange = (preference, value) => {
+    setPreferences(prev => ({
+      ...prev,
+      [preference]: value
+    }));
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      
+      await axios.delete(`${API_BASE_URL}users/delete-account/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Clear local storage and redirect to login
+      localStorage.clear();
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      setError('Failed to delete account');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  if (loading && !user) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <AppTheme>
+        <SideMenu />
+        <Box sx={{ flexGrow: 1 }}>
+          <AppNavbar />
+          <Header title="Account Settings" />
+          
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+                {error}
+              </Alert>
+            )}
+            
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess(null)}>
+                {success}
+              </Alert>
+            )}
+
+            <Grid container spacing={3}>
+              {/* Security Settings */}
+              <Grid item xs={12} md={6}>
+                <Card elevation={3}>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" gap={2} mb={3}>
+                      <SecurityIcon color="primary" />
+                      <Typography variant="h6" fontWeight="bold">
+                        Security
+                      </Typography>
+                    </Box>
+                    
+                    <List>
+                      <ListItem>
+                        <ListItemIcon>
+                          <SecurityIcon color="action" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Change Password"
+                          secondary="Update your account password"
+                        />
+                        <ListItemSecondaryAction>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => setPasswordDialogOpen(true)}
+                          >
+                            Change
+                          </Button>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      
+                      <Divider />
+                      
+                      <ListItem>
+                        <ListItemIcon>
+                          <SecurityIcon color="action" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Two-Factor Authentication"
+                          secondary="Add an extra layer of security"
+                        />
+                        <ListItemSecondaryAction>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            disabled
+                          >
+                            Coming Soon
+                          </Button>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      
+                      <Divider />
+                      
+                      <ListItem>
+                        <ListItemIcon>
+                          <SecurityIcon color="action" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Login History"
+                          secondary="View recent login activity"
+                        />
+                        <ListItemSecondaryAction>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            disabled
+                          >
+                            Coming Soon
+                          </Button>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    </List>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Preferences */}
+              <Grid item xs={12} md={6}>
+                <Card elevation={3}>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" gap={2} mb={3}>
+                      <NotificationsIcon color="primary" />
+                      <Typography variant="h6" fontWeight="bold">
+                        Preferences
+                      </Typography>
+                    </Box>
+                    
+                    <List>
+                      <ListItem>
+                        <ListItemIcon>
+                          <NotificationsIcon color="action" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Email Notifications"
+                          secondary="Receive updates via email"
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            checked={preferences.email_notifications}
+                            onChange={(e) => handlePreferenceChange('email_notifications', e.target.checked)}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      
+                      <Divider />
+                      
+                      <ListItem>
+                        <ListItemIcon>
+                          <NotificationsIcon color="action" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Push Notifications"
+                          secondary="Receive browser notifications"
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            checked={preferences.push_notifications}
+                            onChange={(e) => handlePreferenceChange('push_notifications', e.target.checked)}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      
+                      <Divider />
+                      
+                      <ListItem>
+                        <ListItemIcon>
+                          <PaletteIcon color="action" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Dark Mode"
+                          secondary="Use dark theme"
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            checked={preferences.dark_mode}
+                            onChange={(e) => handlePreferenceChange('dark_mode', e.target.checked)}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      
+                      <Divider />
+                      
+                      <ListItem>
+                        <ListItemIcon>
+                          <LanguageIcon color="action" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Language"
+                          secondary="Choose your preferred language"
+                        />
+                        <ListItemSecondaryAction>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            disabled
+                          >
+                            English
+                          </Button>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    </List>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Account Information */}
+              <Grid item xs={12}>
+                <Card elevation={3}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                      Account Information
+                    </Typography>
+                    
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={6}>
+                        <Paper sx={{ p: 2 }}>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            Email Address
+                          </Typography>
+                          <Typography variant="body1" fontWeight="medium">
+                            {user?.email}
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                      
+                      <Grid item xs={12} md={6}>
+                        <Paper sx={{ p: 2 }}>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            Member Since
+                          </Typography>
+                          <Typography variant="body1" fontWeight="medium">
+                            {user?.date_joined ? new Date(user.date_joined).toLocaleDateString() : 'N/A'}
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                      
+                      <Grid item xs={12} md={6}>
+                        <Paper sx={{ p: 2 }}>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            Last Login
+                          </Typography>
+                          <Typography variant="body1" fontWeight="medium">
+                            {user?.last_login ? new Date(user.last_login).toLocaleDateString() : 'N/A'}
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                      
+                      <Grid item xs={12} md={6}>
+                        <Paper sx={{ p: 2 }}>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            Account Status
+                          </Typography>
+                          <Typography variant="body1" fontWeight="medium" color="success.main">
+                            Active
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Danger Zone */}
+              <Grid item xs={12}>
+                <Card elevation={3} sx={{ border: '1px solid #ff6b6b' }}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: '#ff6b6b' }}>
+                      Danger Zone
+                    </Typography>
+                    
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                      These actions are irreversible. Please proceed with caution.
+                    </Typography>
+                    
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => setDeleteDialogOpen(true)}
+                    >
+                      Delete Account
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Container>
+        </Box>
+      </AppTheme>
+
+      {/* Password Change Dialog */}
+      <Dialog open={passwordDialogOpen} onClose={() => setPasswordDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Change Password</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1 }}>
+            <TextField
+              fullWidth
+              label="Current Password"
+              type={showPasswords.current ? 'text' : 'password'}
+              value={passwordForm.current_password}
+              onChange={(e) => setPasswordForm(prev => ({ ...prev, current_password: e.target.value }))}
+              margin="normal"
+              InputProps={{
+                endAdornment: (
+                  <IconButton onClick={() => togglePasswordVisibility('current')}>
+                    {showPasswords.current ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                )
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              label="New Password"
+              type={showPasswords.new ? 'text' : 'password'}
+              value={passwordForm.new_password}
+              onChange={(e) => setPasswordForm(prev => ({ ...prev, new_password: e.target.value }))}
+              margin="normal"
+              InputProps={{
+                endAdornment: (
+                  <IconButton onClick={() => togglePasswordVisibility('new')}>
+                    {showPasswords.new ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                )
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              label="Confirm New Password"
+              type={showPasswords.confirm ? 'text' : 'password'}
+              value={passwordForm.confirm_password}
+              onChange={(e) => setPasswordForm(prev => ({ ...prev, confirm_password: e.target.value }))}
+              margin="normal"
+              InputProps={{
+                endAdornment: (
+                  <IconButton onClick={() => togglePasswordVisibility('confirm')}>
+                    {showPasswords.confirm ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                )
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPasswordDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handlePasswordChange}
+            disabled={loading}
+            startIcon={<SaveIcon />}
+          >
+            Change Password
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Account Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ color: '#ff6b6b' }}>Delete Account</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" paragraph>
+            Are you sure you want to delete your account? This action cannot be undone.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            All your data, including club information, posts, and settings will be permanently deleted.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteAccount}
+            disabled={loading}
+            startIcon={<DeleteIcon />}
+          >
+            Delete Account
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default Account;
