@@ -91,13 +91,15 @@ const FeatureGate = ({
       // Feature access check
       
       const response = await axios.get(
-        `${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}`,
+        `${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}&t=${Date.now()}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
       
       const { feature_access, subscription_tier, subscription_active } = response.data;
+      console.log('API Response for', featureCode, ':', { feature_access, subscription_tier, subscription_active });
+      console.log('Feature access for', featureCode, ':', feature_access[featureCode]);
       setHasAccess(feature_access[featureCode] || false);
       setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
       
@@ -209,7 +211,9 @@ const FeatureGate = ({
     );
   }
 
+  console.log('FeatureGate render - featureCode:', featureCode, 'hasAccess:', hasAccess, 'loading:', loading);
   if (hasAccess) {
+    console.log('Rendering children for', featureCode);
     return children;
   }
 
