@@ -14,6 +14,7 @@ import EventIcon from '@mui/icons-material/Event';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
+import PaymentIcon from '@mui/icons-material/Payment';
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
 
@@ -26,6 +27,7 @@ const mainListItems = [
 ];
 
 const secondaryListItems = [
+  { text: 'Subscription', icon: <PaymentIcon />, link: '/subscription' },
   { text: 'Settings', icon: <SettingsRoundedIcon />, link: '/settings' },
   { text: 'About', icon: <InfoRoundedIcon />, link: '/about' },
   { text: 'Feedback', icon: <HelpRoundedIcon />, link: '/feedback' },

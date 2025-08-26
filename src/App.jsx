@@ -29,6 +29,7 @@ const SocialMediaPostGenerator = lazy(() => import("./components/MatchdayPostGen
 const TextElementManagement = lazy(() => import("./pages/TextElementManagement"));
 const FixturesManagement = lazy(() => import("./pages/FixturesManagement"));
 const TeamManagement = lazy(() => import("./pages/TeamManagement"));
+const SubscriptionManagement = lazy(() => import("./pages/SubscriptionManagement"));
 
 
 function App() {
@@ -97,6 +98,7 @@ function App() {
           <Route path="/gen/posts/:fixtureId/:postType" element={<PrivateRoute><SocialMediaPostGenerator /></PrivateRoute>} />
           <Route path="/text-elements" element={<PrivateRoute><TextElementManagement /></PrivateRoute>} />
           <Route path="/team-management" element={<PrivateRoute><TeamManagement /></PrivateRoute>} />
+          <Route path="/subscription" element={<PrivateRoute><SubscriptionManagement /></PrivateRoute>} />
 
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
         </Routes>
