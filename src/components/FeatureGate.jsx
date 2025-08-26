@@ -103,6 +103,8 @@ const FeatureGate = ({
       );
       
       console.log('Feature access response:', response.data);
+      console.log('Checking access for feature code:', featureCode);
+      console.log('Feature access for this code:', feature_access[featureCode]);
       const { feature_access, subscription_tier, subscription_active } = response.data;
       setHasAccess(feature_access[featureCode] || false);
       setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });

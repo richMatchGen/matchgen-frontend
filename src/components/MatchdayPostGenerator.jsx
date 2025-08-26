@@ -108,7 +108,8 @@ const POST_TYPES = [
     label: 'Full Time',
     icon: <Flag />, 
     description: 'Final result announcement',
-    color: 'success'
+    color: 'success',
+    featureCode: 'post.fulltime'
   }
 ];
 
