@@ -49,12 +49,16 @@ const FeatureGate = ({
   const selectedClubId = localStorage.getItem('selectedClubId');
 
   useEffect(() => {
-    if (selectedClubId) {
-      checkFeatureAccess();
-    } else {
-      // If no club ID, try to fetch it from the API
-      fetchClubId();
-    }
+    const timer = setTimeout(() => {
+      if (selectedClubId) {
+        checkFeatureAccess();
+      } else {
+        // If no club ID, try to fetch it from the API
+        fetchClubId();
+      }
+    }, 1000); // Add 1 second delay to prevent rate limiting
+
+    return () => clearTimeout(timer);
   }, [selectedClubId, featureCode]);
 
   const fetchClubId = async () => {
