@@ -28,6 +28,11 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 
+// API Configuration - same as apiClient
+const API_BASE_URL = import.meta.env.MODE === 'production' 
+  ? 'https://matchgen-backend-production.up.railway.app/api/'
+  : 'http://localhost:8000/api/';
+
 const FeatureGate = ({ 
   featureCode, 
   children, 
@@ -59,7 +64,7 @@ const FeatureGate = ({
       console.log('Token exists:', !!token);
       
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/users/my-club/`,
+        `${API_BASE_URL}users/my-club/`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -87,7 +92,7 @@ const FeatureGate = ({
       console.log('Token exists:', !!token);
       
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/users/feature-access/?club_id=${selectedClubId}`,
+        `${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -115,7 +120,7 @@ const FeatureGate = ({
     try {
       const token = localStorage.getItem('accessToken');
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/users/features/`,
+        `${API_BASE_URL}users/features/`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
