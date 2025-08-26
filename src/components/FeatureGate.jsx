@@ -98,8 +98,6 @@ const FeatureGate = ({
       );
       
       const { feature_access, subscription_tier, subscription_active } = response.data;
-      console.log('API Response for', featureCode, ':', { feature_access, subscription_tier, subscription_active });
-      console.log('Feature access for', featureCode, ':', feature_access[featureCode]);
       setHasAccess(feature_access[featureCode] || false);
       setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
       
@@ -211,9 +209,7 @@ const FeatureGate = ({
     );
   }
 
-  console.log('FeatureGate render - featureCode:', featureCode, 'hasAccess:', hasAccess, 'loading:', loading);
   if (hasAccess) {
-    console.log('Rendering children for', featureCode);
     return children;
   }
 
