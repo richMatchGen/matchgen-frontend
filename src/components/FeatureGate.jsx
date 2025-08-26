@@ -46,8 +46,31 @@ const FeatureGate = ({
   useEffect(() => {
     if (selectedClubId) {
       checkFeatureAccess();
+    } else {
+      // If no club ID, try to fetch it from the API
+      fetchClubId();
     }
   }, [selectedClubId, featureCode]);
+
+  const fetchClubId = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/users/my-club/`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      if (response.data && response.data.id) {
+        localStorage.setItem('selectedClubId', response.data.id.toString());
+        checkFeatureAccess();
+      }
+    } catch (error) {
+      console.error('Error fetching club ID:', error);
+      setLoading(false);
+    }
+  };
 
   const checkFeatureAccess = async () => {
     try {
