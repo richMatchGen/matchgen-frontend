@@ -37,7 +37,7 @@ import {
   AdminPanelSettings as AdminIcon,
   Edit as EditorIcon,
   Visibility as ViewerIcon,
-  Crown as OwnerIcon
+  Star as OwnerIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 
