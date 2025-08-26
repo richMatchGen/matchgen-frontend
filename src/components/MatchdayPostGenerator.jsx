@@ -45,6 +45,11 @@ import AppNavbar from './AppNavBar';
 import Header from './Header';
 import FeatureGate from './FeatureGate';
 
+// API Configuration - same as apiClient
+const API_BASE_URL = import.meta.env.MODE === 'production' 
+  ? 'https://matchgen-backend-production.up.railway.app/api/'
+  : 'http://localhost:8000/api/';
+
 // Post type definitions
 const POST_TYPES = [
   { 
@@ -329,7 +334,35 @@ const SocialMediaPostGenerator = () => {
     }
   };
 
-  const handlePostTypeChange = (event, newValue) => {
+  const handlePostTypeChange = async (event, newValue) => {
+    // Check if user has access to this feature
+    const postType = POST_TYPES.find(pt => pt.id === newValue);
+    if (postType && postType.featureCode) {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const clubId = localStorage.getItem('selectedClubId');
+        
+        if (token && clubId) {
+          const response = await axios.get(
+            `${API_BASE_URL}users/feature-access/?club_id=${clubId}&t=${Date.now()}`,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+          
+          const { feature_access } = response.data;
+          if (!feature_access[postType.featureCode]) {
+            // Show upgrade dialog or message
+            console.log('Feature not available:', postType.featureCode);
+            return; // Don't change the tab
+          }
+        }
+      } catch (error) {
+        console.error('Error checking feature access:', error);
+        return; // Don't change the tab on error
+      }
+    }
+    
     setSelectedPostType(newValue);
     setGeneratedImage(null); // Clear previous generated image
   };
@@ -400,67 +433,33 @@ const SocialMediaPostGenerator = () => {
                       sx={{ borderRight: 1, borderColor: 'divider', minHeight: 400 }}
                     >
                       {POST_TYPES.map((postType) => (
-                        <FeatureGate
+                        <Tab
                           key={postType.id}
-                          featureCode={postType.featureCode}
-                          showUpgradeDialog={true}
-                          fallback={
-                            <Tab
-                              value={postType.id}
-                              label={
-                                <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
-                                  <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
-                                    {postType.icon}
-                                  </Box>
-                                  <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                                      {postType.label}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                      {postType.description}
-                                    </Typography>
-                                  </Box>
-                                </Box>
-                              }
-                              sx={{ 
-                                alignItems: 'flex-start',
-                                minHeight: 60,
-                                opacity: 0.6,
-                                '&.Mui-selected': {
-                                  backgroundColor: `${postType.color}.50`,
-                                  color: `${postType.color}.main`
-                                }
-                              }}
-                            />
-                          }
-                        >
-                          <Tab
-                            value={postType.id}
-                            label={
-                              <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
-                                <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
-                                  {postType.icon}
-                                </Box>
-                                <Box>
-                                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                                    {postType.label}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {postType.description}
-                                  </Typography>
-                                </Box>
+                          value={postType.id}
+                          label={
+                            <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
+                              <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
+                                {postType.icon}
                               </Box>
+                              <Box>
+                                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                  {postType.label}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {postType.description}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          }
+                          sx={{ 
+                            alignItems: 'flex-start',
+                            minHeight: 60,
+                            '&.Mui-selected': {
+                              backgroundColor: `${postType.color}.50`,
+                              color: `${postType.color}.main`
                             }
-                            sx={{ 
-                              alignItems: 'flex-start',
-                              minHeight: 60,
-                              '&.Mui-selected': {
-                                backgroundColor: `${postType.color}.50`,
-                                color: `${postType.color}.main`
-                              }
-                            }}
-                          />
-                        </FeatureGate>
+                          }}
+                        />
                       ))}
                     </Tabs>
                   </CardContent>
