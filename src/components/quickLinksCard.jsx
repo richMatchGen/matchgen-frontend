@@ -54,17 +54,7 @@ export default function QuickLinksCard() {
           <NestedModal />
           <AddFixtureModal />
           <AddResultModal />
-          <Button
-            variant="contained"
-            size="small"
-            color="secondary"
-            endIcon={<ChevronRightRoundedIcon />}
-            fullWidth={isSmallScreen}
-            component={RouterLink}
-            to="/gen/posts"
-          >
-            Gen Posts
-          </Button>
+
         </Stack>
       </CardContent>
     </Card>
