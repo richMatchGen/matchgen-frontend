@@ -116,7 +116,7 @@ export default function SideMenu({ user }) {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
           <Sitemark />
         </Box>
-        {club && (
+        {/* {club && (
           <Box sx={{ mt: 2 }}>
             <Typography 
               variant="subtitle2" 
@@ -143,7 +143,7 @@ export default function SideMenu({ user }) {
               }}
             />
           </Box>
-        )}
+        )} */}
       </BrandSection>
 
       {/* Menu Content */}
