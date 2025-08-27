@@ -43,10 +43,15 @@ export default function ClubProfileDetails() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
-  const { club, refreshClub } = useClubSingleton();
+  const { club, loading: clubLoading, error: clubError, refreshClub } = useClubSingleton();
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Debug logging
+  console.log('ClubProfileDetails - club:', club);
+  console.log('ClubProfileDetails - clubLoading:', clubLoading);
+  console.log('ClubProfileDetails - clubError:', clubError);
 
   const handleRefresh = async () => {
     setLoading(true);
@@ -66,7 +71,7 @@ export default function ClubProfileDetails() {
   };
 
   // Loading state
-  if (loading && !club) {
+  if (clubLoading || loading) {
     return (
       <Fade in={true} timeout={500}>
         <Card sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -82,13 +87,13 @@ export default function ClubProfileDetails() {
   }
 
   // Error state
-  if (error && !club) {
+  if (clubError || error) {
     return (
       <Fade in={true} timeout={500}>
         <Card sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Stack spacing={3} alignItems="center" maxWidth={400}>
             <Alert severity="error" sx={{ width: '100%' }}>
-              {error}
+              {clubError || error}
             </Alert>
             <Button
               variant="contained"
