@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import Copyright from '../internals/Components/Copyright';
 import ChartUserByCountry from './ChartUserByCountry';
 import CustomizedTreeView from './CustomizedTreeView';
-import CustomizedDataGrid from './CustomizedDataGrid';
+import ClubProfileDetails from './ClubProfileDetails';
 import HighlightedCard from './ResultCard';
 import MatchDayCard from './MatchdayCard';
 import FixtureCard from './FixtureCard';
@@ -76,18 +76,12 @@ export default function MainGrid() {
       </Grid>
 
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        Squad
+        Club Profile
       </Typography>
         <Grid container spacing={2} columns={12}>
           <Grid size={{ xs: 12, lg: 12}}>
-              <CustomizedDataGrid />
+              <ClubProfileDetails />
           </Grid>
-                    {/* <Grid size={{ xs: 12, lg: 3 }}> */}
-                      {/* <Stack gap={2} direction={{ xs: 'column', sm: 'row', lg: 'column' }}> */}
-                        {/* <CustomizedTreeView />  */}
-            {/*             <ChartUserByCountry /> */}
-                      {/* </Stack> */}
-                    {/* </Grid> */}
         </Grid>
 
 <Copyright sx={{ my: 4 }} />
