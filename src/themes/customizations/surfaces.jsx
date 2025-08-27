@@ -97,7 +97,8 @@ export const surfacesCustomizations = {
   MuiButtonBase: {
     styleOverrides: {
       root: {
-        color: '#000000 !important',
+        color: '#ffffff !important',
+        backgroundColor: '#000000 !important',
         borderRadius: '0px !important',
       },
     },
