@@ -94,27 +94,5 @@ export const surfacesCustomizations = {
       },
     },
   },
-  MuiButtonBase: {
-    styleOverrides: {
-      root: {
-        color: '#ffffff !important',
-        backgroundColor: '#000000 !important',
-        borderRadius: '0px !important',
-        // Override for selected state with white SVG icons
-        '&.Mui-selected .MuiSvgIcon-root': {
-          color: 'hsl(0deg 0% 100%) !important',
-        },
-      },
-    },
-  },
-  MuiSvgIcon: {
-    styleOverrides: {
-      root: {
-        width: '1rem !important',
-        height: '1rem !important',
-        color: 'hsl(0deg 0% 100%) !important',
-      },
-    },
-  },
 };
 
