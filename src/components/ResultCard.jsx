@@ -34,29 +34,37 @@ export default function HighlightedCard() {
   }, []);
 
   return (
-    <Card sx={{ height: '100%' }}>
+    <Card sx={{ 
+      height: '100%',
+      borderRadius: 0, // Straight edges
+      background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%)',
+      color: '#ffffff',
+    }}>
       <CardContent>
-        <SportsIcon />
+        <SportsIcon sx={{ color: '#ffffff', mb: 1 }} />
         <Typography
           component="h2"
           variant="subtitle2"
           gutterBottom
-          sx={{ fontWeight: '600' }}
+          sx={{ 
+            fontWeight: '600',
+            color: '#ffffff',
+          }}
         >
           Last Match
         </Typography>
 
         {match ? (
           <>
-            <Typography variant="h6" sx={{ mb: 1 }}>
+            <Typography variant="h6" sx={{ mb: 1, color: '#ffffff' }}>
               vs {match.opponent}
             </Typography>
-            <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
+            <Typography sx={{ color: 'rgba(255,255,255,0.8)', mb: '8px' }}>
             {new Date(match.date).toLocaleDateString("en-GB")} — {match.result}
             </Typography>
           </>
         ) : (
-          <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
+          <Typography sx={{ color: 'rgba(255,255,255,0.8)', mb: '8px' }}>
             No matches available.
           </Typography>
         )}
@@ -69,6 +77,14 @@ export default function HighlightedCard() {
           fullWidth={isSmallScreen}
           component={RouterLink} 
           to={match ? `/gen/posts/${match.id}/fulltime` : "/gen/posts"}
+          sx={{ 
+            borderRadius: 0, // Straight edges
+            backgroundColor: '#000000',
+            color: '#ffffff',
+            '&:hover': {
+              backgroundColor: '#1a1a1a',
+            }
+          }}
         >
           Generate Post
         </Button>

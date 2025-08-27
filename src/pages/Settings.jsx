@@ -110,24 +110,24 @@ const Settings = () => {
                       Settings
                     </Typography>
                     
-                    <List>
-                      {settingsSections.map((section, index) => (
-                        <React.Fragment key={section.id}>
-                          <ListItem disablePadding>
-                            <ListItemButton
-                              selected={selectedSection === section.id}
-                              onClick={() => handleSectionClick(section)}
-                              sx={{
-                                borderRadius: 1,
-                                mb: 0.5,
-                                '&.Mui-selected': {
-                                  backgroundColor: `${section.color}.50`,
-                                  '&:hover': {
-                                    backgroundColor: `${section.color}.100`,
-                                  }
-                                }
-                              }}
-                            >
+                                         <List>
+                       {settingsSections.map((section, index) => (
+                         <React.Fragment key={section.id}>
+                           <ListItem disablePadding>
+                             <ListItemButton
+                               selected={selectedSection === section.id}
+                               onClick={() => handleSectionClick(section)}
+                               sx={{
+                                 borderRadius: 0, // Straight edges
+                                 mb: 0.5,
+                                 '&.Mui-selected': {
+                                   backgroundColor: `${section.color}.50`,
+                                   '&:hover': {
+                                     backgroundColor: `${section.color}.100`,
+                                   }
+                                 }
+                               }}
+                             >
                               <ListItemIcon sx={{ color: `${section.color}.main` }}>
                                 {section.icon}
                               </ListItemIcon>
@@ -172,19 +172,20 @@ const Settings = () => {
                     <Grid container spacing={2}>
                       {settingsSections.map((section) => (
                         <Grid item xs={12} sm={6} key={section.id}>
-                          <Paper
-                            elevation={1}
-                            sx={{
-                              p: 2,
-                              cursor: 'pointer',
-                              transition: 'all 0.2s',
-                              '&:hover': {
-                                elevation: 3,
-                                transform: 'translateY(-2px)'
-                              }
-                            }}
-                            onClick={() => handleSectionClick(section)}
-                          >
+                                                     <Paper
+                             elevation={1}
+                             sx={{
+                               p: 2,
+                               cursor: 'pointer',
+                               transition: 'all 0.2s',
+                               borderRadius: 0, // Straight edges
+                               '&:hover': {
+                                 elevation: 3,
+                                 transform: 'translateY(-2px)'
+                               }
+                             }}
+                             onClick={() => handleSectionClick(section)}
+                           >
                             <Box display="flex" alignItems="center" gap={2}>
                               <Avatar sx={{ bgcolor: `${section.color}.main`, width: 40, height: 40 }}>
                                 {section.icon}

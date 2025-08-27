@@ -24,26 +24,27 @@ const HeaderContainer = styled(Stack)(({ theme }) => ({
   justifyContent: 'space-between',
   maxWidth: '1700px',
   padding: theme.spacing(2, 3),
-  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%)',
   backdropFilter: 'blur(10px)',
-  borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
-  borderRadius: '0 0 16px 16px',
+  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+  borderRadius: 0,
   margin: theme.spacing(0, 2),
-  boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.04)',
+  boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15)',
 }));
 
 const PageTitle = styled(Typography)(({ theme }) => ({
   fontSize: '1.5rem',
   fontWeight: 700,
-  color: '#28443f',
+  color: '#ffffff',
   letterSpacing: '-0.02em',
 }));
 
 const ActionButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: 'rgba(40, 68, 63, 0.08)',
-  color: '#28443f',
+  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  color: '#ffffff',
+  borderRadius: 0,
   '&:hover': {
-    backgroundColor: 'rgba(40, 68, 63, 0.12)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   width: 40,
   height: 40,

@@ -251,6 +251,7 @@ const SubscriptionManagement = () => {
                           sx={{ 
                             p: 2, 
                             mb: 2, 
+                            borderRadius: 0, // Straight edges
                             border: isCurrentTier ? 2 : 1,
                             borderColor: isCurrentTier ? 'primary.main' : 'divider',
                             position: 'relative'
@@ -303,6 +304,7 @@ const SubscriptionManagement = () => {
                             disabled={isCurrentTier}
                             onClick={() => handleUpgrade(tier)}
                             startIcon={isCurrentTier ? null : <UpgradeIcon />}
+                            sx={{ borderRadius: 0 }} // Straight edges
                           >
                             {isCurrentTier ? 'Current Plan' : 'Upgrade'}
                           </Button>

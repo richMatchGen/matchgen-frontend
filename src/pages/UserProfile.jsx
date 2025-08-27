@@ -217,32 +217,35 @@ const UserProfile = () => {
                       </Box>
                       
                       <Box>
-                        {!editing ? (
-                          <Button
-                            variant="outlined"
-                            startIcon={<EditIcon />}
-                            onClick={handleEdit}
-                          >
-                            Edit Profile
-                          </Button>
-                        ) : (
-                          <Box display="flex" gap={1}>
-                            <Button
-                              variant="contained"
-                              startIcon={<SaveIcon />}
-                              onClick={handleSave}
-                              disabled={loading}
-                            >
-                              Save
-                            </Button>
-                            <Button
-                              variant="outlined"
-                              startIcon={<CancelIcon />}
-                              onClick={handleCancel}
-                            >
-                              Cancel
-                            </Button>
-                          </Box>
+                                                 {!editing ? (
+                           <Button
+                             variant="outlined"
+                             startIcon={<EditIcon />}
+                             onClick={handleEdit}
+                             sx={{ borderRadius: 0 }} // Straight edges
+                           >
+                             Edit Profile
+                           </Button>
+                         ) : (
+                                                     <Box display="flex" gap={1}>
+                             <Button
+                               variant="contained"
+                               startIcon={<SaveIcon />}
+                               onClick={handleSave}
+                               disabled={loading}
+                               sx={{ borderRadius: 0 }} // Straight edges
+                             >
+                               Save
+                             </Button>
+                             <Button
+                               variant="outlined"
+                               startIcon={<CancelIcon />}
+                               onClick={handleCancel}
+                               sx={{ borderRadius: 0 }} // Straight edges
+                             >
+                               Cancel
+                             </Button>
+                           </Box>
                         )}
                       </Box>
                     </Box>

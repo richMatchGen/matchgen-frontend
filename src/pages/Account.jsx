@@ -435,14 +435,15 @@ const Account = () => {
                       These actions are irreversible. Please proceed with caution.
                     </Typography>
                     
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      startIcon={<DeleteIcon />}
-                      onClick={() => setDeleteDialogOpen(true)}
-                    >
-                      Delete Account
-                    </Button>
+                                         <Button
+                       variant="outlined"
+                       color="error"
+                       startIcon={<DeleteIcon />}
+                       onClick={() => setDeleteDialogOpen(true)}
+                       sx={{ borderRadius: 0 }} // Straight edges
+                     >
+                       Delete Account
+                     </Button>
                   </CardContent>
                 </Card>
               </Grid>
@@ -509,14 +510,15 @@ const Account = () => {
           <Button onClick={() => setPasswordDialogOpen(false)}>
             Cancel
           </Button>
-          <Button
-            variant="contained"
-            onClick={handlePasswordChange}
-            disabled={loading}
-            startIcon={<SaveIcon />}
-          >
-            Change Password
-          </Button>
+                     <Button
+             variant="contained"
+             onClick={handlePasswordChange}
+             disabled={loading}
+             startIcon={<SaveIcon />}
+             sx={{ borderRadius: 0 }} // Straight edges
+           >
+             Change Password
+           </Button>
         </DialogActions>
       </Dialog>
 
@@ -535,15 +537,16 @@ const Account = () => {
           <Button onClick={() => setDeleteDialogOpen(false)}>
             Cancel
           </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleDeleteAccount}
-            disabled={loading}
-            startIcon={<DeleteIcon />}
-          >
-            Delete Account
-          </Button>
+                     <Button
+             variant="contained"
+             color="error"
+             onClick={handleDeleteAccount}
+             disabled={loading}
+             startIcon={<DeleteIcon />}
+             sx={{ borderRadius: 0 }} // Straight edges
+           >
+             Delete Account
+           </Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -352,60 +352,63 @@ export const createMatchGenTheme = (mode = 'light') => {
           },
         },
       },
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: 8,
-            textTransform: 'none',
-            fontWeight: 600,
-            fontSize: '0.875rem',
-            padding: '10px 24px',
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: isLight 
-                ? '0px 4px 8px rgba(0, 0, 0, 0.12)'
-                : '0px 4px 8px rgba(0, 0, 0, 0.4)',
-            },
-          },
-          contained: {
-            '&:hover': {
-              boxShadow: isLight 
-                ? '0px 4px 8px rgba(0, 0, 0, 0.12)'
-                : '0px 4px 8px rgba(0, 0, 0, 0.4)',
-            },
-          },
-          outlined: {
-            borderWidth: '2px',
-            '&:hover': {
-              borderWidth: '2px',
-            },
-          },
-        },
-      },
-      MuiCard: {
-        styleOverrides: {
-          root: {
-            borderRadius: 16,
-            boxShadow: isLight 
-              ? '0px 2px 8px rgba(0, 0, 0, 0.08), 0px 1px 3px rgba(0, 0, 0, 0.12)'
-              : '0px 2px 8px rgba(0, 0, 0, 0.3), 0px 1px 3px rgba(0, 0, 0, 0.4)',
-            border: isLight ? '1px solid rgba(0, 0, 0, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
-            '&:hover': {
-              boxShadow: isLight 
-                ? '0px 4px 16px rgba(0, 0, 0, 0.12), 0px 2px 6px rgba(0, 0, 0, 0.16)'
-                : '0px 4px 16px rgba(0, 0, 0, 0.4), 0px 2px 6px rgba(0, 0, 0, 0.5)',
-            },
-          },
-        },
-      },
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            borderRadius: 12,
-            backgroundImage: 'none',
-          },
-        },
-      },
+             MuiButton: {
+         styleOverrides: {
+           root: {
+             borderRadius: 0, // Straight edges
+             textTransform: 'none',
+             fontWeight: 600,
+             fontSize: '0.875rem',
+             padding: '12px 24px',
+             boxShadow: 'none',
+             '&:hover': {
+               boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+             },
+           },
+           contained: {
+             backgroundColor: '#000000',
+             color: '#ffffff',
+             '&:hover': {
+               backgroundColor: '#1a1a1a',
+               boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+             },
+           },
+           outlined: {
+             borderWidth: '2px',
+             borderColor: '#000000',
+             color: '#000000',
+             '&:hover': {
+               backgroundColor: '#000000',
+               color: '#ffffff',
+               borderWidth: '2px',
+             },
+           },
+         },
+       },
+             MuiCard: {
+         styleOverrides: {
+           root: {
+             borderRadius: 0, // Straight edges
+             background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%)',
+             color: '#ffffff',
+             boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1)',
+             border: '1px solid rgba(255, 255, 255, 0.1)',
+             '&:hover': {
+               boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15)',
+               transform: 'translateY(-2px)',
+               transition: 'all 0.3s ease',
+             },
+           },
+         },
+       },
+             MuiPaper: {
+         styleOverrides: {
+           root: {
+             borderRadius: 0, // Straight edges
+             backgroundImage: 'none',
+           },
+         },
+       },
       MuiTextField: {
         styleOverrides: {
           root: {
@@ -422,25 +425,25 @@ export const createMatchGenTheme = (mode = 'light') => {
           },
         },
       },
-      MuiChip: {
-        styleOverrides: {
-          root: {
-            borderRadius: 8,
-            fontWeight: 500,
-            fontSize: '0.75rem',
-          },
-        },
-      },
-      MuiDialog: {
-        styleOverrides: {
-          paper: {
-            borderRadius: 16,
-            boxShadow: isLight 
-              ? '0px 8px 32px rgba(0, 0, 0, 0.16), 0px 4px 16px rgba(0, 0, 0, 0.24)'
-              : '0px 8px 32px rgba(0, 0, 0, 0.6), 0px 4px 16px rgba(0, 0, 0, 0.7)',
-          },
-        },
-      },
+             MuiChip: {
+         styleOverrides: {
+           root: {
+             borderRadius: 0, // Straight edges
+             fontWeight: 500,
+             fontSize: '0.75rem',
+           },
+         },
+       },
+             MuiDialog: {
+         styleOverrides: {
+           paper: {
+             borderRadius: 0, // Straight edges
+             background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%)',
+             color: '#ffffff',
+             boxShadow: '0px 8px 32px rgba(0, 0, 0, 0.3), 0px 4px 16px rgba(0, 0, 0, 0.2)',
+           },
+         },
+       },
       MuiAppBar: {
         styleOverrides: {
           root: {
@@ -520,13 +523,20 @@ export const createMatchGenTheme = (mode = 'light') => {
           },
         },
       },
-      MuiCircularProgress: {
-        styleOverrides: {
-          root: {
-            color: matchgenPrimary,
-          },
-        },
-      },
+             MuiCircularProgress: {
+         styleOverrides: {
+           root: {
+             color: matchgenPrimary,
+           },
+         },
+       },
+       MuiSvgIcon: {
+         styleOverrides: {
+           root: {
+             color: '#ffffff', // White icons
+           },
+         },
+       },
     },
   });
 };

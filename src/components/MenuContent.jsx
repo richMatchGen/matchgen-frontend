@@ -38,7 +38,7 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
 
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
   margin: theme.spacing(0.25, 1),
-  borderRadius: 8,
+  borderRadius: 0, // Straight edges
   color: 'rgba(255,255,255,0.8)',
   '&:hover': {
     backgroundColor: 'rgba(255,255,255,0.1)',
