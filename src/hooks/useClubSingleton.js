@@ -4,7 +4,7 @@ import { getClubInfoWithRateLimit } from '../api/config';
 // Singleton state management for club data
 let clubState = {
   club: null,
-  loading: true,
+  loading: false, // Changed from true to false
   error: null,
   rateLimited: false,
   subscribers: new Set(),
@@ -156,7 +156,7 @@ const useClubSingleton = () => {
 // Export function to clear cache (useful for logout)
 export const clearClubCache = () => {
   clubState.club = null;
-  clubState.loading = true;
+  clubState.loading = false; // Changed from true to false
   clubState.error = null;
   clubState.rateLimited = false;
   clubState.fetchPromise = null;
