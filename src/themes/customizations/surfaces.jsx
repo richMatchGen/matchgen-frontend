@@ -47,16 +47,28 @@ export const surfacesCustomizations = {
   MuiCard: {
     styleOverrides: {
       root: ({ theme }) => ({
-        padding: 16,
-        gap: 16,
-        transition: 'all 100ms ease',
-        backgroundColor: gray[50],
-        borderRadius: (theme.vars || theme).shape.borderRadius,
-        border: `1px solid ${(theme.vars || theme).palette.divider}`,
-        boxShadow: 'none',
-        ...theme.applyStyles('dark', {
-          backgroundColor: gray[800],
-        }),
+        borderRadius: 0, // Straight edges
+        background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%) !important',
+        color: '#ffffff !important',
+        boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1) !important',
+        border: '1px solid rgba(255, 255, 255, 0.1) !important',
+        '&:hover': {
+          boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15) !important',
+          transform: 'translateY(-2px)',
+          transition: 'all 0.3s ease',
+        },
+        // Ensure all text inside cards is white
+        '& .MuiTypography-root': {
+          color: '#ffffff !important',
+        },
+        // Ensure secondary text has proper opacity
+        '& .MuiTypography-body2, & .MuiTypography-caption': {
+          color: 'rgba(255,255,255,0.8) !important',
+        },
+        // Ensure all icons inside cards are white
+        '& .MuiSvgIcon-root': {
+          color: '#ffffff !important',
+        },
       }),
     },
   },
