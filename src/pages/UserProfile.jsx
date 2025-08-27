@@ -221,9 +221,8 @@ const UserProfile = () => {
                            <Button
                              variant="outlined"
                              startIcon={<EditIcon />}
-                             onClick={handleEdit}
-                             sx={{ borderRadius: 0 }} // Straight edges
-                           >
+                                                           onClick={handleEdit}
+                            >
                              Edit Profile
                            </Button>
                          ) : (
@@ -233,7 +232,6 @@ const UserProfile = () => {
                                startIcon={<SaveIcon />}
                                onClick={handleSave}
                                disabled={loading}
-                               sx={{ borderRadius: 0 }} // Straight edges
                              >
                                Save
                              </Button>
@@ -241,7 +239,6 @@ const UserProfile = () => {
                                variant="outlined"
                                startIcon={<CancelIcon />}
                                onClick={handleCancel}
-                               sx={{ borderRadius: 0 }} // Straight edges
                              >
                                Cancel
                              </Button>

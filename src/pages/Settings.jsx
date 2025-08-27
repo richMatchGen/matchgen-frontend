@@ -118,7 +118,7 @@ const Settings = () => {
                                selected={selectedSection === section.id}
                                onClick={() => handleSectionClick(section)}
                                sx={{
-                                 borderRadius: 0, // Straight edges
+ 
                                  mb: 0.5,
                                  '&.Mui-selected': {
                                    backgroundColor: `${section.color}.50`,
@@ -178,7 +178,7 @@ const Settings = () => {
                                p: 2,
                                cursor: 'pointer',
                                transition: 'all 0.2s',
-                               borderRadius: 0, // Straight edges
+
                                '&:hover': {
                                  elevation: 3,
                                  transform: 'translateY(-2px)'

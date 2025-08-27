@@ -304,7 +304,7 @@ const SubscriptionManagement = () => {
                             disabled={isCurrentTier}
                             onClick={() => handleUpgrade(tier)}
                             startIcon={isCurrentTier ? null : <UpgradeIcon />}
-                            sx={{ borderRadius: 0 }} // Straight edges
+
                           >
                             {isCurrentTier ? 'Current Plan' : 'Upgrade'}
                           </Button>

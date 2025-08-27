@@ -466,7 +466,7 @@ export const createMatchGenTheme = (mode = 'light') => {
       MuiListItem: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
+            borderRadius: 0, // Straight edges
             marginBottom: 4,
             '&:hover': {
               backgroundColor: isLight 
@@ -479,7 +479,7 @@ export const createMatchGenTheme = (mode = 'light') => {
       MuiListItemButton: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
+            borderRadius: 0, // Straight edges
             '&:hover': {
               backgroundColor: isLight 
                 ? alpha(gray[900], 0.04)

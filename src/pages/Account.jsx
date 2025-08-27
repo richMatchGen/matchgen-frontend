@@ -440,7 +440,6 @@ const Account = () => {
                        color="error"
                        startIcon={<DeleteIcon />}
                        onClick={() => setDeleteDialogOpen(true)}
-                       sx={{ borderRadius: 0 }} // Straight edges
                      >
                        Delete Account
                      </Button>
@@ -515,7 +514,6 @@ const Account = () => {
              onClick={handlePasswordChange}
              disabled={loading}
              startIcon={<SaveIcon />}
-             sx={{ borderRadius: 0 }} // Straight edges
            >
              Change Password
            </Button>
@@ -543,7 +541,6 @@ const Account = () => {
              onClick={handleDeleteAccount}
              disabled={loading}
              startIcon={<DeleteIcon />}
-             sx={{ borderRadius: 0 }} // Straight edges
            >
              Delete Account
            </Button>
