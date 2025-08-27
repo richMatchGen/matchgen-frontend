@@ -94,5 +94,22 @@ export const surfacesCustomizations = {
       },
     },
   },
+  MuiSvgIcon: {
+    styleOverrides: {
+      root: {
+        color: '#ffffff !important',
+      },
+    },
+  },
+  MuiButton: {
+    styleOverrides: {
+      root: {
+        '&.MuiButton-colorPrimary': {
+          backgroundColor: '#000000 !important',
+          color: '#ffffff !important',
+        },
+      },
+    },
+  },
 };
 
