@@ -124,6 +124,11 @@ const SocialMediaPostGenerator = () => {
   const [matches, setMatches] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState(fixtureId || '');
   const [selectedPostType, setSelectedPostType] = useState(postType || 'matchday');
+  
+  // Debug logging
+  console.log('🔍 URL fixtureId:', fixtureId, 'type:', typeof fixtureId);
+  console.log('🔍 selectedMatch:', selectedMatch, 'type:', typeof selectedMatch);
+  console.log('🔍 !fixtureId condition:', !fixtureId);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null);
@@ -306,7 +311,11 @@ const SocialMediaPostGenerator = () => {
   };
 
   const getSelectedMatchData = () => {
-    return matches.find(match => match.id === selectedMatch);
+    console.log('🔍 getSelectedMatchData - selectedMatch:', selectedMatch, 'type:', typeof selectedMatch);
+    console.log('🔍 matches:', matches);
+    const match = matches.find(match => match.id === parseInt(selectedMatch));
+    console.log('🔍 found match:', match);
+    return match;
   };
 
   const formatDate = (dateString) => {
