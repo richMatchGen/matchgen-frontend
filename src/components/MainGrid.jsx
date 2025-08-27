@@ -77,9 +77,9 @@ export default function MainGrid() {
             </Grid> */}
       </Grid>
 
-      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+      {/* <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Club Profile
-      </Typography>
+      </Typography> */}
         <Grid container spacing={2} columns={12}>
           <Grid size={{ xs: 12, lg: 12}}>
               <ClubProfileDetails />
