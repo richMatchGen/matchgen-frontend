@@ -289,7 +289,7 @@ export default function ClubProfileDetails() {
                   </Stack>
                 )}
                 
-                {club.founded && (
+                {club.founded_year && (
                   <Stack direction="row" spacing={2} alignItems="center">
                     <FoundedIcon sx={{ color: theme.palette.primary.main }} />
                     <Box>
@@ -297,19 +297,19 @@ export default function ClubProfileDetails() {
                         Founded
                       </Typography>
                       <Typography variant="body1" fontWeight="500">
-                        {club.founded}
+                        {club.founded_year}
                       </Typography>
                     </Box>
                   </Stack>
                 )}
                 
-                {club.description && (
+                {club.bio && (
                   <Box>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                       Description
                     </Typography>
                     <Typography variant="body1">
-                      {club.description}
+                      {club.bio}
                     </Typography>
                   </Box>
                 )}
