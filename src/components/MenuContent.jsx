@@ -52,7 +52,7 @@ const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
     },
   },
   '& .MuiListItemIcon-root': {
-    color: 'white',
+    color: '#ffffff !important',
     minWidth: 40,
   },
   '& .MuiListItemText-primary': {
