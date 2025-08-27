@@ -19,6 +19,8 @@ import Link from '@mui/material/Link';
 
 
 export default function MainGrid() {
+  console.log('🏢 MainGrid component rendering');
+  
   return (
 
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>

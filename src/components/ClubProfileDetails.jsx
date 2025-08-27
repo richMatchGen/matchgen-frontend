@@ -40,6 +40,8 @@ import { useNavigate } from "react-router-dom";
 import useClubSingleton from "../hooks/useClubSingleton";
 
 export default function ClubProfileDetails() {
+  console.log('🏢 ClubProfileDetails component rendering');
+  
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();

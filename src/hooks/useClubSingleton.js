@@ -115,13 +115,23 @@ const useClubSingleton = () => {
   }, []);
 
   useEffect(() => {
+    console.log('🏢 useClubSingleton useEffect triggered');
+    console.log('🏢 Current clubState:', {
+      club: clubState.club,
+      loading: clubState.loading,
+      fetchPromise: !!clubState.fetchPromise
+    });
+    
     // Subscribe to state changes
     subscriberRef.current = updateLocalState;
     clubState.subscribers.add(subscriberRef.current);
 
     // Initial fetch if we don't have data
     if (!clubState.club && !clubState.loading && !clubState.fetchPromise) {
+      console.log('🏢 Triggering initial fetch...');
       fetchClubData();
+    } else {
+      console.log('🏢 Skipping initial fetch - conditions not met');
     }
 
     // Cleanup subscription
