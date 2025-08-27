@@ -68,6 +68,10 @@ export const surfacesCustomizations = {
         '& .MuiTypography-body2, & .MuiTypography-caption': {
           color: 'rgba(255,255,255,0.8) !important',
         },
+        // Override for fixture details - make text black
+        '& .MuiPaper-root .MuiTypography-root': {
+          color: '#000000 !important',
+        },
         // Ensure all icons inside cards are white
         '& .MuiSvgIcon-root': {
           color: '#ffffff !important',
