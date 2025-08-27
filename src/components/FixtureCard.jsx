@@ -36,55 +36,59 @@ export default function FixtureCard() {
   }, []);
 
   return (
-<Card sx={{ height: '100%' }}>
-  <CardContent>
-    <TodayIcon />
-    <Typography
-      component="h2"
-      variant="subtitle2"
-      gutterBottom
-      sx={{ fontWeight: '600' }}
-    >
-      Upcoming Fixture 
-    </Typography>
-
-    {match ? (
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-        <Box>
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            vs {match.opponent}
-          </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>
-            {new Date(match.date).toLocaleDateString('en-GB')} — {match.venue}
-          </Typography>
-        </Box>
-
-        {match.opponent_logo && (
-          <Box
-            component="img"
-            src={match.opponent_logo}
-            alt={`${match.opponent} logo`}
-            sx={{ width: 64, height: 64, ml: 2 }}
-          />
-        )}
-      </Box>
-    ) : (
-      <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
-        No matches available.
+<Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+  <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1 }}>
+      <TodayIcon />
+      <Typography
+        component="h2"
+        variant="subtitle2"
+        gutterBottom
+        sx={{ fontWeight: '600' }}
+      >
+        Upcoming Fixture 
       </Typography>
-    )}
 
-    <Button
-      variant="contained"
-      size="small"
-      color="primary"
-      endIcon={<ChevronRightRoundedIcon />}
-      fullWidth={isSmallScreen}
-      component={RouterLink}
-      to={match ? `/gen/posts/${match.id}/upcomingFixture` : "/gen/posts"}
-    >
-      Generate Post
-    </Button>
+      {match ? (
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+          <Box>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              vs {match.opponent}
+            </Typography>
+            <Typography sx={{ color: 'text.secondary' }}>
+              {new Date(match.date).toLocaleDateString('en-GB')} — {match.venue}
+            </Typography>
+          </Box>
+
+          {match.opponent_logo && (
+            <Box
+              component="img"
+              src={match.opponent_logo}
+              alt={`${match.opponent} logo`}
+              sx={{ width: 64, height: 64, ml: 2 }}
+            />
+          )}
+        </Box>
+      ) : (
+        <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
+          No matches available.
+        </Typography>
+      )}
+    </Box>
+
+    <Box sx={{ marginTop: 'auto', pt: 2 }}>
+      <Button
+        variant="contained"
+        size="small"
+        color="primary"
+        endIcon={<ChevronRightRoundedIcon />}
+        fullWidth={isSmallScreen}
+        component={RouterLink}
+        to={match ? `/gen/posts/${match.id}/upcomingFixture` : "/gen/posts"}
+      >
+        Generate Post
+      </Button>
+    </Box>
   </CardContent>
 </Card>
   );

@@ -39,23 +39,24 @@ export default function QuickLinksCard() {
   }, []);
 
   return (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <TodayIcon />
-        <Typography
-          component="h2"
-          variant="subtitle2"
-          gutterBottom
-          sx={{ fontWeight: '600' }}
-        >
-          Quick Links
-        </Typography>
-        <Stack spacing={1} direction="column">
-          <NestedModal />
-          <AddFixtureModal />
-          <AddResultModal />
-
-        </Stack>
+    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1 }}>
+          <TodayIcon />
+          <Typography
+            component="h2"
+            variant="subtitle2"
+            gutterBottom
+            sx={{ fontWeight: '600' }}
+          >
+            Quick Links
+          </Typography>
+          <Stack spacing={1} direction="column">
+            <NestedModal />
+            <AddFixtureModal />
+            <AddResultModal />
+          </Stack>
+        </Box>
       </CardContent>
     </Card>
   );
