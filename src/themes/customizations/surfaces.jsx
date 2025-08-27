@@ -52,6 +52,9 @@ export const surfacesCustomizations = {
         color: '#ffffff !important',
         boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1) !important',
         border: '1px solid rgba(255, 255, 255, 0.1) !important',
+        display: 'flex !important',
+        flexDirection: 'column !important',
+        height: '100% !important',
         '&:hover': {
           boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15) !important',
           transform: 'translateY(-2px)',
@@ -75,8 +78,14 @@ export const surfacesCustomizations = {
   MuiCardContent: {
     styleOverrides: {
       root: {
-        padding: 20,
-        '&:last-child': { paddingBottom: 0 },
+        padding: '20px !important',
+        paddingBottom: '20px !important',
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        '&:last-child': { 
+          paddingBottom: '20px !important' 
+        },
       },
     },
   },
@@ -90,7 +99,8 @@ export const surfacesCustomizations = {
   MuiCardActions: {
     styleOverrides: {
       root: {
-        padding: 0,
+        padding: '20px !important',
+        marginTop: 'auto !important',
       },
     },
   },
@@ -107,6 +117,7 @@ export const surfacesCustomizations = {
         '&.MuiButton-colorPrimary': {
           backgroundColor: '#000000 !important',
           color: '#ffffff !important',
+          borderRadius: '0px !important',
         },
       },
     },
