@@ -23,7 +23,7 @@ export default function MainGrid() {
 
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       {/* cards */}
-      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+      {/* <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
       <Link
         component={RouterLink}
         to="/results"
@@ -43,7 +43,7 @@ export default function MainGrid() {
       >
         Fixtures
       </Link>
-    </Typography>
+    </Typography> */}
       <Grid
         container
         spacing={2}
