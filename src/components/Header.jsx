@@ -27,7 +27,6 @@ const HeaderContainer = styled(Stack)(({ theme }) => ({
   background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%)',
   backdropFilter: 'blur(10px)',
   borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-  borderRadius: 0,
   margin: theme.spacing(0, 2),
   boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15)',
 }));
@@ -42,7 +41,6 @@ const PageTitle = styled(Typography)(({ theme }) => ({
 const ActionButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: 'rgba(255, 255, 255, 0.1)',
   color: '#ffffff',
-  borderRadius: 0,
   '&:hover': {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
