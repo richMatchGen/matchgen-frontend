@@ -47,19 +47,30 @@ export default function HighlightedCard() {
         </Typography>
 
         {match ? (
-          <>
-            <Typography variant="h6" sx={{ mb: 1 }}>
-              vs {match.opponent}
-            </Typography>
-            <Typography sx={{ mb: '8px' }}>
-            {new Date(match.date).toLocaleDateString("en-GB")} — {match.result}
-            </Typography>
-          </>
-        ) : (
-          <Typography sx={{ mb: '8px' }}>
-            No matches available.
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+        <Box>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            vs {match.opponent}
           </Typography>
+          <Typography sx={{ color: 'text.secondary' }}>
+            {new Date(match.date).toLocaleDateString('en-GB')} — {match.venue}
+          </Typography>
+        </Box>
+
+        {match.opponent_logo && (
+          <Box
+            component="img"
+            src={match.opponent_logo}
+            alt={`${match.opponent} logo`}
+            sx={{ width: 64, height: 64, ml: 2 }}
+          />
         )}
+      </Box>
+    ) : (
+      <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
+        No matches available.
+      </Typography>
+    )}
 
         <Button
           variant="contained"

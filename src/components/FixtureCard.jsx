@@ -45,7 +45,7 @@ export default function FixtureCard() {
       gutterBottom
       sx={{ fontWeight: '600' }}
     >
-      Upcoming Fixture
+      Upcoming Fixture 
     </Typography>
 
     {match ? (
