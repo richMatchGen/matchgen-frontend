@@ -151,6 +151,10 @@ export const getUserProfile = async () => {
 };
 
 export const getClubInfo = async () => {
+  console.log('🏢 getClubInfo called');
+  console.log('🏢 API_BASE_URL:', API_BASE_URL);
+  console.log('🏢 Auth headers:', getAuthHeaders());
+  
   return makeApiRequest(
     () => apiClient.get('/users/my-club/'),
     'Get club info'

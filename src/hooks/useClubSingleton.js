@@ -19,21 +19,22 @@ const notifySubscribers = () => {
   clubState.subscribers.forEach(callback => callback(clubState));
 };
 
-// Single fetch function that all components share
-const fetchClubData = async () => {
-  const now = Date.now();
-  
-  // If we have a recent fetch or one is in progress, return the existing promise
-  if (clubState.fetchPromise && (now - clubState.lastFetch) < CACHE_DURATION) {
-    return clubState.fetchPromise;
-  }
+  // Single fetch function that all components share
+  const fetchClubData = async () => {
+    const now = Date.now();
+    
+    // If we have a recent fetch or one is in progress, return the existing promise
+    if (clubState.fetchPromise && (now - clubState.lastFetch) < CACHE_DURATION) {
+      return clubState.fetchPromise;
+    }
 
-  // If we already have data and it's recent, don't fetch again
-  if (clubState.club && (now - clubState.lastFetch) < CACHE_DURATION) {
-    return Promise.resolve();
-  }
+    // If we already have data and it's recent, don't fetch again
+    if (clubState.club && (now - clubState.lastFetch) < CACHE_DURATION) {
+      return Promise.resolve();
+    }
 
-  console.log('🏢 Fetching club data (singleton)...');
+    console.log('🏢 Fetching club data (singleton)...');
+    console.log('🏢 Token exists:', !!localStorage.getItem('accessToken'));
   
   clubState.loading = true;
   clubState.error = null;
@@ -41,35 +42,39 @@ const fetchClubData = async () => {
   clubState.lastFetch = now;
   notifySubscribers();
 
-  clubState.fetchPromise = (async () => {
-    try {
-      const result = await getClubInfoWithRateLimit();
-      
-      if (result.success) {
-        clubState.club = result.data;
-        clubState.error = null;
-        clubState.rateLimited = false;
-      } else {
-        if (result.error.includes('Rate limited')) {
-          clubState.rateLimited = true;
-          clubState.error = `Rate limited. Please wait ${result.retryAfter} seconds before trying again.`;
-        } else {
-          clubState.error = result.error;
-          clubState.club = null;
+      clubState.fetchPromise = (async () => {
+      try {
+        console.log('🏢 Calling getClubInfoWithRateLimit...');
+        const result = await getClubInfoWithRateLimit();
+        console.log('🏢 API Result:', result);
+        
+        if (result.success) {
+          clubState.club = result.data;
+          clubState.error = null;
           clubState.rateLimited = false;
+          console.log('🏢 Club data set successfully:', result.data);
+        } else {
+          console.log('🏢 API call failed:', result.error);
+          if (result.error.includes('Rate limited')) {
+            clubState.rateLimited = true;
+            clubState.error = `Rate limited. Please wait ${result.retryAfter} seconds before trying again.`;
+          } else {
+            clubState.error = result.error;
+            clubState.club = null;
+            clubState.rateLimited = false;
+          }
         }
+      } catch (err) {
+        console.error("🏢 Error fetching club data:", err);
+        clubState.error = "Failed to load club data";
+        clubState.club = null;
+        clubState.rateLimited = false;
+      } finally {
+        clubState.loading = false;
+        clubState.fetchPromise = null;
+        notifySubscribers();
       }
-    } catch (err) {
-      console.warn("User might not have a club yet:", err);
-      clubState.error = "Failed to load club data";
-      clubState.club = null;
-      clubState.rateLimited = false;
-    } finally {
-      clubState.loading = false;
-      clubState.fetchPromise = null;
-      notifySubscribers();
-    }
-  })();
+    })();
 
   return clubState.fetchPromise;
 };
