@@ -75,7 +75,7 @@ export const surfacesCustomizations = {
   MuiCardContent: {
     styleOverrides: {
       root: {
-        padding: 20px,
+        padding: 20,
         '&:last-child': { paddingBottom: 0 },
       },
     },
