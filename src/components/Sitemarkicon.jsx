@@ -2,10 +2,10 @@ import * as React from 'react';
 import SvgIcon from '@mui/material/SvgIcon';
 
 export default function SitemarkIcon() {
-  const fillColor = '#284440';
+  const fillColor = '#f2fd7d';
 
   return (
-    <SvgIcon sx={{ height: 21, width: 100, mr: 2 }}>
+    <SvgIcon sx={{ height: 31, width: 110, mr: 2 }}>
       <svg
         id="Layer_1"
         xmlns="http://www.w3.org/2000/svg"
