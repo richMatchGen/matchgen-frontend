@@ -5,7 +5,7 @@ export default function SitemarkIcon() {
   const fillColor = '#f2fd7d';
 
   return (
-    <SvgIcon sx={{ height: 31, width: 110, mr: 2 }}>
+    <SvgIcon sx={{ height: 61, width: 140, mr: 2 }}>
       <svg
         id="Layer_1"
         xmlns="http://www.w3.org/2000/svg"
