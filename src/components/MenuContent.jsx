@@ -1,11 +1,14 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import AnalyticsRoundedIcon from '@mui/icons-material/AnalyticsRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
@@ -17,10 +20,50 @@ import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
 import PaymentIcon from '@mui/icons-material/Payment';
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
+import Box from '@mui/material/Box';
+
+const MenuSection = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(1, 0),
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  color: 'rgba(255,255,255,0.6)',
+  fontSize: '0.75rem',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  padding: theme.spacing(1, 2),
+  marginBottom: theme.spacing(0.5),
+}));
+
+const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
+  margin: theme.spacing(0.25, 1),
+  borderRadius: 8,
+  color: 'rgba(255,255,255,0.8)',
+  '&:hover': {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    color: '#ffffff',
+  },
+  '&.Mui-selected': {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    color: '#ffffff',
+    '&:hover': {
+      backgroundColor: 'rgba(255,255,255,0.2)',
+    },
+  },
+  '& .MuiListItemIcon-root': {
+    color: 'inherit',
+    minWidth: 40,
+  },
+  '& .MuiListItemText-primary': {
+    fontWeight: 500,
+    fontSize: '0.875rem',
+  },
+}));
 
 const mainListItems = [
   { text: 'Dashboard', icon: <HomeRoundedIcon />, link: '/dashboard' },
-  { text: 'Gen ✨', icon: <AnalyticsRoundedIcon />, link: '/gen/teamlineup' },
+  { text: 'Gen Posts', icon: <AnalyticsRoundedIcon />, link: '/gen/posts' },
   { text: 'Club', icon: <PeopleRoundedIcon />, link: '/club' },
   { text: 'Fixtures', icon: <EventIcon />, link: '/fixtures-management' },
   { text: 'Templates', icon: <AssignmentRoundedIcon />, link: '/gen/templates' },
@@ -34,28 +77,54 @@ const secondaryListItems = [
 ];
 
 export default function MenuContent() {
+  const location = useLocation();
+
+  const isActive = (link) => {
+    if (link === '/dashboard') {
+      return location.pathname === '/dashboard';
+    }
+    return location.pathname.startsWith(link);
+  };
+
   return (
-    <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
-      <List dense>
-        {mainListItems.map((item, index) => (
-          <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton component={Link} to={item.link} selected={index === 0}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <List dense>
-        {secondaryListItems.map((item, index) => (
-          <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton component={Link} to={item.link} >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+    <Stack sx={{ flexGrow: 1, justifyContent: 'space-between' }}>
+      {/* Main Navigation */}
+      <MenuSection>
+        <SectionTitle>Main</SectionTitle>
+        <List dense disablePadding>
+          {mainListItems.map((item, index) => (
+            <ListItem key={index} disablePadding sx={{ display: 'block' }}>
+              <StyledListItemButton 
+                component={Link} 
+                to={item.link} 
+                selected={isActive(item.link)}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </StyledListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </MenuSection>
+
+      {/* Secondary Navigation */}
+      <MenuSection>
+        <SectionTitle>Account</SectionTitle>
+        <List dense disablePadding>
+          {secondaryListItems.map((item, index) => (
+            <ListItem key={index} disablePadding sx={{ display: 'block' }}>
+              <StyledListItemButton 
+                component={Link} 
+                to={item.link} 
+                selected={isActive(item.link)}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </StyledListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </MenuSection>
     </Stack>
   );
 }

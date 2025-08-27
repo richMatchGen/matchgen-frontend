@@ -7,6 +7,9 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import SelectContent from './SelectContent';
 import MenuContent from './MenuContent';
 import CardAlert from './CardAlert';
@@ -15,20 +18,49 @@ import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { getProfile } from '../hooks/auth';
 import useClubSingleton from "../hooks/useClubSingleton";
-import Sitemark from '../components/Sitemarkicon'
+import Sitemark from '../components/Sitemarkicon';
+import {
+  Settings as SettingsIcon,
+  Person as PersonIcon,
+  Notifications as NotificationsIcon,
+  Help as HelpIcon
+} from '@mui/icons-material';
 
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 const Drawer = styled(MuiDrawer)({
   width: drawerWidth,
   flexShrink: 0,
   boxSizing: 'border-box',
-  mt: 10,
   [`& .${drawerClasses.paper}`]: {
     width: drawerWidth,
     boxSizing: 'border-box',
+    background: 'linear-gradient(180deg, #28443f 0%, #1a2f2a 100%)',
+    borderRight: 'none',
   },
 });
+
+const BrandSection = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(3, 2),
+  background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+  borderBottom: '1px solid rgba(255,255,255,0.1)',
+  backdropFilter: 'blur(10px)',
+}));
+
+const UserSection = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  background: 'rgba(255,255,255,0.05)',
+  borderTop: '1px solid rgba(255,255,255,0.1)',
+  backdropFilter: 'blur(10px)',
+}));
+
+const ActionButton = styled(IconButton)(({ theme }) => ({
+  color: 'rgba(255,255,255,0.7)',
+  '&:hover': {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    color: '#ffffff',
+  },
+}));
 
 export default function SideMenu({ user }) {
   const navigate = useNavigate();
@@ -47,67 +79,159 @@ export default function SideMenu({ user }) {
     fetchUser();
   }, []);
 
+  const getSubscriptionColor = (tier) => {
+    switch (tier) {
+      case 'prem':
+        return '#ffd700';
+      case 'semipro':
+        return '#c0c0c0';
+      default:
+        return '#cd7f32';
+    }
+  };
 
+  const getSubscriptionLabel = (tier) => {
+    switch (tier) {
+      case 'prem':
+        return 'Prem Gen';
+      case 'semipro':
+        return 'SemiPro Gen';
+      default:
+        return 'Basic Gen';
+    }
+  };
 
   return (
-
     <Drawer
       variant="permanent"
       sx={{
         display: { xs: 'none', md: 'block' },
         [`& .${drawerClasses.paper}`]: {
-          backgroundColor: 'background.paper',
+          backgroundColor: 'transparent',
         },
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          mt: 'calc(var(--template-frame-height, 0px) + 4px)',
-          p: 1.5,
-        }}
-      >
-       <Sitemark />
-      </Box>
-      <Divider />
+      {/* Brand Section */}
+      <BrandSection>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Sitemark />
+        </Box>
+        {club && (
+          <Box sx={{ mt: 2 }}>
+            <Typography 
+              variant="subtitle2" 
+              sx={{ 
+                color: 'rgba(255,255,255,0.8)', 
+                fontWeight: 500,
+                mb: 1 
+              }}
+            >
+              {club.name}
+            </Typography>
+            <Chip
+              label={getSubscriptionLabel(club.subscription_tier)}
+              size="small"
+              sx={{
+                backgroundColor: getSubscriptionColor(club.subscription_tier),
+                color: '#000',
+                fontWeight: 600,
+                fontSize: '0.7rem',
+                height: 20,
+                '& .MuiChip-label': {
+                  px: 1,
+                },
+              }}
+            />
+          </Box>
+        )}
+      </BrandSection>
+
+      {/* Menu Content */}
       <Box
         sx={{
           overflow: 'auto',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
+          flex: 1,
+          py: 1,
         }}
       >
         <MenuContent />
-        {/* <CardAlert /> */}
       </Box>
-      <Stack
-        direction="row"
-        sx={{
-          p: 2,
-          gap: 1,
-          alignItems: 'center',
-          borderTop: '1px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <Avatar
-          sizes="small"
-          alt={club?.name || "No club"}
-          src={club?.logo || "/static/images/avatar/7.jpg"}
-          sx={{ width: 36, height: 36 }}
-        />
-        <Box sx={{ mr: 'auto' }}>
-        <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-      {club?.name || "No club"}
-      {userProfile?.first_name ? ` — ${userProfile.first_name}` : ""}
-    </Typography>
-    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-      {userProfile?.email || ""}
-    </Typography>
-        </Box>
-        <OptionsMenu />
-      </Stack>
+
+      {/* User Section */}
+      <UserSection>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
+          <Avatar
+            sizes="small"
+            alt={club?.name || "No club"}
+            src={club?.logo || "/static/images/avatar/7.jpg"}
+            sx={{ 
+              width: 40, 
+              height: 40,
+              border: '2px solid rgba(255,255,255,0.2)',
+            }}
+          />
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#ffffff', 
+                fontWeight: 500,
+                fontSize: '0.875rem',
+                lineHeight: 1.2,
+              }}
+              noWrap
+            >
+              {userProfile?.first_name} {userProfile?.last_name}
+            </Typography>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: 'rgba(255,255,255,0.6)',
+                fontSize: '0.75rem',
+              }}
+              noWrap
+            >
+              {userProfile?.email}
+            </Typography>
+          </Box>
+        </Stack>
+
+        {/* Action Buttons */}
+        <Stack direction="row" spacing={1} justifyContent="space-between">
+          <Tooltip title="Settings">
+            <ActionButton 
+              size="small"
+              onClick={() => navigate('/settings')}
+            >
+              <SettingsIcon fontSize="small" />
+            </ActionButton>
+          </Tooltip>
+          
+          <Tooltip title="Profile">
+            <ActionButton 
+              size="small"
+              onClick={() => navigate('/profile')}
+            >
+              <PersonIcon fontSize="small" />
+            </ActionButton>
+          </Tooltip>
+          
+          <Tooltip title="Notifications">
+            <ActionButton size="small">
+              <NotificationsIcon fontSize="small" />
+            </ActionButton>
+          </Tooltip>
+          
+          <Tooltip title="Help">
+            <ActionButton size="small">
+              <HelpIcon fontSize="small" />
+            </ActionButton>
+          </Tooltip>
+        </Stack>
+      </UserSection>
     </Drawer>
   );
 }

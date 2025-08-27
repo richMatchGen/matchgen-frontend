@@ -6,9 +6,9 @@ import PrivateRoute from "./components/PrivateRoute";
 import useAuth from "./hooks/useAuth";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { SkipToMainContent, AccessibilityToolbar } from "./components/EnhancedAccessibility";
-import { createEnhancedTheme } from "./themes/EnhancedTheme";
 import { ThemeProvider } from "@mui/material/styles";
 import { RateLimitProvider } from "./context";
+import { createMatchGenTheme } from "./themes/MatchGenTheme";
 
 // Lazy load components for better performance
 const Login = lazy(() => import("./pages/Login"));
@@ -36,7 +36,7 @@ const Account = lazy(() => import("./pages/Account"));
 
 function App() {
   const { auth, logout } = useAuth();
-  const theme = createEnhancedTheme('light');
+  const theme = createMatchGenTheme('light');
 
   return (
     <RateLimitProvider>
