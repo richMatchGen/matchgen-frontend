@@ -75,8 +75,8 @@ export const surfacesCustomizations = {
   MuiCardContent: {
     styleOverrides: {
       root: {
-        padding: 0,
-        '&:last-child': { paddingBottom: 0 },
+        padding: '20px !important',
+        '&:last-child': { paddingBottom: '20px !important' },
       },
     },
   },
@@ -91,6 +91,14 @@ export const surfacesCustomizations = {
     styleOverrides: {
       root: {
         padding: 0,
+      },
+    },
+  },
+  MuiButtonBase: {
+    styleOverrides: {
+      root: {
+        color: '#000000 !important',
+        borderRadius: '0px !important',
       },
     },
   },
