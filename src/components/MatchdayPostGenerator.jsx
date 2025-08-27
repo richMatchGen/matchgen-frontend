@@ -477,7 +477,7 @@ const SocialMediaPostGenerator = () => {
 
               {/* Center Panel - Fixture Selection & Details */}
               <Grid item xs={12} md={4}>
-                <Card elevation={3}>
+                <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
                       {fixtureId ? 'Fixture Details' : 'Select Fixture'}
