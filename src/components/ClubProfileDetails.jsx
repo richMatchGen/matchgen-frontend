@@ -52,12 +52,17 @@ export default function ClubProfileDetails() {
   console.log('ClubProfileDetails - club:', club);
   console.log('ClubProfileDetails - clubLoading:', clubLoading);
   console.log('ClubProfileDetails - clubError:', clubError);
+  console.log('ClubProfileDetails - loading:', loading);
+  console.log('ClubProfileDetails - error:', error);
 
   const handleRefresh = async () => {
     setLoading(true);
     try {
+      console.log('🔄 Manual refresh triggered');
       await refreshClub();
+      console.log('🔄 Manual refresh completed');
     } catch (err) {
+      console.error('🔄 Manual refresh error:', err);
       setError("Failed to refresh club data");
     } finally {
       setLoading(false);
@@ -131,14 +136,25 @@ export default function ClubProfileDetails() {
             <Typography variant="body2" color="text.secondary" textAlign="center">
               Create your club profile to get started
             </Typography>
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => navigate("/create-club")}
-              startIcon={<BusinessIcon />}
-            >
-              Create Club Profile
-            </Button>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => navigate("/create-club")}
+                startIcon={<BusinessIcon />}
+              >
+                Create Club Profile
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={handleRefresh}
+                startIcon={<RefreshIcon />}
+                disabled={loading}
+              >
+                {loading ? 'Loading...' : 'Refresh'}
+              </Button>
+            </Stack>
           </Stack>
         </Card>
       </Fade>
