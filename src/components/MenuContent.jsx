@@ -52,7 +52,7 @@ const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
     },
   },
   '& .MuiListItemIcon-root': {
-    color: 'inherit',
+    color: 'white',
     minWidth: 40,
   },
   '& .MuiListItemText-primary': {
