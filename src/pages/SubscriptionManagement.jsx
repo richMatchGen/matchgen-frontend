@@ -33,6 +33,7 @@ import AppTheme from '../themes/AppTheme';
 import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
+import stripeService from '../services/stripeService';
 
 const SubscriptionManagement = () => {
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
@@ -141,12 +142,22 @@ const SubscriptionManagement = () => {
     setUpgradeDialogOpen(true);
   };
 
-  const confirmUpgrade = () => {
-    // TODO: Implement actual upgrade flow with payment processor
-    console.log('Upgrading to:', selectedTier);
-    setUpgradeDialogOpen(false);
-    // Refresh subscription info after upgrade
-    fetchSubscriptionInfo();
+  const confirmUpgrade = async () => {
+    if (!selectedTier) return;
+    
+    try {
+      const clubId = localStorage.getItem('selectedClubId');
+      
+      // Redirect to Stripe checkout
+      await stripeService.redirectToCheckout(selectedTier, clubId);
+      
+      // Note: The page will redirect to Stripe, so we don't need to handle the response here
+      // The webhook will handle the subscription update when payment is completed
+      
+    } catch (error) {
+      console.error('Error redirecting to checkout:', error);
+      alert('Failed to redirect to payment. Please try again.');
+    }
   };
 
   if (loading) {
@@ -223,6 +234,25 @@ const SubscriptionManagement = () => {
                         Your subscription is currently inactive. Please contact support.
                       </Alert>
                     )}
+
+                    <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+                      <Button
+                        variant="outlined"
+                        startIcon={<PaymentIcon />}
+                        onClick={async () => {
+                          try {
+                            const clubId = localStorage.getItem('selectedClubId');
+                            await stripeService.redirectToBillingPortal(clubId);
+                          } catch (error) {
+                            console.error('Error redirecting to billing portal:', error);
+                            alert('Failed to open billing portal. Please try again.');
+                          }
+                        }}
+                        fullWidth
+                      >
+                        Manage Billing
+                      </Button>
+                    </Box>
                   </CardContent>
                 </Card>
               </Grid>

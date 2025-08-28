@@ -49,6 +49,7 @@ import AppTheme from '../themes/AppTheme';
 import SideMenu from './SideMenu';
 import AppNavbar from './AppNavBar';
 import Header from './Header';
+import stripeService from '../services/stripeService';
 
 const FeatureCatalog = () => {
   const [featureCatalog, setFeatureCatalog] = useState(null);
@@ -118,34 +119,17 @@ const FeatureCatalog = () => {
     
     try {
       setUpdating(true);
-      const token = localStorage.getItem('accessToken');
       const clubId = localStorage.getItem('selectedClubId');
-      const API_BASE_URL = import.meta.env.MODE === 'production' 
-        ? 'https://matchgen-backend-production.up.railway.app/api/'
-        : 'http://localhost:8000/api/';
-        
-      const response = await axios.post(
-        `${API_BASE_URL}users/update-subscription/`,
-        {
-          club_id: clubId,
-          subscription_tier: selectedTier
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
       
-      // Refresh club features
-      await fetchClubFeatures();
-      setUpgradeDialogOpen(false);
-      setSelectedTier(null);
+      // Redirect to Stripe checkout
+      await stripeService.redirectToCheckout(selectedTier, clubId);
       
-      // Show success message
-      alert(`Successfully upgraded to ${selectedTier.toUpperCase()} tier!`);
+      // Note: The page will redirect to Stripe, so we don't need to handle the response here
+      // The webhook will handle the subscription update when payment is completed
+      
     } catch (error) {
-      console.error('Error upgrading subscription:', error);
-      alert('Failed to upgrade subscription. Please try again.');
-    } finally {
+      console.error('Error redirecting to checkout:', error);
+      alert('Failed to redirect to payment. Please try again.');
       setUpdating(false);
     }
   };
