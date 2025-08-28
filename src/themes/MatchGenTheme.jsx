@@ -353,23 +353,11 @@ export const createMatchGenTheme = (mode = 'light') => {
            // Global card styling override - highest priority
            '.MuiCard-root': {
              borderRadius: '0 !important',
-             background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%) !important',
-             color: '#ffffff !important',
              boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1) !important',
-             border: '1px solid rgba(255, 255, 255, 0.1) !important',
              '&:hover': {
                boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15) !important',
                transform: 'translateY(-2px)',
                transition: 'all 0.3s ease',
-             },
-             '& .MuiTypography-root': {
-               color: '#ffffff !important',
-             },
-             '& .MuiTypography-body2, & .MuiTypography-caption': {
-               color: 'rgba(255,255,255,0.8) !important',
-             },
-             '& .MuiSvgIcon-root': {
-               color: '#ffffff !important',
              },
            },
         },
@@ -419,26 +407,11 @@ export const createMatchGenTheme = (mode = 'light') => {
         styleOverrides: {
           root: {
             borderRadius: 0, // Straight edges
-            background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%) !important',
-            color: '#ffffff !important',
             boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1) !important',
-            border: '1px solid rgba(255, 255, 255, 0.1) !important',
             '&:hover': {
               boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15) !important',
               transform: 'translateY(-2px)',
               transition: 'all 0.3s ease',
-            },
-            // Ensure all text inside cards is white
-            '& .MuiTypography-root': {
-              color: '#ffffff !important',
-            },
-            // Ensure secondary text has proper opacity
-            '& .MuiTypography-body2, & .MuiTypography-caption': {
-              color: 'rgba(255,255,255,0.8) !important',
-            },
-            // Ensure all icons inside cards are white
-            '& .MuiSvgIcon-root': {
-              color: '#ffffff !important',
             },
           },
         },
@@ -572,39 +545,18 @@ export const createMatchGenTheme = (mode = 'light') => {
            },
          },
        },
-               MuiSvgIcon: {
-          styleOverrides: {
-            root: {
-              color: '#ffffff', // White icons
-            },
-          },
-        },
+
                  MuiGrid2: {
            styleOverrides: {
              root: {
                // Ensure Grid items with cards maintain styling
                '& .MuiCard-root': {
                  borderRadius: 0, // Straight edges
-                 background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%)',
-                 color: '#ffffff',
                  boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1)',
-                 border: '1px solid rgba(255, 255, 255, 0.1)',
                  '&:hover': {
                    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15)',
                    transform: 'translateY(-2px)',
                    transition: 'all 0.3s ease',
-                 },
-                 // Ensure all text inside cards is white
-                 '& .MuiTypography-root': {
-                   color: '#ffffff',
-                 },
-                 // Ensure secondary text has proper opacity
-                 '& .MuiTypography-body2, & .MuiTypography-caption': {
-                   color: 'rgba(255,255,255,0.8)',
-                 },
-                 // Ensure all icons inside cards are white
-                 '& .MuiSvgIcon-root': {
-                   color: '#ffffff',
                  },
                },
              },
@@ -616,26 +568,11 @@ export const createMatchGenTheme = (mode = 'light') => {
                // Ensure legacy Grid items with cards maintain styling
                '& .MuiCard-root': {
                  borderRadius: 0, // Straight edges
-                 background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%)',
-                 color: '#ffffff',
                  boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1)',
-                 border: '1px solid rgba(255, 255, 255, 0.1)',
                  '&:hover': {
                    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15)',
                    transform: 'translateY(-2px)',
                    transition: 'all 0.3s ease',
-                 },
-                 // Ensure all text inside cards is white
-                 '& .MuiTypography-root': {
-                   color: '#ffffff',
-                 },
-                 // Ensure secondary text has proper opacity
-                 '& .MuiTypography-body2, & .MuiTypography-caption': {
-                   color: 'rgba(255,255,255,0.8)',
-                 },
-                 // Ensure all icons inside cards are white
-                 '& .MuiSvgIcon-root': {
-                   color: '#ffffff',
                  },
                },
              },
