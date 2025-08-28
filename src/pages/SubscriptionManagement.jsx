@@ -241,7 +241,9 @@ const SubscriptionManagement = () => {
                         startIcon={<PaymentIcon />}
                         onClick={async () => {
                           try {
+                            console.log('Manage Billing button clicked');
                             const clubId = localStorage.getItem('selectedClubId');
+                            console.log('Club ID:', clubId);
                             await stripeService.redirectToBillingPortal(clubId);
                           } catch (error) {
                             console.error('Error redirecting to billing portal:', error);
