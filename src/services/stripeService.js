@@ -12,21 +12,21 @@ const stripeService = {
    * @param {number} clubId - The club ID
    * @returns {Promise} - Returns the checkout session URL
    */
-  createCheckoutSession: async (tier, clubId) => {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/users/stripe/checkout/`,
-        {
-          tier,
-          club_id: clubId
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+     createCheckoutSession: async (tier, clubId) => {
+     try {
+       const response = await axios.post(
+         `${API_BASE_URL}/api/users/stripe/checkout/`,
+         {
+           tier,
+           club_id: clubId
+         },
+         {
+           headers: {
+             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+             'Content-Type': 'application/json'
+           }
+         }
+       );
       
       return response.data;
     } catch (error) {
@@ -40,20 +40,20 @@ const stripeService = {
    * @param {number} clubId - The club ID
    * @returns {Promise} - Returns the billing portal URL
    */
-  createBillingPortalSession: async (clubId) => {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/users/stripe/billing-portal/`,
-        {
-          club_id: clubId
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+     createBillingPortalSession: async (clubId) => {
+     try {
+       const response = await axios.post(
+         `${API_BASE_URL}/api/users/stripe/billing-portal/`,
+         {
+           club_id: clubId
+         },
+         {
+           headers: {
+             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+             'Content-Type': 'application/json'
+           }
+         }
+       );
       
       return response.data;
     } catch (error) {
