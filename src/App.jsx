@@ -13,6 +13,8 @@ import { createMatchGenTheme } from "./themes/MatchGenTheme";
 // Lazy load components for better performance
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import('./pages/Signup'));
+const EnhancedSignup = lazy(() => import('./pages/EnhancedSignup'));
+const EmailVerification = lazy(() => import('./pages/EmailVerification'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const EditClub = lazy(() => import('./pages/editclub'));
 const CreateClub = lazy(() => import('./pages/createclub'));
@@ -76,6 +78,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Signup />} />
+          <Route path="/enhanced-signup" element={<EnhancedSignup />} />
+          <Route path="/verify-email" element={<EmailVerification />} />
           <Route path="/dashboard" element={
             <PrivateRoute>
               <Dashboard />
