@@ -1,5 +1,9 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../api/config';
+
+// API Configuration
+const API_BASE_URL = import.meta.env.MODE === 'production' 
+  ? 'https://matchgen-backend-production.up.railway.app/api/'
+  : 'http://localhost:8000/api/';
 
 const stripeService = {
   /**
