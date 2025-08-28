@@ -29,6 +29,7 @@ const TextElementManagement = lazy(() => import("./pages/TextElementManagement")
 const FixturesManagement = lazy(() => import("./pages/FixturesManagement"));
 const TeamManagement = lazy(() => import("./pages/TeamManagement"));
 const SubscriptionManagement = lazy(() => import("./pages/SubscriptionManagement"));
+const FeatureCatalog = lazy(() => import("./components/FeatureCatalog"));
 const Settings = lazy(() => import("./pages/Settings"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const Account = lazy(() => import("./pages/Account"));
@@ -100,6 +101,7 @@ function App() {
           <Route path="/text-elements" element={<PrivateRoute><TextElementManagement /></PrivateRoute>} />
           <Route path="/team-management" element={<PrivateRoute><TeamManagement /></PrivateRoute>} />
           <Route path="/subscription" element={<PrivateRoute><SubscriptionManagement /></PrivateRoute>} />
+          <Route path="/feature-catalog" element={<PrivateRoute><FeatureCatalog /></PrivateRoute>} />
 
           {/* Settings and Profile Routes */}
           <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
