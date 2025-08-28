@@ -350,16 +350,7 @@ export const createMatchGenTheme = (mode = 'light') => {
                background: isLight ? gray[500] : gray[500],
              },
            },
-           // Global card styling override - highest priority
-           '.MuiCard-root': {
-             borderRadius: '0 !important',
-             boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1) !important',
-             '&:hover': {
-               boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15) !important',
-               transform: 'translateY(-2px)',
-               transition: 'all 0.3s ease',
-             },
-           },
+           
         },
       },
                    MuiButton: {
@@ -403,19 +394,7 @@ export const createMatchGenTheme = (mode = 'light') => {
           },
         },
       },
-                   MuiCard: {
-        styleOverrides: {
-          root: {
-            borderRadius: 0, // Straight edges
-            boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1) !important',
-            '&:hover': {
-              boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15) !important',
-              transform: 'translateY(-2px)',
-              transition: 'all 0.3s ease',
-            },
-          },
-        },
-      },
+
              MuiPaper: {
          styleOverrides: {
            root: {
@@ -546,38 +525,7 @@ export const createMatchGenTheme = (mode = 'light') => {
          },
        },
 
-                 MuiGrid2: {
-           styleOverrides: {
-             root: {
-               // Ensure Grid items with cards maintain styling
-               '& .MuiCard-root': {
-                 borderRadius: 0, // Straight edges
-                 boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1)',
-                 '&:hover': {
-                   boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15)',
-                   transform: 'translateY(-2px)',
-                   transition: 'all 0.3s ease',
-                 },
-               },
-             },
-           },
-         },
-         MuiGrid: {
-           styleOverrides: {
-             root: {
-               // Ensure legacy Grid items with cards maintain styling
-               '& .MuiCard-root': {
-                 borderRadius: 0, // Straight edges
-                 boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1)',
-                 '&:hover': {
-                   boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15)',
-                   transform: 'translateY(-2px)',
-                   transition: 'all 0.3s ease',
-                 },
-               },
-             },
-           },
-         },
+                 
     },
   });
 };

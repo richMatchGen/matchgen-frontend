@@ -47,34 +47,12 @@ export const surfacesCustomizations = {
   MuiCard: {
     styleOverrides: {
       root: ({ theme }) => ({
-        borderRadius: 0, // Straight edges
-        background: 'linear-gradient(135deg, #28443f 0%, #1a2f2a 100%) !important',
-        color: '#ffffff !important',
-        boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.1) !important',
-        border: '1px solid rgba(255, 255, 255, 0.1) !important',
-        display: 'flex !important',
-        flexDirection: 'column !important',
-        height: '100% !important',
+        // Use MUI default card styling
+        borderRadius: (theme.vars || theme).shape.borderRadius,
+        boxShadow: (theme.vars || theme).shadows[1],
         '&:hover': {
-          boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2), 0px 4px 12px rgba(0, 0, 0, 0.15) !important',
-          transform: 'translateY(-2px)',
+          boxShadow: (theme.vars || theme).shadows[4],
           transition: 'all 0.3s ease',
-        },
-        // Ensure all text inside cards is white
-        '& .MuiTypography-root': {
-          color: '#ffffff !important',
-        },
-        // Ensure secondary text has proper opacity
-        '& .MuiTypography-body2, & .MuiTypography-caption': {
-          color: 'rgba(255,255,255,0.8) !important',
-        },
-        // Override for fixture details - make text black
-        '& .MuiPaper-root .MuiTypography-root': {
-          color: '#000000 !important',
-        },
-        // Ensure all icons inside cards are white
-        '& .MuiSvgIcon-root': {
-          color: '#ffffff !important',
         },
       }),
     },
@@ -82,14 +60,7 @@ export const surfacesCustomizations = {
   MuiCardContent: {
     styleOverrides: {
       root: {
-        padding: '20px !important',
-        paddingBottom: '20px !important',
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        '&:last-child': { 
-          paddingBottom: '20px !important' 
-        },
+        // Use MUI default card content styling
       },
     },
   },
@@ -103,18 +74,11 @@ export const surfacesCustomizations = {
   MuiCardActions: {
     styleOverrides: {
       root: {
-        padding: '20px !important',
-        marginTop: 'auto !important',
+        // Use MUI default card actions styling
       },
     },
   },
-  MuiSvgIcon: {
-    styleOverrides: {
-      root: {
-        color: '#ffffff !important',
-      },
-    },
-  },
+
   MuiButton: {
     styleOverrides: {
       root: {
