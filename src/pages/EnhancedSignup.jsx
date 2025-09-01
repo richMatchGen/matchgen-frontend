@@ -22,7 +22,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const steps = ['Create Account', 'Setup Club'];
+const steps = ['Create Account', 'Setup Club', 'Choose Graphic Pack'];
 
 const EnhancedSignup = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -47,8 +47,11 @@ const EnhancedSignup = () => {
     primary_color: '#28443f',
     secondary_color: '#4a7c59',
     bio: '',
-    graphic_pack_id: ''
+    logo: null
   });
+
+  // Step 3: Graphic pack selection
+  const [selectedGraphicPack, setSelectedGraphicPack] = useState('');
 
   const [graphicPacks, setGraphicPacks] = useState([]);
 
@@ -64,6 +67,26 @@ const EnhancedSignup = () => {
       ...clubData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type and size
+      if (!file.type.startsWith('image/')) {
+        setError('Please select an image file');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setError('Logo file size must be less than 5MB');
+        return;
+      }
+      setClubData({
+        ...clubData,
+        logo: file
+      });
+      setError(''); // Clear any previous errors
+    }
   };
 
   const validateAccountData = () => {
@@ -85,6 +108,10 @@ const EnhancedSignup = () => {
   const validateClubData = () => {
     if (!clubData.name || !clubData.sport) {
       setError('Club name and sport are required');
+      return false;
+    }
+    if (!clubData.logo) {
+      setError('Please upload a club logo');
       return false;
     }
     return true;
@@ -132,10 +159,57 @@ const EnhancedSignup = () => {
 
       const token = loginResponse.data.access;
 
+      // Create FormData for logo upload
+      const formData = new FormData();
+      formData.append('name', clubData.name);
+      formData.append('sport', clubData.sport);
+      formData.append('venue_name', clubData.venue_name);
+      formData.append('location', clubData.location);
+      formData.append('primary_color', clubData.primary_color);
+      formData.append('secondary_color', clubData.secondary_color);
+      formData.append('bio', clubData.bio);
+      if (clubData.logo) {
+        formData.append('logo', clubData.logo);
+      }
+
       // Create club
       const clubResponse = await axios.post(
         'https://matchgen-backend-production.up.railway.app/api/users/club/enhanced/',
-        clubData,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      setSuccess('Club created successfully! Now choose your graphic pack.');
+      setActiveStep(2);
+      localStorage.setItem('accessToken', token);
+      localStorage.setItem('refreshToken', loginResponse.data.refresh);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Club creation failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFinishSetup = async () => {
+    if (!selectedGraphicPack) {
+      setError('Please select a graphic pack or choose "Choose Later"');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // Update club with graphic pack selection
+      const token = localStorage.getItem('accessToken');
+      const clubResponse = await axios.patch(
+        'https://matchgen-backend-production.up.railway.app/api/users/club/enhanced/',
+        { graphic_pack_id: selectedGraphicPack },
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -143,15 +217,12 @@ const EnhancedSignup = () => {
         }
       );
 
-      setSuccess('Club created successfully! Redirecting to dashboard...');
-      localStorage.setItem('accessToken', token);
-      localStorage.setItem('refreshToken', loginResponse.data.refresh);
-      
+      setSuccess('Setup complete! Redirecting to dashboard...');
       setTimeout(() => {
         navigate('/dashboard');
       }, 2000);
     } catch (err) {
-      setError(err.response?.data?.error || 'Club creation failed');
+      setError(err.response?.data?.error || 'Failed to complete setup');
     } finally {
       setLoading(false);
     }
@@ -160,8 +231,10 @@ const EnhancedSignup = () => {
   const handleNext = () => {
     if (activeStep === 0) {
       handleCreateAccount();
-    } else {
+    } else if (activeStep === 1) {
       handleCreateClub();
+    } else if (activeStep === 2) {
+      handleFinishSetup();
     }
   };
 
@@ -284,42 +357,179 @@ const EnhancedSignup = () => {
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Graphic Pack Selection (Optional)
+                  Club Logo (Required)
                 </Typography>
-                <Grid container spacing={1}>
-                  <Grid item>
-                    <Chip 
-                      label="Choose Later" 
-                      variant={clubData.graphic_pack_id === '' ? "filled" : "outlined"}
-                      color="primary"
-                      onClick={() => setClubData({...clubData, graphic_pack_id: ''})}
-                      sx={{ mb: 1 }}
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="logo-upload"
+                  type="file"
+                  onChange={handleLogoUpload}
+                />
+                <label htmlFor="logo-upload">
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    startIcon={<span>📷</span>}
+                    sx={{ mb: 2 }}
+                  >
+                    {clubData.logo ? clubData.logo.name : 'Upload Logo'}
+                  </Button>
+                </label>
+                {clubData.logo && (
+                  <Box sx={{ mt: 1 }}>
+                    <img
+                      src={URL.createObjectURL(clubData.logo)}
+                      alt="Club Logo Preview"
+                      style={{
+                        maxWidth: '100px',
+                        maxHeight: '100px',
+                        objectFit: 'contain',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }}
                     />
-                  </Grid>
-                  <Grid item>
-                    <Chip 
-                      label="Default Pack" 
-                      variant={clubData.graphic_pack_id === 'default' ? "filled" : "outlined"}
-                      color="secondary"
-                      onClick={() => setClubData({...clubData, graphic_pack_id: 'default'})}
-                      sx={{ mb: 1 }}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <Chip 
-                      label="Premium Pack" 
-                      variant={clubData.graphic_pack_id === 'premium' ? "filled" : "outlined"}
-                      color="secondary"
-                      onClick={() => setClubData({...clubData, graphic_pack_id: 'premium'})}
-                      sx={{ mb: 1 }}
-                    />
-                  </Grid>
-                </Grid>
+                    <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                      {clubData.logo.name} ({(clubData.logo.size / 1024 / 1024).toFixed(2)} MB)
+                    </Typography>
+                  </Box>
+                )}
                 <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                  Select a graphic pack now or choose later from your dashboard
+                  Accepted formats: JPG, PNG, GIF. Max size: 5MB
                 </Typography>
               </Grid>
             </Grid>
+          </Box>
+        );
+
+      case 2:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Choose Your Graphic Pack
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Select a graphic pack to get started with professional templates, or choose to select later from your dashboard.
+            </Typography>
+            
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={4}>
+                <Card 
+                  variant={selectedGraphicPack === '' ? "elevation" : "outlined"}
+                  sx={{ 
+                    cursor: 'pointer',
+                    border: selectedGraphicPack === '' ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                    transform: selectedGraphicPack === '' ? 'scale(1.02)' : 'scale(1)',
+                    transition: 'all 0.2s ease-in-out'
+                  }}
+                  onClick={() => setSelectedGraphicPack('')}
+                >
+                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Choose Later
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      No graphic pack selected
+                    </Typography>
+                    <Typography variant="caption" sx={{ mt: 2, display: 'block' }}>
+                      You can select from our full catalog later
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <Card 
+                  variant={selectedGraphicPack === 'default' ? "elevation" : "outlined"}
+                  sx={{ 
+                    cursor: 'pointer',
+                    border: selectedGraphicPack === 'default' ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                    transform: selectedGraphicPack === 'default' ? 'scale(1.02)' : 'scale(1)',
+                    transition: 'all 0.2s ease-in-out'
+                  }}
+                  onClick={() => setSelectedGraphicPack('default')}
+                >
+                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Default Pack
+                    </Typography>
+                    <Box sx={{ 
+                      width: '100%', 
+                      height: '120px', 
+                      bgcolor: '#f5f5f5', 
+                      borderRadius: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 2
+                    }}>
+                      <Typography variant="h4" color="text.secondary">
+                        🎨
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Professional templates for all sports
+                    </Typography>
+                    <Typography variant="caption" sx={{ mt: 2, display: 'block' }}>
+                      Includes 10+ base templates
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <Card 
+                  variant={selectedGraphicPack === 'premium' ? "elevation" : "outlined"}
+                  sx={{ 
+                    cursor: 'pointer',
+                    border: selectedGraphicPack === 'premium' ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                    transform: selectedGraphicPack === 'premium' ? 'scale(1.02)' : 'scale(1)',
+                    transition: 'all 0.2s ease-in-out'
+                  }}
+                  onClick={() => setSelectedGraphicPack('premium')}
+                >
+                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Premium Pack
+                    </Typography>
+                    <Box sx={{ 
+                      width: '100%', 
+                      height: '120px', 
+                      bgcolor: '#f5f5f5', 
+                      borderRadius: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 2
+                    }}>
+                      <Typography variant="h4" color="text.secondary">
+                        ⭐
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Advanced templates with customization
+                    </Typography>
+                    <Typography variant="caption" sx={{ mt: 2, display: 'block' }}>
+                      Includes 25+ premium templates
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+
+            {selectedGraphicPack && (
+              <Box sx={{ mt: 3, p: 2, bgcolor: '#f8f9fa', borderRadius: 1 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Selected: {selectedGraphicPack === 'default' ? 'Default Pack' : 'Premium Pack'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {selectedGraphicPack === 'default' 
+                    ? 'You\'ll have access to our professional default templates for all sports.' 
+                    : 'You\'ll have access to our premium templates with advanced customization options.'
+                  }
+                </Typography>
+              </Box>
+            )}
           </Box>
         );
 
@@ -376,10 +586,12 @@ const EnhancedSignup = () => {
             >
               {loading ? (
                 <CircularProgress size={24} />
-              ) : activeStep === steps.length - 1 ? (
+              ) : activeStep === 0 ? (
+                'Create Account'
+              ) : activeStep === 1 ? (
                 'Create Club'
               ) : (
-                'Next'
+                'Complete Setup'
               )}
             </Button>
           </Box>
