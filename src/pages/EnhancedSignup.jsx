@@ -286,14 +286,37 @@ const EnhancedSignup = () => {
                 <Typography variant="subtitle2" gutterBottom>
                   Graphic Pack Selection (Optional)
                 </Typography>
-                <Chip 
-                  label="Choose Later" 
-                  variant="outlined" 
-                  color="primary"
-                  onClick={() => setClubData({...clubData, graphic_pack_id: ''})}
-                />
+                <Grid container spacing={1}>
+                  <Grid item>
+                    <Chip 
+                      label="Choose Later" 
+                      variant={clubData.graphic_pack_id === '' ? "filled" : "outlined"}
+                      color="primary"
+                      onClick={() => setClubData({...clubData, graphic_pack_id: ''})}
+                      sx={{ mb: 1 }}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Chip 
+                      label="Default Pack" 
+                      variant={clubData.graphic_pack_id === 'default' ? "filled" : "outlined"}
+                      color="secondary"
+                      onClick={() => setClubData({...clubData, graphic_pack_id: 'default'})}
+                      sx={{ mb: 1 }}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Chip 
+                      label="Premium Pack" 
+                      variant={clubData.graphic_pack_id === 'premium' ? "filled" : "outlined"}
+                      color="secondary"
+                      onClick={() => setClubData({...clubData, graphic_pack_id: 'premium'})}
+                      sx={{ mb: 1 }}
+                    />
+                  </Grid>
+                </Grid>
                 <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                  You can select a graphic pack later from your dashboard
+                  Select a graphic pack now or choose later from your dashboard
                 </Typography>
               </Grid>
             </Grid>
