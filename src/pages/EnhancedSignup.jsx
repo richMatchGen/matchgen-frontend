@@ -47,6 +47,9 @@ const EnhancedSignup = () => {
     primary_color: '#28443f',
     secondary_color: '#4a7c59',
     bio: '',
+    league: '',
+    website: '',
+    founded_year: '',
     logo: null
   });
 
@@ -168,6 +171,11 @@ const EnhancedSignup = () => {
       formData.append('primary_color', clubData.primary_color);
       formData.append('secondary_color', clubData.secondary_color);
       formData.append('bio', clubData.bio);
+      formData.append('league', clubData.league);
+      formData.append('website', clubData.website);
+      if (clubData.founded_year) {
+        formData.append('founded_year', clubData.founded_year);
+      }
       if (clubData.logo) {
         formData.append('logo', clubData.logo);
       }
@@ -353,6 +361,42 @@ const EnhancedSignup = () => {
                   margin="normal"
                   multiline
                   rows={3}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="League (Optional)"
+                  name="league"
+                  value={clubData.league}
+                  onChange={handleClubChange}
+                  margin="normal"
+                  placeholder="e.g., Premier League, NBA, etc."
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Website (Optional)"
+                  name="website"
+                  type="url"
+                  value={clubData.website}
+                  onChange={handleClubChange}
+                  margin="normal"
+                  placeholder="https://yourclub.com"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Founded Year (Optional)"
+                  name="founded_year"
+                  type="number"
+                  value={clubData.founded_year}
+                  onChange={handleClubChange}
+                  margin="normal"
+                  placeholder="e.g., 1995"
+                  inputProps={{ min: 1800, max: new Date().getFullYear() }}
                 />
               </Grid>
               <Grid item xs={12}>
