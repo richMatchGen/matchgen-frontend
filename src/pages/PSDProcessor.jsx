@@ -30,11 +30,14 @@ import {
   Visibility as ViewIcon,
   Info as InfoIcon
 } from '@mui/icons-material';
-import { useAuth } from '../hooks/useAuth';
+import useAuth from '../hooks/useAuth';
 import { api } from '../api/config';
+import axios from 'axios';
 
 const PSDProcessor = () => {
-  const { user, token } = useAuth();
+  const { auth, logout } = useAuth();
+  const token = auth.token;
+  const [user, setUser] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [title, setTitle] = useState('');
@@ -46,10 +49,25 @@ const PSDProcessor = () => {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (user && token) {
-      fetchDocuments();
+    if (!token) {
+      return;
     }
-  }, [user, token]);
+
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get('/api/users/me/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUser(response.data);
+        fetchDocuments();
+      } catch (err) {
+        console.error('Failed to fetch user:', err);
+        logout();
+      }
+    };
+
+    fetchUser();
+  }, [token, logout]);
 
   const fetchDocuments = async () => {
     try {
@@ -153,10 +171,19 @@ const PSDProcessor = () => {
     return () => clearTimeout(timer);
   }, [error, success]);
 
-  if (!user) {
+  if (!token) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Typography variant="h6">Please log in to access the PSD Processor</Typography>
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <CircularProgress />
+        <Typography variant="h6" sx={{ mt: 2 }}>Loading user data...</Typography>
       </Box>
     );
   }
