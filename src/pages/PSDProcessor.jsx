@@ -32,7 +32,6 @@ import {
 } from '@mui/icons-material';
 import useAuth from '../hooks/useAuth';
 import apiClient from '../api/config';
-import axios from 'axios';
 
 const PSDProcessor = () => {
   const { auth, logout } = useAuth();
@@ -55,7 +54,7 @@ const PSDProcessor = () => {
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get('/api/users/me/', {
+        const response = await apiClient.get('users/me/', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(response.data);
@@ -72,7 +71,7 @@ const PSDProcessor = () => {
   const fetchDocuments = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/api/psd/documents/', {
+      const response = await apiClient.get('psd/documents/', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setDocuments(response.data);
@@ -109,7 +108,7 @@ const PSDProcessor = () => {
       formData.append('file', selectedFile);
       formData.append('title', title);
 
-      const response = await apiClient.post('/api/psd/upload/', formData, {
+      const response = await apiClient.post('psd/upload/', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -132,7 +131,7 @@ const PSDProcessor = () => {
   const handleDelete = async (documentId) => {
     if (window.confirm('Are you sure you want to delete this document?')) {
       try {
-        await apiClient.delete(`/api/psd/documents/${documentId}/delete/`, {
+        await apiClient.delete(`psd/documents/${documentId}/delete/`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setSuccess('Document deleted successfully');
@@ -146,7 +145,7 @@ const PSDProcessor = () => {
 
   const handleViewDocument = async (documentId) => {
     try {
-      const response = await apiClient.get(`/api/psd/documents/${documentId}/`, {
+      const response = await apiClient.get(`psd/documents/${documentId}/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSelectedDocument(response.data);
