@@ -35,6 +35,7 @@ const FeatureCatalog = lazy(() => import("./components/FeatureCatalog"));
 const Settings = lazy(() => import("./pages/Settings"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const Account = lazy(() => import("./pages/Account"));
+const PSDProcessor = lazy(() => import("./pages/PSDProcessor"));
 
 
 function App() {
@@ -114,6 +115,9 @@ function App() {
           <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
 
           <Route path="/gen/templates" element={<PrivateRoute><ChoosePackPage/></PrivateRoute>} />
+          
+          {/* PSD Processor Routes */}
+          <Route path="/psd-processor" element={<PrivateRoute><PSDProcessor /></PrivateRoute>} />
         </Routes>
       </Suspense>
       </Box>

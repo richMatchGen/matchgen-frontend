@@ -15,6 +15,7 @@ import Stack from '@mui/material/Stack';
 import NestedModal from './AddPlayerModal';
 import AddFixtureModal from './AddFixtureModal';
 import AddResultModal from './AddResultModal';
+import PSDProcessorLink from './PSDProcessorLink';
 
 export default function QuickLinksCard() {
   const theme = useTheme();
@@ -56,6 +57,7 @@ export default function QuickLinksCard() {
             <NestedModal />
             <AddFixtureModal />
             <AddResultModal />
+            <PSDProcessorLink />
           </Stack>
         </Box>
       </CardContent>

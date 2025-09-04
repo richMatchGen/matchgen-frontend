@@ -34,6 +34,7 @@ import {
   Search,
   Brightness4,
   Brightness7,
+  CloudUpload,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { styled } from "@mui/material/styles";
@@ -131,6 +132,7 @@ const EnhancedNavigation = ({
     { icon: <SportsSoccer />, text: "Fixtures", path: "/fixtures" },
     { icon: <People />, text: "Results", path: "/results" },
     { icon: <Settings />, text: "Settings", path: "/settings" },
+    { icon: <CloudUpload />, text: "PSD Processor", path: "/psd-processor" },
   ];
 
   const items = navigationItems.length > 0 ? navigationItems : defaultNavigationItems;

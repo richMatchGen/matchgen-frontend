@@ -378,7 +378,6 @@ export default function ClubProfileDetails() {
               </Stack>
             </Grid>
 
-            Statistics
             <Grid item xs={12}>
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6" fontWeight="600" sx={{ mb: 2, color: '#28443f' }}>
