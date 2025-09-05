@@ -199,6 +199,10 @@ const PSDProcessor = () => {
           <Typography variant="h6" gutterBottom>
             Upload PSD File
           </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Supported PSD versions: 1-7 (Photoshop CS6 and earlier). 
+            PSD version 8 (Photoshop CC 2018+) is not yet supported.
+          </Typography>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={6}>
               <input
