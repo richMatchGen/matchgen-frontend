@@ -66,7 +66,7 @@ const PSDProcessor = () => {
     };
 
     fetchUser();
-  }, [token, logout]);
+  }, [token]);
 
   const fetchDocuments = async () => {
     try {

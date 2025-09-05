@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 const useAuth = () => {
@@ -30,18 +30,18 @@ const useAuth = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const login = ({ access, refresh }) => {
+  const login = useCallback(({ access, refresh }) => {
     localStorage.setItem("accessToken", access);
     localStorage.setItem("refreshToken", refresh);
     setAuth({ token: access, refresh });
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     setAuth({ token: null, refresh: null });
     window.location.href = "/login";
-  };
+  }, []);
 
   return { auth, login, logout };
 };

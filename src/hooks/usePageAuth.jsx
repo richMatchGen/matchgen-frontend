@@ -50,7 +50,7 @@ export const usePageAuth = () => {
     };
 
     fetchData();
-  }, [navigate, logout]);
+  }, [navigate]);
 
   return {
     user,

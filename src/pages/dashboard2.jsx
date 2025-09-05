@@ -49,7 +49,7 @@ const Dashboard = () => {
 
     fetchUser();
     fetchClub();
-  }, [navigate, logout]);
+  }, [navigate]);
 
   if (loading) return <p>Loading your dashboard...</p>;
   if (!user) return null; // user fetch failure already handled
