@@ -88,27 +88,34 @@ const FeatureGate = ({
     try {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
-      // Feature access check
       
-      const response = await axios.get(
-        `${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}&t=${Date.now()}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
+      // Only check feature access if we have a valid club ID
+      if (selectedClubId && selectedClubId !== 'null') {
+        const response = await axios.get(
+          `${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}&t=${Date.now()}`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        
+        const { feature_access, subscription_tier, subscription_active } = response.data;
+        setHasAccess(feature_access[featureCode] || false);
+        setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
+        
+        // Get feature info for upgrade dialog
+        if (!feature_access[featureCode] && showUpgradeDialog) {
+          getFeatureInfo();
         }
-      );
-      
-      const { feature_access, subscription_tier, subscription_active } = response.data;
-      setHasAccess(feature_access[featureCode] || false);
-      setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
-      
-      // Get feature info for upgrade dialog
-      if (!feature_access[featureCode] && showUpgradeDialog) {
-        getFeatureInfo();
+      } else {
+        // No club ID - default to no access
+        setHasAccess(false);
+        setSubscriptionInfo({ tier: 'basic', active: false });
       }
     } catch (error) {
       console.error('Error checking feature access:', error);
       console.error('Error details:', error.response?.data);
       setHasAccess(false);
+      setSubscriptionInfo({ tier: 'basic', active: false });
     } finally {
       setLoading(false);
     }

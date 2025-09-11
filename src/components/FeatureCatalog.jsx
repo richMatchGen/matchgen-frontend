@@ -89,21 +89,64 @@ const FeatureCatalog = () => {
   const fetchClubFeatures = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const clubId = localStorage.getItem('selectedClubId');
+      let clubId = localStorage.getItem('selectedClubId');
       const API_BASE_URL = import.meta.env.MODE === 'production' 
         ? 'https://matchgen-backend-production.up.railway.app/api/'
         : 'http://localhost:8000/api/';
-        
-      const response = await axios.get(
-        `${API_BASE_URL}users/feature-access/?club_id=${clubId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
       
-      setClubFeatures(response.data);
+      // If no club ID, try to fetch it first
+      if (!clubId) {
+        try {
+          const clubResponse = await axios.get(
+            `${API_BASE_URL}users/my-club/`,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+          
+          if (clubResponse.data && clubResponse.data.id) {
+            clubId = clubResponse.data.id.toString();
+            localStorage.setItem('selectedClubId', clubId);
+          }
+        } catch (clubError) {
+          console.warn('User might not have a club yet:', clubError);
+          // Set default features for users without clubs
+          setClubFeatures({
+            subscription_tier: 'basic',
+            subscription_active: false,
+            feature_access: {}
+          });
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Only fetch feature access if we have a valid club ID
+      if (clubId && clubId !== 'null') {
+        const response = await axios.get(
+          `${API_BASE_URL}users/feature-access/?club_id=${clubId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        
+        setClubFeatures(response.data);
+      } else {
+        // Set default features for users without clubs
+        setClubFeatures({
+          subscription_tier: 'basic',
+          subscription_active: false,
+          feature_access: {}
+        });
+      }
     } catch (error) {
       console.error('Error fetching club features:', error);
+      // Set default features on error
+      setClubFeatures({
+        subscription_tier: 'basic',
+        subscription_active: false,
+        feature_access: {}
+      });
     } finally {
       setLoading(false);
     }

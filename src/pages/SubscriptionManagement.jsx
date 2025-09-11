@@ -50,24 +50,71 @@ const SubscriptionManagement = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
-      const clubId = localStorage.getItem('selectedClubId');
+      let clubId = localStorage.getItem('selectedClubId');
       
-      // API Configuration - same as other components
-      const API_BASE_URL = import.meta.env.MODE === 'production' 
-        ? 'https://matchgen-backend-production.up.railway.app/api/'
-        : 'http://localhost:8000/api/';
-        
-      const response = await axios.get(
-        `${API_BASE_URL}users/feature-access/?club_id=${clubId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
+      // If no club ID, try to fetch it first
+      if (!clubId) {
+        try {
+          const API_BASE_URL = import.meta.env.MODE === 'production' 
+            ? 'https://matchgen-backend-production.up.railway.app/api/'
+            : 'http://localhost:8000/api/';
+            
+          const clubResponse = await axios.get(
+            `${API_BASE_URL}users/my-club/`,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+          
+          if (clubResponse.data && clubResponse.data.id) {
+            clubId = clubResponse.data.id.toString();
+            localStorage.setItem('selectedClubId', clubId);
+          }
+        } catch (clubError) {
+          console.warn('User might not have a club yet:', clubError);
+          // Set default subscription info for users without clubs
+          setSubscriptionInfo({
+            subscription_tier: 'basic',
+            subscription_active: false,
+            feature_access: {}
+          });
+          setLoading(false);
+          return;
         }
-      );
+      }
       
-      setSubscriptionInfo(response.data);
+      // Only fetch feature access if we have a valid club ID
+      if (clubId && clubId !== 'null') {
+        const API_BASE_URL = import.meta.env.MODE === 'production' 
+          ? 'https://matchgen-backend-production.up.railway.app/api/'
+          : 'http://localhost:8000/api/';
+          
+        const response = await axios.get(
+          `${API_BASE_URL}users/feature-access/?club_id=${clubId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        
+        setSubscriptionInfo(response.data);
+      } else {
+        // Set default subscription info for users without clubs
+        setSubscriptionInfo({
+          subscription_tier: 'basic',
+          subscription_active: false,
+          feature_access: {}
+        });
+      }
     } catch (error) {
       console.error('Error fetching subscription info:', error);
       setError('Failed to load subscription information');
+      
+      // Set default subscription info on error
+      setSubscriptionInfo({
+        subscription_tier: 'basic',
+        subscription_active: false,
+        feature_access: {}
+      });
     } finally {
       setLoading(false);
     }
@@ -180,6 +227,7 @@ const SubscriptionManagement = () => {
   const currentTierInfo = getSubscriptionTierInfo(currentTier);
   const nextTier = getNextTier(currentTier);
   const nextTierInfo = nextTier ? getSubscriptionTierInfo(nextTier) : null;
+  const clubId = localStorage.getItem('selectedClubId');
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -190,6 +238,25 @@ const SubscriptionManagement = () => {
           <Header title="Subscription Management" />
           
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            {/* Show message for users without clubs */}
+            {(!clubId || clubId === 'null') && (
+              <Alert severity="info" sx={{ mb: 3 }}>
+                <Typography variant="body1" gutterBottom>
+                  <strong>No Club Found</strong>
+                </Typography>
+                <Typography variant="body2">
+                  You need to create a club first before managing subscriptions. 
+                  <Button 
+                    variant="text" 
+                    color="primary" 
+                    onClick={() => window.location.href = '/clubs/createclub'}
+                    sx={{ ml: 1 }}
+                  >
+                    Create Club
+                  </Button>
+                </Typography>
+              </Alert>
+            )}
             <Grid container spacing={3}>
               {/* Current Plan */}
               <Grid item xs={12} md={6}>

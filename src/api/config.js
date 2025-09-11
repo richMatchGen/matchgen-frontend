@@ -199,4 +199,15 @@ export const getClubInfoWithRateLimit = async () => {
   return result;
 };
 
+// Utility function to validate and get club ID
+export const getValidClubId = () => {
+  const clubId = localStorage.getItem('selectedClubId');
+  return clubId && clubId !== 'null' ? clubId : null;
+};
+
+// Utility function to check if user has a valid club
+export const hasValidClub = () => {
+  return getValidClubId() !== null;
+};
+
 export default apiClient;
