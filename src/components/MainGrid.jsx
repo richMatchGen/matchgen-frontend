@@ -14,6 +14,7 @@ import QuickLinksCard from './quickLinksCard';
 import PageViewsBarChart from './PageViewsBarChart';
 import SessionsChart from './SessionsChart';
 import StatCard from './StatCard';
+import TodoList from './TodoList';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
 
@@ -24,6 +25,9 @@ export default function MainGrid() {
   return (
 
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
+      {/* Todo List for new users */}
+      <TodoList />
+      
       {/* cards */}
       {/* <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
       <Link
