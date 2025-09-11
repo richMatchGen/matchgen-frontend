@@ -63,6 +63,7 @@ import AppTheme from '../themes/AppTheme';
 import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
+import FeatureRestrictedButton from '../components/FeatureRestrictedButton';
 
 const TeamManagement = () => {
   const [teamData, setTeamData] = useState(null);
@@ -389,15 +390,19 @@ const TeamManagement = () => {
             <Grid item xs={12} md={4} textAlign="right">
               <Box display="flex" flexDirection="column" gap={2}>
                 {teamData.can_manage_members && (
-                  <Button
+                  <FeatureRestrictedButton
+                    featureCode="team_management"
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={() => setInviteDialogOpen(true)}
                     size="large"
                     sx={{ minWidth: 200 }}
+                    tooltipText="Team management requires SemiPro Gen or higher"
+                    upgradeDialogTitle="Team Management Feature"
+                    upgradeDialogDescription="Invite and manage team members with different roles and permissions."
                   >
                     Invite Team Member
-                  </Button>
+                  </FeatureRestrictedButton>
                 )}
                 <Button
                   variant="outlined"

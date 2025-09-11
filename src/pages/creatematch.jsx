@@ -53,6 +53,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import FeatureRestrictedButton from "../components/FeatureRestrictedButton";
 
 // Enhanced styled components
 const StyledCard = styled(Card)(({ theme, isActive }) => ({
@@ -902,7 +903,8 @@ const CreateMatch = ({ onFixtureAdded }) => {
                 Back
               </Button>
               
-              <Button
+              <FeatureRestrictedButton
+                featureCode="match_creation"
                 variant="contained"
                 size="large"
                 onClick={handleCreate}
@@ -919,9 +921,12 @@ const CreateMatch = ({ onFixtureAdded }) => {
                     background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
                   },
                 }}
+                tooltipText="Match creation requires Basic Gen or higher"
+                upgradeDialogTitle="Match Creation Feature"
+                upgradeDialogDescription="Create and manage match fixtures for your club's schedule."
               >
                 {loading ? "Creating Match..." : "Create Match"}
-              </Button>
+              </FeatureRestrictedButton>
             </Stack>
           </Box>
         </Paper>

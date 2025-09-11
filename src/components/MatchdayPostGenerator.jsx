@@ -36,7 +36,8 @@ import {
   SwapHoriz,
   Person,
   Timer,
-  Flag
+  Flag,
+  Lock as LockIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 import AppTheme from '../themes/AppTheme';
@@ -44,6 +45,7 @@ import SideMenu from './SideMenu';
 import AppNavbar from './AppNavBar';
 import Header from './Header';
 import FeatureGate from './FeatureGate';
+import useFeatureAccess from '../hooks/useFeatureAccess';
 
 // API Configuration - same as apiClient
 const API_BASE_URL = import.meta.env.MODE === 'production' 
@@ -151,11 +153,16 @@ const SocialMediaPostGenerator = () => {
   // Starting XI state
   const [startingLineup, setStartingLineup] = useState([]);
   const [substitutes, setSubstitutes] = useState([]);
+  
+  // Feature access state
+  const [featureAccess, setFeatureAccess] = useState({});
+  const [accessLoading, setAccessLoading] = useState(true);
 
   // Fetch matches and players on component mount
   useEffect(() => {
     fetchMatches();
     fetchPlayers();
+    checkFeatureAccess();
   }, []);
 
   const fetchMatches = async () => {
@@ -189,6 +196,34 @@ const SocialMediaPostGenerator = () => {
     }
   };
 
+  const checkFeatureAccess = async () => {
+    try {
+      setAccessLoading(true);
+      const token = localStorage.getItem('accessToken');
+      const clubId = localStorage.getItem('selectedClubId');
+      
+      if (token && clubId) {
+        const response = await axios.get(
+          `${API_BASE_URL}users/feature-access/?club_id=${clubId}&t=${Date.now()}`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        
+        const { feature_access } = response.data;
+        setFeatureAccess(feature_access || {});
+      } else {
+        // Default to no access if no club ID
+        setFeatureAccess({});
+      }
+    } catch (error) {
+      console.error('Error checking feature access:', error);
+      setFeatureAccess({});
+    } finally {
+      setAccessLoading(false);
+    }
+  };
+
   const generatePost = async () => {
     if (!selectedMatch) {
       setSnackbar({
@@ -197,6 +232,20 @@ const SocialMediaPostGenerator = () => {
         severity: 'warning'
       });
       return;
+    }
+
+    // Check feature access before generating
+    const currentPostType = POST_TYPES.find(pt => pt.id === selectedPostType);
+    if (currentPostType && currentPostType.featureCode) {
+      const hasAccess = featureAccess[currentPostType.featureCode] || false;
+      if (!hasAccess) {
+        setSnackbar({
+          open: true,
+          message: `${currentPostType.label} requires a higher subscription tier. Please upgrade to access this feature.`,
+          severity: 'warning'
+        });
+        return;
+      }
     }
 
     try {
@@ -344,31 +393,18 @@ const SocialMediaPostGenerator = () => {
   };
 
   const handlePostTypeChange = async (event, newValue) => {
-    // Check if user has access to this feature
+    // Check if user has access to this feature using cached data
     const postType = POST_TYPES.find(pt => pt.id === newValue);
     if (postType && postType.featureCode) {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const clubId = localStorage.getItem('selectedClubId');
-        
-        if (token && clubId) {
-          const response = await axios.get(
-            `${API_BASE_URL}users/feature-access/?club_id=${clubId}&t=${Date.now()}`,
-            {
-              headers: { Authorization: `Bearer ${token}` }
-            }
-          );
-          
-          const { feature_access } = response.data;
-          if (!feature_access[postType.featureCode]) {
-            // Show upgrade dialog or message
-            console.log('Feature not available:', postType.featureCode);
-            return; // Don't change the tab
-          }
-        }
-      } catch (error) {
-        console.error('Error checking feature access:', error);
-        return; // Don't change the tab on error
+      const hasAccess = featureAccess[postType.featureCode] || false;
+      if (!hasAccess) {
+        // Show upgrade message
+        setSnackbar({
+          open: true,
+          message: `${postType.label} requires a higher subscription tier. Please upgrade to access this feature.`,
+          severity: 'warning'
+        });
+        return; // Don't change the tab
       }
     }
     
@@ -376,7 +412,7 @@ const SocialMediaPostGenerator = () => {
     setGeneratedImage(null); // Clear previous generated image
   };
 
-  if (loading) {
+  if (loading || accessLoading) {
     return (
       <AppTheme>
         <CssBaseline />
@@ -441,35 +477,65 @@ const SocialMediaPostGenerator = () => {
                       variant="scrollable"
                       sx={{ borderRight: 1, borderColor: 'divider', minHeight: 400 }}
                     >
-                      {POST_TYPES.map((postType) => (
-                        <Tab
-                          key={postType.id}
-                          value={postType.id}
-                          label={
-                            <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
-                              <Box sx={{ mr: 1, color: `${postType.color}.main` }}>
-                                {postType.icon}
+                      {POST_TYPES.map((postType) => {
+                        const hasAccess = featureAccess[postType.featureCode] || false;
+                        const isRestricted = !hasAccess;
+                        
+                        return (
+                          <Tab
+                            key={postType.id}
+                            value={postType.id}
+                            disabled={isRestricted}
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left', width: '100%' }}>
+                                <Box sx={{ mr: 1, color: isRestricted ? 'text.disabled' : `${postType.color}.main` }}>
+                                  {isRestricted ? <LockIcon /> : postType.icon}
+                                </Box>
+                                <Box sx={{ flex: 1 }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Typography 
+                                      variant="body2" 
+                                      sx={{ 
+                                        fontWeight: 'bold',
+                                        color: isRestricted ? 'text.disabled' : 'inherit'
+                                      }}
+                                    >
+                                      {postType.label}
+                                    </Typography>
+                                    {isRestricted && (
+                                      <Chip 
+                                        label="Upgrade Required" 
+                                        size="small" 
+                                        color="warning" 
+                                        variant="outlined"
+                                        sx={{ fontSize: '0.7rem', height: 20 }}
+                                      />
+                                    )}
+                                  </Box>
+                                  <Typography 
+                                    variant="caption" 
+                                    color={isRestricted ? 'text.disabled' : 'text.secondary'}
+                                  >
+                                    {postType.description}
+                                  </Typography>
+                                </Box>
                               </Box>
-                              <Box>
-                                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                                  {postType.label}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  {postType.description}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          }
-                          sx={{ 
-                            alignItems: 'flex-start',
-                            minHeight: 60,
-                            '&.Mui-selected': {
-                              backgroundColor: `${postType.color}.50`,
-                              color: `${postType.color}.main`
                             }
-                          }}
-                        />
-                      ))}
+                            sx={{ 
+                              alignItems: 'flex-start',
+                              minHeight: 60,
+                              opacity: isRestricted ? 0.6 : 1,
+                              '&.Mui-selected': {
+                                backgroundColor: isRestricted ? 'grey.100' : `${postType.color}.50`,
+                                color: isRestricted ? 'text.disabled' : `${postType.color}.main`
+                              },
+                              '&.Mui-disabled': {
+                                opacity: 0.6
+                              }
+                            }}
+                          />
+                        );
+                      })}
                     </Tabs>
                   </CardContent>
                 </Card>
@@ -762,21 +828,36 @@ const SocialMediaPostGenerator = () => {
                       </Paper>
                     )}
 
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      size="large"
-                      onClick={generatePost}
-                      disabled={!selectedMatch || generating}
-                      startIcon={generating ? <CircularProgress size={20} /> : <Image />}
-                      sx={{ 
-                        py: 1.5,
-                        fontWeight: 'bold',
-                        fontSize: '1.1rem'
-                      }}
-                    >
-                      {generating ? 'Generating...' : `Generate ${POST_TYPES.find(pt => pt.id === selectedPostType)?.label} Post`}
-                    </Button>
+                    {(() => {
+                      const currentPostType = POST_TYPES.find(pt => pt.id === selectedPostType);
+                      const hasAccess = currentPostType ? featureAccess[currentPostType.featureCode] || false : true;
+                      const isRestricted = !hasAccess;
+                      
+                      return (
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          size="large"
+                          onClick={generatePost}
+                          disabled={!selectedMatch || generating || isRestricted}
+                          startIcon={
+                            generating ? <CircularProgress size={20} /> : 
+                            isRestricted ? <LockIcon /> : 
+                            <Image />
+                          }
+                          sx={{ 
+                            py: 1.5,
+                            fontWeight: 'bold',
+                            fontSize: '1.1rem',
+                            opacity: isRestricted ? 0.6 : 1
+                          }}
+                        >
+                          {generating ? 'Generating...' : 
+                           isRestricted ? 'Upgrade Required' :
+                           `Generate ${currentPostType?.label} Post`}
+                        </Button>
+                      );
+                    })()}
                   </CardContent>
                 </Card>
               </Grid>

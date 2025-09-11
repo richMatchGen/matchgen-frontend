@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -10,14 +10,13 @@ import {
   DialogContent,
   DialogActions,
   Chip,
-  Tooltip,
   Alert,
-  Grid,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Divider
+  Divider,
+  CircularProgress
 } from '@mui/material';
 import {
   Lock as LockIcon,
@@ -26,12 +25,7 @@ import {
   Upgrade as UpgradeIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import axios from 'axios';
-
-// API Configuration - same as apiClient
-const API_BASE_URL = import.meta.env.MODE === 'production' 
-  ? 'https://matchgen-backend-production.up.railway.app/api/'
-  : 'http://localhost:8000/api/';
+import useFeatureAccess from '../hooks/useFeatureAccess';
 
 const FeatureGate = ({ 
   featureCode, 
@@ -40,157 +34,16 @@ const FeatureGate = ({
   showUpgradeDialog = true,
   cardProps = {}
 }) => {
-  const [hasAccess, setHasAccess] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
-  const [featureInfo, setFeatureInfo] = useState(null);
-  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const {
+    hasAccess,
+    loading,
+    subscriptionInfo,
+    featureInfo,
+    currentTierInfo,
+    nextTierInfo
+  } = useFeatureAccess(featureCode);
 
-  const selectedClubId = localStorage.getItem('selectedClubId');
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (selectedClubId) {
-        checkFeatureAccess();
-      } else {
-        // If no club ID, try to fetch it from the API
-        fetchClubId();
-      }
-    }, 1000); // Add 1 second delay to prevent rate limiting
-
-    return () => clearTimeout(timer);
-  }, [selectedClubId, featureCode]);
-
-  const fetchClubId = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      // Fetch club ID
-      
-      const response = await axios.get(
-        `${API_BASE_URL}users/my-club/`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      
-      if (response.data && response.data.id) {
-        localStorage.setItem('selectedClubId', response.data.id.toString());
-        checkFeatureAccess();
-      }
-    } catch (error) {
-      console.error('Error fetching club ID:', error);
-      console.error('Error details:', error.response?.data);
-      setLoading(false);
-    }
-  };
-
-  const checkFeatureAccess = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('accessToken');
-      
-      // Only check feature access if we have a valid club ID
-      if (selectedClubId && selectedClubId !== 'null') {
-        const response = await axios.get(
-          `${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}&t=${Date.now()}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
-        
-        const { feature_access, subscription_tier, subscription_active } = response.data;
-        setHasAccess(feature_access[featureCode] || false);
-        setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
-        
-        // Get feature info for upgrade dialog
-        if (!feature_access[featureCode] && showUpgradeDialog) {
-          getFeatureInfo();
-        }
-      } else {
-        // No club ID - default to no access
-        setHasAccess(false);
-        setSubscriptionInfo({ tier: 'basic', active: false });
-      }
-    } catch (error) {
-      console.error('Error checking feature access:', error);
-      console.error('Error details:', error.response?.data);
-      setHasAccess(false);
-      setSubscriptionInfo({ tier: 'basic', active: false });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getFeatureInfo = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.get(
-        `${API_BASE_URL}users/features/`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      
-      const feature = response.data.find(f => f.code === featureCode);
-      if (feature) {
-        setFeatureInfo(feature);
-      }
-    } catch (error) {
-      console.error('Error fetching feature info:', error);
-    }
-  };
-
-  const getSubscriptionTierInfo = (tier) => {
-    const tiers = {
-      basic: {
-        name: 'Basic Gen',
-        price: '£9.99',
-        period: 'month',
-        features: [
-          'Upcoming Fixture Posts',
-          'Matchday Posts',
-          'Starting XI Posts'
-        ]
-      },
-      semipro: {
-        name: 'SemiPro Gen',
-        price: '£14.99',
-        period: 'month',
-        features: [
-          'Upcoming Fixture Posts',
-          'Matchday Posts',
-          'Starting XI Posts',
-          'Substitution Posts',
-          'Half Time Posts',
-          'Full Time Posts'
-        ]
-      },
-      prem: {
-        name: 'Prem Gen',
-        price: '£24.99',
-        period: 'month',
-        features: [
-          'Upcoming Fixture Posts',
-          'Matchday Posts',
-          'Starting XI Posts',
-          'Substitution Posts',
-          'Half Time Posts',
-          'Full Time Posts',
-          'Goal Posts',
-          'Player of the Match Posts',
-          'Bespoke Templates',
-          'Multiple Teams'
-        ]
-      }
-    };
-    return tiers[tier] || tiers.basic;
-  };
-
-  const getNextTier = (currentTier) => {
-    const tierOrder = ['basic', 'semipro', 'prem'];
-    const currentIndex = tierOrder.indexOf(currentTier);
-    return currentIndex < tierOrder.length - 1 ? tierOrder[currentIndex + 1] : null;
-  };
 
   const handleUpgradeClick = () => {
     if (showUpgradeDialog) {
@@ -199,8 +52,8 @@ const FeatureGate = ({
   };
 
   const handleUpgrade = () => {
-    // TODO: Implement actual upgrade flow
-    console.log('Upgrade to next tier');
+    // Redirect to subscription management page
+    window.location.href = '/subscription';
     setUpgradeDialogOpen(false);
   };
 
@@ -209,7 +62,7 @@ const FeatureGate = ({
       <Card {...cardProps}>
         <CardContent>
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="100px">
-            <Typography>Checking access...</Typography>
+            <CircularProgress />
           </Box>
         </CardContent>
       </Card>
@@ -224,9 +77,6 @@ const FeatureGate = ({
     return fallback;
   }
 
-  const currentTierInfo = getSubscriptionTierInfo(subscriptionInfo?.tier);
-  const nextTier = getNextTier(subscriptionInfo?.tier);
-  const nextTierInfo = nextTier ? getSubscriptionTierInfo(nextTier) : null;
 
   return (
     <>
@@ -288,24 +138,26 @@ const FeatureGate = ({
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={3}>
             {/* Current Plan */}
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                Current Plan: {currentTierInfo.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {currentTierInfo.price}/{currentTierInfo.period}
-              </Typography>
-              <List dense>
-                {currentTierInfo.features.map((feature, index) => (
-                  <ListItem key={index}>
-                    <ListItemIcon>
-                      <CheckIcon color="success" />
-                    </ListItemIcon>
-                    <ListItemText primary={feature} />
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
+            {currentTierInfo && (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Current Plan: {currentTierInfo.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  {currentTierInfo.price}/{currentTierInfo.period}
+                </Typography>
+                <List dense>
+                  {currentTierInfo.features.map((feature, index) => (
+                    <ListItem key={index}>
+                      <ListItemIcon>
+                        <CheckIcon color="success" />
+                      </ListItemIcon>
+                      <ListItemText primary={feature} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            )}
 
             <Divider />
 

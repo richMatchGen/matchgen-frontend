@@ -32,6 +32,8 @@ import {
 } from '@mui/icons-material';
 import useAuth from '../hooks/useAuth';
 import apiClient from '../api/config';
+import FeatureRestrictedButton from '../components/FeatureRestrictedButton';
+import FeatureRestrictedElement from '../components/FeatureRestrictedElement';
 
 const PSDProcessor = () => {
   const { auth, logout } = useAuth();
@@ -194,64 +196,75 @@ const PSDProcessor = () => {
       </Typography>
 
       {/* Upload Section */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Upload PSD File
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Supported PSD versions: 1-7 (Photoshop CS6 and earlier). 
-            PSD version 8 (Photoshop CC 2018+) is not yet supported.
-          </Typography>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6}>
-              <input
-                id="file-input"
-                type="file"
-                accept=".psd"
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
-              />
-              <label htmlFor="file-input">
-                <Button
-                  variant="outlined"
-                  component="span"
-                  startIcon={<UploadIcon />}
+      <FeatureRestrictedElement
+        featureCode="psd_processor"
+        tooltipText="PSD processing requires SemiPro Gen or higher"
+        upgradeDialogTitle="PSD Processing Feature"
+        upgradeDialogDescription="Upload and process PSD files to extract design elements for your social media posts."
+      >
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Upload PSD File
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Supported PSD versions: 1-7 (Photoshop CS6 and earlier). 
+              PSD version 8 (Photoshop CC 2018+) is not yet supported.
+            </Typography>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={6}>
+                <input
+                  id="file-input"
+                  type="file"
+                  accept=".psd"
+                  onChange={handleFileSelect}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor="file-input">
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    startIcon={<UploadIcon />}
+                    disabled={uploading}
+                  >
+                    Select PSD File
+                  </Button>
+                </label>
+                {selectedFile && (
+                  <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+                    Selected: {selectedFile.name}
+                  </Typography>
+                )}
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Document Title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter document title"
                   disabled={uploading}
+                />
+              </Grid>
+              <Grid item xs={12} sm={2}>
+                <FeatureRestrictedButton
+                  featureCode="psd_processor"
+                  variant="contained"
+                  onClick={handleUpload}
+                  disabled={!selectedFile || !title.trim() || uploading}
+                  startIcon={uploading ? <CircularProgress size={20} /> : null}
+                  fullWidth
+                  tooltipText="PSD processing requires SemiPro Gen or higher"
+                  upgradeDialogTitle="PSD Processing Feature"
+                  upgradeDialogDescription="Upload and process PSD files to extract design elements for your social media posts."
                 >
-                  Select PSD File
-                </Button>
-              </label>
-              {selectedFile && (
-                <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                  Selected: {selectedFile.name}
-                </Typography>
-              )}
+                  {uploading ? 'Processing...' : 'Upload'}
+                </FeatureRestrictedButton>
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="Document Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter document title"
-                disabled={uploading}
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <Button
-                variant="contained"
-                onClick={handleUpload}
-                disabled={!selectedFile || !title.trim() || uploading}
-                startIcon={uploading ? <CircularProgress size={20} /> : null}
-                fullWidth
-              >
-                {uploading ? 'Processing...' : 'Upload'}
-              </Button>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </FeatureRestrictedElement>
 
       {/* Messages */}
       {error && (
