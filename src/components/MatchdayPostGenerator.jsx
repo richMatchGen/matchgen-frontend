@@ -123,6 +123,7 @@ const SocialMediaPostGenerator = () => {
   // Feature access state
   const [featureAccess, setFeatureAccess] = useState({});
   const [accessLoading, setAccessLoading] = useState(true);
+  const [userSubscriptionTier, setUserSubscriptionTier] = useState('basic');
 
   // Fetch feature access data
   const checkFeatureAccess = async () => {
@@ -139,6 +140,7 @@ const SocialMediaPostGenerator = () => {
 
       if (response.data) {
         setFeatureAccess(response.data.feature_access || {});
+        setUserSubscriptionTier(response.data.subscription_tier || 'basic');
       }
     } catch (error) {
       console.error('Error fetching feature access:', error);
@@ -161,6 +163,17 @@ const SocialMediaPostGenerator = () => {
       'post.fulltime': 'SemiPro Gen',
     };
     return planMap[featureCode] || 'SemiPro Gen';
+  };
+
+  // Helper function to check if user has access to a feature based on subscription tier
+  const hasFeatureAccess = (featureCode) => {
+    const tierAccess = {
+      'basic': ['post.matchday', 'post.upcoming', 'post.startingxi'],
+      'semipro': ['post.matchday', 'post.upcoming', 'post.startingxi', 'post.substitution', 'post.halftime', 'post.fulltime'],
+      'prem': ['post.matchday', 'post.upcoming', 'post.startingxi', 'post.substitution', 'post.halftime', 'post.fulltime', 'post.goal', 'post.potm']
+    };
+    
+    return tierAccess[userSubscriptionTier]?.includes(featureCode) || false;
   };
 
   // Helper function to generate tooltip content
@@ -192,26 +205,30 @@ const SocialMediaPostGenerator = () => {
           return;
         }
 
-        const response = await axios.get(`${API_BASE_URL}content/matches/`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        // If fixtureId is provided, fetch only that specific match
+        if (fixtureId) {
+          const response = await axios.get(`${API_BASE_URL}content/matches/${fixtureId}/`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
 
-        if (response.data && response.data.results) {
-          setMatches(response.data.results);
-          
-          // If fixtureId is provided, find and select that match
-          if (fixtureId) {
-            const match = response.data.results.find(m => m.id === parseInt(fixtureId));
-            if (match) {
-              setSelectedMatch(match);
-            }
+          if (response.data) {
+            setSelectedMatch(response.data);
+          }
+        } else {
+          // If no fixtureId, fetch all matches (fallback)
+          const response = await axios.get(`${API_BASE_URL}content/matches/`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (response.data && response.data.results) {
+            setMatches(response.data.results);
           }
         }
       } catch (error) {
         console.error('Error fetching matches:', error);
         setSnackbar({
           open: true,
-          message: 'Error fetching matches. Please try again.',
+          message: 'Error fetching match. Please try again.',
           severity: 'error'
         });
       } finally {
@@ -224,7 +241,7 @@ const SocialMediaPostGenerator = () => {
 
   const handlePostTypeChange = (event, newValue) => {
     const postTypeObj = POST_TYPES.find(p => p.id === newValue);
-    const isRestricted = !featureAccess[postTypeObj.featureCode];
+    const isRestricted = !hasFeatureAccess(postTypeObj.featureCode);
     
     if (isRestricted) {
       const requiredPlan = getRequiredPlan(postTypeObj.featureCode);
@@ -290,10 +307,10 @@ const SocialMediaPostGenerator = () => {
                 Select Post Type
               </Typography>
               <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                  {POST_TYPES.map((postType) => {
-                    const isRestricted = !featureAccess[postType.featureCode];
-                    const isSelected = selectedPostType === postType.id;
+                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                   {POST_TYPES.map((postType) => {
+                     const isRestricted = !hasFeatureAccess(postType.featureCode);
+                     const isSelected = selectedPostType === postType.id;
                     
                     const tabContent = (
                       <Tab
@@ -371,52 +388,61 @@ const SocialMediaPostGenerator = () => {
             </CardContent>
           </Card>
 
-          {/* Match Selection */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                Select Match
-              </Typography>
-              <Grid container spacing={2}>
-                {matches.map((match) => (
-                  <Grid item xs={12} sm={6} md={4} key={match.id}>
-                    <Paper
-                      sx={{
-                        p: 2,
-                        cursor: 'pointer',
-                        border: selectedMatch?.id === match.id ? 2 : 1,
-                        borderColor: selectedMatch?.id === match.id ? 'primary.main' : 'divider',
-                        '&:hover': {
-                          backgroundColor: 'action.hover'
-                        }
-                      }}
-                      onClick={() => setSelectedMatch(match)}
-                    >
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                        {match.home_away === 'HOME' ? 'HOME' : 'AWAY'} vs {match.opponent}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {new Date(match.date).toLocaleDateString()} at {match.time_start}
-                      </Typography>
-                      {match.venue && (
-                        <Typography variant="caption" color="text.secondary">
-                          {match.venue}
-                        </Typography>
-                      )}
-                    </Paper>
-                  </Grid>
-                ))}
-              </Grid>
-            </CardContent>
-          </Card>
+           {/* Selected Match Display */}
+           {selectedMatch && (
+             <Card sx={{ mb: 3 }}>
+               <CardContent>
+                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+                   Selected Match
+                 </Typography>
+                 <Paper
+                   sx={{
+                     p: 3,
+                     backgroundColor: '#fafafa',
+                     border: '1px solid #e0e0e0',
+                     borderRadius: 2
+                   }}
+                 >
+                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                     <Box>
+                       <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
+                         {selectedMatch.home_away === 'HOME' ? 'HOME' : 'AWAY'} vs {selectedMatch.opponent}
+                       </Typography>
+                       <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                         {new Date(selectedMatch.date).toLocaleDateString('en-GB', {
+                           weekday: 'long',
+                           year: 'numeric',
+                           month: 'long',
+                           day: 'numeric'
+                         })} at {selectedMatch.time_start}
+                       </Typography>
+                       {selectedMatch.venue && (
+                         <Typography variant="body2" color="text.secondary">
+                           📍 {selectedMatch.venue}
+                         </Typography>
+                       )}
+                     </Box>
+                     {selectedMatch.opponent_logo && (
+                       <Box
+                         component="img"
+                         src={selectedMatch.opponent_logo}
+                         alt={`${selectedMatch.opponent} logo`}
+                         sx={{ width: 80, height: 80, ml: 2 }}
+                       />
+                     )}
+                   </Box>
+                 </Paper>
+               </CardContent>
+             </Card>
+           )}
 
           {/* Generate Button */}
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                {(() => {
-                  const postTypeObj = POST_TYPES.find(p => p.id === selectedPostType);
-                  const isRestricted = !featureAccess[postTypeObj.featureCode];
+               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                 {(() => {
+                   const postTypeObj = POST_TYPES.find(p => p.id === selectedPostType);
+                   const isRestricted = !hasFeatureAccess(postTypeObj.featureCode);
                   
                   const button = (
                     <Button
