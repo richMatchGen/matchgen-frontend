@@ -43,6 +43,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import AppTheme from '../themes/AppTheme';
+import MonochromeTheme from '../themes/MonochromeTheme';
 import SideMenu from './SideMenu';
 import AppNavbar from './AppNavBar';
 import Header from './Header';
@@ -54,14 +55,13 @@ const API_BASE_URL = import.meta.env.MODE === 'production'
   ? 'https://matchgen-backend-production.up.railway.app/api/'
   : 'http://localhost:8000/api/';
 
-// Post type definitions
+// Post type definitions - Monochrome theme
 const POST_TYPES = [
   { 
     id: 'matchday', 
     label: 'Matchday', 
     icon: <Event />, 
     description: 'Pre-match announcement with fixture details',
-    color: 'primary',
     featureCode: 'post.matchday'
   },
   { 
@@ -69,7 +69,6 @@ const POST_TYPES = [
     label: 'Upcoming Fixture', 
     icon: <Schedule />, 
     description: 'Future fixture announcement',
-    color: 'info',
     featureCode: 'post.upcoming'
   },
   { 
@@ -77,7 +76,6 @@ const POST_TYPES = [
     label: 'Starting XI', 
     icon: <Group />, 
     description: 'Team lineup announcement',
-    color: 'success',
     featureCode: 'post.startingxi'
   },
   { 
@@ -85,7 +83,6 @@ const POST_TYPES = [
     label: 'Goal', 
     icon: <SportsSoccer />, 
     description: 'Goal celebration post',
-    color: 'warning',
     featureCode: 'post.goal'
   },
   { 
@@ -93,7 +90,6 @@ const POST_TYPES = [
     label: 'Substitution', 
     icon: <SwapHoriz />, 
     description: 'Player substitution announcement',
-    color: 'secondary',
     featureCode: 'post.substitution'
   },
   { 
@@ -101,7 +97,6 @@ const POST_TYPES = [
     label: 'Player of the Match', 
     icon: <EmojiEvents />, 
     description: 'Man of the match announcement',
-    color: 'warning',
     featureCode: 'post.potm'
   },
   { 
@@ -109,7 +104,6 @@ const POST_TYPES = [
     label: 'Half Time', 
     icon: <Timer />, 
     description: 'Half-time score update',
-    color: 'info',
     featureCode: 'post.halftime'
   },
   { 
@@ -117,7 +111,6 @@ const POST_TYPES = [
     label: 'Full Time',
     icon: <Flag />, 
     description: 'Final result announcement',
-    color: 'success',
     featureCode: 'post.fulltime'
   }
 ];
@@ -472,7 +465,7 @@ const SocialMediaPostGenerator = () => {
 
   if (loading || accessLoading) {
     return (
-      <AppTheme>
+      <MonochromeTheme>
         <CssBaseline />
         <Box sx={{ display: 'flex' }}>
           <SideMenu />
@@ -483,12 +476,12 @@ const SocialMediaPostGenerator = () => {
             </Box>
           </Box>
         </Box>
-      </AppTheme>
+      </MonochromeTheme>
     );
   }
 
   return (
-    <AppTheme>
+    <MonochromeTheme>
       <CssBaseline />
       <Box sx={{ display: 'flex' }}>
         <SideMenu />
@@ -546,7 +539,7 @@ const SocialMediaPostGenerator = () => {
                             disabled={isRestricted}
                             label={
                               <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left', width: '100%' }}>
-                                <Box sx={{ mr: 1, color: isRestricted ? 'text.disabled' : `${postType.color}.main` }}>
+                                <Box sx={{ mr: 1, color: isRestricted ? '#cccccc' : '#000000' }}>
                                   {isRestricted ? <LockIcon /> : postType.icon}
                                 </Box>
                                 <Box sx={{ flex: 1 }}>
@@ -555,7 +548,7 @@ const SocialMediaPostGenerator = () => {
                                       variant="body2" 
                                       sx={{ 
                                         fontWeight: 'bold',
-                                        color: isRestricted ? 'text.disabled' : 'inherit'
+                                        color: isRestricted ? '#999999' : '#000000'
                                       }}
                                     >
                                       {postType.label}
@@ -564,15 +557,20 @@ const SocialMediaPostGenerator = () => {
                                       <Chip 
                                         label="Upgrade Required" 
                                         size="small" 
-                                        color="warning" 
                                         variant="outlined"
-                                        sx={{ fontSize: '0.7rem', height: 20 }}
+                                        sx={{ 
+                                          fontSize: '0.7rem', 
+                                          height: 20,
+                                          backgroundColor: '#f5f5f5',
+                                          color: '#666666',
+                                          border: '1px solid #cccccc'
+                                        }}
                                       />
                                     )}
                                   </Box>
                                   <Typography 
                                     variant="caption" 
-                                    color={isRestricted ? 'text.disabled' : 'text.secondary'}
+                                    sx={{ color: isRestricted ? '#999999' : '#666666' }}
                                   >
                                     {postType.description}
                                   </Typography>
@@ -584,8 +582,8 @@ const SocialMediaPostGenerator = () => {
                               minHeight: 60,
                               opacity: isRestricted ? 0.6 : 1,
                               '&.Mui-selected': {
-                                backgroundColor: isRestricted ? 'grey.100' : `${postType.color}.50`,
-                                color: isRestricted ? 'text.disabled' : `${postType.color}.main`
+                                backgroundColor: isRestricted ? '#f5f5f5' : '#f5f5f5',
+                                color: isRestricted ? '#999999' : '#000000'
                               },
                               '&.Mui-disabled': {
                                 opacity: 0.6
@@ -1056,7 +1054,7 @@ const SocialMediaPostGenerator = () => {
           </Container>
         </Box>
       </Box>
-    </AppTheme>
+    </MonochromeTheme>
   );
 };
 
