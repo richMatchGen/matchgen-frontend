@@ -35,30 +35,28 @@ const Drawer = styled(MuiDrawer)({
   [`& .${drawerClasses.paper}`]: {
     width: drawerWidth,
     boxSizing: 'border-box',
-    background: 'linear-gradient(180deg, #28443f 0%, #1a2f2a 100%)',
-    borderRight: 'none',
+    backgroundColor: '#ffffff',
+    borderRight: '1px solid #e0e0e0',
   },
 });
 
 const BrandSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3, 2),
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-  borderBottom: '1px solid rgba(255,255,255,0.1)',
-  backdropFilter: 'blur(10px)',
+  backgroundColor: '#ffffff',
+  borderBottom: '1px solid #e0e0e0',
 }));
 
 const UserSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
-  background: 'rgba(255,255,255,0.05)',
-  borderTop: '1px solid rgba(255,255,255,0.1)',
-  backdropFilter: 'blur(10px)',
+  backgroundColor: '#fafafa',
+  borderTop: '1px solid #e0e0e0',
 }));
 
 const ActionButton = styled(IconButton)(({ theme }) => ({
-  color: 'rgba(255,255,255,0.7)',
+  color: '#666666',
   '&:hover': {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    color: '#ffffff',
+    backgroundColor: '#f5f5f5',
+    color: '#000000',
   },
 }));
 

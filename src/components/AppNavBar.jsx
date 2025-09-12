@@ -42,11 +42,9 @@ export default function AppNavbar() {
       position="fixed"
       sx={{
         display: { xs: 'auto', md: 'none' },
-        boxShadow: 0,
-        bgcolor: 'background.paper',
-        backgroundImage: 'none',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
+        boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
+        backgroundColor: '#ffffff',
+        borderBottom: '1px solid #e0e0e0',
         top: 'var(--template-frame-height, 0px)',
       }}
     >

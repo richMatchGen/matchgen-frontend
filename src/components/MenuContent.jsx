@@ -27,7 +27,7 @@ const MenuSection = styled(Box)(({ theme }) => ({
 }));
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
-  color: 'rgba(255,255,255,0.6)',
+  color: '#999999',
   fontSize: '0.75rem',
   fontWeight: 600,
   textTransform: 'uppercase',
@@ -39,20 +39,20 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
   margin: theme.spacing(0.25, 1),
 
-  color: 'rgba(255,255,255,0.8)',
+  color: '#666666',
   '&:hover': {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    color: '#ffffff',
+    backgroundColor: '#f5f5f5',
+    color: '#000000',
   },
   '&.Mui-selected': {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    color: '#ffffff',
+    backgroundColor: '#f0f0f0',
+    color: '#000000',
     '&:hover': {
-      backgroundColor: 'rgba(255,255,255,0.2)',
+      backgroundColor: '#f5f5f5',
     },
   },
   '& .MuiListItemIcon-root': {
-    color: '#ffffff !important',
+    color: 'inherit !important',
     minWidth: 40,
   },
   '& .MuiListItemText-primary': {
