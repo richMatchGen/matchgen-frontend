@@ -107,6 +107,20 @@ const POST_TYPES = [
     icon: <Flag />, 
     description: 'Final result announcement',
     featureCode: 'post.fulltime'
+  },
+  { 
+    id: 'substitution', 
+    label: 'Substitution Post', 
+    icon: <SwapHoriz />, 
+    description: 'Player substitution announcement post',
+    featureCode: 'post.substitution'
+  },
+  { 
+    id: 'score', 
+    label: 'Score Update', 
+    icon: <SportsSoccer />, 
+    description: 'Live score update post',
+    featureCode: 'post.score'
   }
 ];
 
@@ -118,6 +132,8 @@ const SocialMediaPostGenerator = () => {
   const [selectedPostType, setSelectedPostType] = useState(postType || 'matchday');
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
+  const [generatedPost, setGeneratedPost] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   
   // Feature access state
@@ -161,6 +177,7 @@ const SocialMediaPostGenerator = () => {
       'post.substitution': 'SemiPro Gen',
       'post.halftime': 'SemiPro Gen',
       'post.fulltime': 'SemiPro Gen',
+      'post.score': 'SemiPro Gen',
     };
     return planMap[featureCode] || 'SemiPro Gen';
   };
@@ -169,8 +186,8 @@ const SocialMediaPostGenerator = () => {
   const hasFeatureAccess = (featureCode) => {
     const tierAccess = {
       'basic': ['post.matchday', 'post.upcoming', 'post.startingxi'],
-      'semipro': ['post.matchday', 'post.upcoming', 'post.startingxi', 'post.substitution', 'post.halftime', 'post.fulltime'],
-      'prem': ['post.matchday', 'post.upcoming', 'post.startingxi', 'post.substitution', 'post.halftime', 'post.fulltime', 'post.goal', 'post.potm']
+      'semipro': ['post.matchday', 'post.upcoming', 'post.startingxi', 'post.substitution', 'post.halftime', 'post.fulltime', 'post.score'],
+      'prem': ['post.matchday', 'post.upcoming', 'post.startingxi', 'post.substitution', 'post.halftime', 'post.fulltime', 'post.goal', 'post.potm', 'post.score']
     };
     
     return tierAccess[userSubscriptionTier]?.includes(featureCode) || false;
@@ -255,6 +272,106 @@ const SocialMediaPostGenerator = () => {
     
     setSelectedPostType(newValue);
     setGeneratedImage(null); // Clear previous generated image
+    setGeneratedPost(null);
+    setPreviewImage(null);
+  };
+
+  // Download functionality
+  const downloadPost = () => {
+    if (generatedPost) {
+      const element = document.createElement('a');
+      const file = new Blob([JSON.stringify(generatedPost, null, 2)], {type: 'application/json'});
+      element.href = URL.createObjectURL(file);
+      element.download = `${selectedPostType}_${selectedMatch?.opponent}_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+  };
+
+  const downloadImage = () => {
+    if (previewImage) {
+      const element = document.createElement('a');
+      element.href = previewImage;
+      element.download = `${selectedPostType}_${selectedMatch?.opponent}_${new Date().toISOString().split('T')[0]}.png`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+  };
+
+  // Generate post function
+  const generatePost = async () => {
+    if (!selectedMatch) {
+      setSnackbar({
+        open: true,
+        message: 'Please select a match first.',
+        severity: 'warning'
+      });
+      return;
+    }
+
+    const postTypeObj = POST_TYPES.find(p => p.id === selectedPostType);
+    const isRestricted = !hasFeatureAccess(postTypeObj.featureCode);
+    
+    if (isRestricted) {
+      const requiredPlan = getRequiredPlan(postTypeObj.featureCode);
+      setSnackbar({
+        open: true,
+        message: `${postTypeObj.label} requires ${requiredPlan} plan. Upgrade to access this feature.`,
+        severity: 'warning'
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Mock post generation - replace with actual API call
+      const mockPost = {
+        id: Date.now(),
+        type: selectedPostType,
+        match: selectedMatch,
+        content: `Generated ${postTypeObj.label} post for ${selectedMatch.opponent}`,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          postType: postTypeObj.label,
+          opponent: selectedMatch.opponent,
+          date: selectedMatch.date,
+          venue: selectedMatch.venue
+        }
+      };
+
+      // Mock preview image generation
+      const mockPreviewImage = `data:image/svg+xml;base64,${btoa(`
+        <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#ffffff" stroke="#000000" stroke-width="2"/>
+          <text x="200" y="50" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#000000">${postTypeObj.label}</text>
+          <text x="200" y="100" text-anchor="middle" font-family="Arial" font-size="18" fill="#333333">${selectedMatch.opponent}</text>
+          <text x="200" y="150" text-anchor="middle" font-family="Arial" font-size="16" fill="#666666">${new Date(selectedMatch.date).toLocaleDateString()}</text>
+          <text x="200" y="200" text-anchor="middle" font-family="Arial" font-size="14" fill="#999999">Generated Post Preview</text>
+        </svg>
+      `)}`;
+
+      setGeneratedPost(mockPost);
+      setPreviewImage(mockPreviewImage);
+      
+      setSnackbar({
+        open: true,
+        message: 'Post generated successfully!',
+        severity: 'success'
+      });
+      
+    } catch (error) {
+      console.error('Error generating post:', error);
+      setSnackbar({
+        open: true,
+        message: 'Error generating post. Please try again.',
+        severity: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading || accessLoading) {
@@ -450,6 +567,7 @@ const SocialMediaPostGenerator = () => {
                       size="large"
                       disabled={!selectedMatch || isRestricted}
                       startIcon={isRestricted ? <LockIcon /> : <SportsSoccer />}
+                      onClick={generatePost}
                       sx={{
                         py: 2,
                         px: 4,
@@ -489,6 +607,112 @@ const SocialMediaPostGenerator = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Preview and Download Section */}
+          {(generatedPost || previewImage) && (
+            <Card sx={{ mt: 3 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+                  Generated Post Preview
+                </Typography>
+                
+                {/* Preview Image */}
+                {previewImage && (
+                  <Box sx={{ mb: 3, textAlign: 'center' }}>
+                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
+                      Post Preview
+                    </Typography>
+                    <Box
+                      component="img"
+                      src={previewImage}
+                      alt="Generated post preview"
+                      sx={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      }}
+                    />
+                  </Box>
+                )}
+
+                {/* Generated Post Content */}
+                {generatedPost && (
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
+                      Post Content
+                    </Typography>
+                    <Paper
+                      sx={{
+                        p: 2,
+                        backgroundColor: '#fafafa',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2
+                      }}
+                    >
+                      <Typography variant="body1" sx={{ mb: 1 }}>
+                        <strong>Type:</strong> {generatedPost.metadata.postType}
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 1 }}>
+                        <strong>Opponent:</strong> {generatedPost.metadata.opponent}
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 1 }}>
+                        <strong>Date:</strong> {new Date(generatedPost.metadata.date).toLocaleDateString()}
+                      </Typography>
+                      {generatedPost.metadata.venue && (
+                        <Typography variant="body1" sx={{ mb: 1 }}>
+                          <strong>Venue:</strong> {generatedPost.metadata.venue}
+                        </Typography>
+                      )}
+                      <Typography variant="body1" sx={{ mt: 2 }}>
+                        <strong>Content:</strong> {generatedPost.content}
+                      </Typography>
+                    </Paper>
+                  </Box>
+                )}
+
+                {/* Download Buttons */}
+                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {previewImage && (
+                    <Button
+                      variant="outlined"
+                      startIcon={<Download />}
+                      onClick={downloadImage}
+                      sx={{
+                        borderColor: '#000000',
+                        color: '#000000',
+                        '&:hover': {
+                          borderColor: '#333333',
+                          backgroundColor: '#f5f5f5'
+                        }
+                      }}
+                    >
+                      Download Image
+                    </Button>
+                  )}
+                  
+                  {generatedPost && (
+                    <Button
+                      variant="outlined"
+                      startIcon={<Download />}
+                      onClick={downloadPost}
+                      sx={{
+                        borderColor: '#000000',
+                        color: '#000000',
+                        '&:hover': {
+                          borderColor: '#333333',
+                          backgroundColor: '#f5f5f5'
+                        }
+                      }}
+                    >
+                      Download Post Data
+                    </Button>
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          )}
 
           <Snackbar
             open={snackbar.open}
