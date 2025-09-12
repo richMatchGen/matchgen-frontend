@@ -7,25 +7,18 @@ import {
   Card,
   CardContent,
   Grid,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
   Paper,
   Container,
   CircularProgress,
   Alert,
   Snackbar,
   Tab,
+  Tabs,
   Divider,
-  CssBaseline,
   Tooltip
 } from '@mui/material';
 import {
   ArrowBack,
-  Download,
   Event,
   Schedule,
   Group,
@@ -34,23 +27,19 @@ import {
   EmojiEvents,
   Timer,
   Flag,
-  Lock as LockIcon,
-  Upgrade as UpgradeIcon
+  Lock as LockIcon
 } from '@mui/icons-material';
 import axios from 'axios';
-// Theme is now applied globally in main.jsx
 import SideMenu from './SideMenu';
 import AppNavbar from './AppNavBar';
 import Header from './Header';
-import FeatureGate from './FeatureGate';
-import useFeatureAccess from '../hooks/useFeatureAccess';
 
-// API Configuration - same as apiClient
+// API Configuration
 const API_BASE_URL = import.meta.env.MODE === 'production' 
   ? 'https://matchgen-backend-production.up.railway.app/api/'
   : 'http://localhost:8000/api/';
 
-// Post type definitions - Monochrome theme
+// Post type definitions
 const POST_TYPES = [
   { 
     id: 'matchday', 
@@ -107,39 +96,22 @@ const POST_TYPES = [
     icon: <Flag />, 
     description: 'Final result announcement',
     featureCode: 'post.fulltime'
-  },
-  { 
-    id: 'substitution', 
-    label: 'Substitution Post', 
-    icon: <SwapHoriz />, 
-    description: 'Player substitution announcement post',
-    featureCode: 'post.substitution'
-  },
-  { 
-    id: 'score', 
-    label: 'Score Update', 
-    icon: <SportsSoccer />, 
-    description: 'Live score update post',
-    featureCode: 'post.score'
   }
 ];
 
 const SocialMediaPostGenerator = () => {
-  const { fixtureId, postType } = useParams(); // Get fixture ID and post type from URL
+  const { fixtureId, postType } = useParams();
   const navigate = useNavigate();
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPostType, setSelectedPostType] = useState(postType || 'matchday');
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
-  const [generatedPost, setGeneratedPost] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   
   // Feature access state
   const [featureAccess, setFeatureAccess] = useState({});
   const [accessLoading, setAccessLoading] = useState(true);
-  const [userSubscriptionTier, setUserSubscriptionTier] = useState('basic');
 
   // Fetch feature access data
   const checkFeatureAccess = async () => {
@@ -156,7 +128,6 @@ const SocialMediaPostGenerator = () => {
 
       if (response.data) {
         setFeatureAccess(response.data.feature_access || {});
-        setUserSubscriptionTier(response.data.subscription_tier || 'basic');
       }
     } catch (error) {
       console.error('Error fetching feature access:', error);
@@ -177,20 +148,8 @@ const SocialMediaPostGenerator = () => {
       'post.substitution': 'SemiPro Gen',
       'post.halftime': 'SemiPro Gen',
       'post.fulltime': 'SemiPro Gen',
-      'post.score': 'SemiPro Gen',
     };
     return planMap[featureCode] || 'SemiPro Gen';
-  };
-
-  // Helper function to check if user has access to a feature based on subscription tier
-  const hasFeatureAccess = (featureCode) => {
-    const tierAccess = {
-      'basic': ['post.matchday', 'post.upcoming', 'post.startingxi'],
-      'semipro': ['post.matchday', 'post.upcoming', 'post.startingxi', 'post.substitution', 'post.halftime', 'post.fulltime', 'post.score'],
-      'prem': ['post.matchday', 'post.upcoming', 'post.startingxi', 'post.substitution', 'post.halftime', 'post.fulltime', 'post.goal', 'post.potm', 'post.score']
-    };
-    
-    return tierAccess[userSubscriptionTier]?.includes(featureCode) || false;
   };
 
   // Helper function to generate tooltip content
@@ -222,30 +181,26 @@ const SocialMediaPostGenerator = () => {
           return;
         }
 
-        // If fixtureId is provided, fetch only that specific match
-        if (fixtureId) {
-          const response = await axios.get(`${API_BASE_URL}content/matches/${fixtureId}/`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+        const response = await axios.get(`${API_BASE_URL}content/matches/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
 
-          if (response.data) {
-            setSelectedMatch(response.data);
-          }
-        } else {
-          // If no fixtureId, fetch all matches (fallback)
-          const response = await axios.get(`${API_BASE_URL}content/matches/`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-
-          if (response.data && response.data.results) {
-            setMatches(response.data.results);
+        if (response.data && response.data.results) {
+          setMatches(response.data.results);
+          
+          // If fixtureId is provided, find and select that match
+          if (fixtureId) {
+            const match = response.data.results.find(m => m.id === parseInt(fixtureId));
+            if (match) {
+              setSelectedMatch(match);
+            }
           }
         }
       } catch (error) {
         console.error('Error fetching matches:', error);
         setSnackbar({
           open: true,
-          message: 'Error fetching match. Please try again.',
+          message: 'Error fetching matches. Please try again.',
           severity: 'error'
         });
       } finally {
@@ -258,7 +213,7 @@ const SocialMediaPostGenerator = () => {
 
   const handlePostTypeChange = (event, newValue) => {
     const postTypeObj = POST_TYPES.find(p => p.id === newValue);
-    const isRestricted = !hasFeatureAccess(postTypeObj.featureCode);
+    const isRestricted = !featureAccess[postTypeObj.featureCode];
     
     if (isRestricted) {
       const requiredPlan = getRequiredPlan(postTypeObj.featureCode);
@@ -272,35 +227,8 @@ const SocialMediaPostGenerator = () => {
     
     setSelectedPostType(newValue);
     setGeneratedImage(null); // Clear previous generated image
-    setGeneratedPost(null);
-    setPreviewImage(null);
   };
 
-  // Download functionality
-  const downloadPost = () => {
-    if (generatedPost) {
-      const element = document.createElement('a');
-      const file = new Blob([JSON.stringify(generatedPost, null, 2)], {type: 'application/json'});
-      element.href = URL.createObjectURL(file);
-      element.download = `${selectedPostType}_${selectedMatch?.opponent}_${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-    }
-  };
-
-  const downloadImage = () => {
-    if (previewImage) {
-      const element = document.createElement('a');
-      element.href = previewImage;
-      element.download = `${selectedPostType}_${selectedMatch?.opponent}_${new Date().toISOString().split('T')[0]}.png`;
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-    }
-  };
-
-  // Generate post function
   const generatePost = async () => {
     if (!selectedMatch) {
       setSnackbar({
@@ -312,7 +240,7 @@ const SocialMediaPostGenerator = () => {
     }
 
     const postTypeObj = POST_TYPES.find(p => p.id === selectedPostType);
-    const isRestricted = !hasFeatureAccess(postTypeObj.featureCode);
+    const isRestricted = !featureAccess[postTypeObj.featureCode];
     
     if (isRestricted) {
       const requiredPlan = getRequiredPlan(postTypeObj.featureCode);
@@ -328,33 +256,17 @@ const SocialMediaPostGenerator = () => {
       setLoading(true);
       
       // Mock post generation - replace with actual API call
-      const mockPost = {
-        id: Date.now(),
-        type: selectedPostType,
-        match: selectedMatch,
-        content: `Generated ${postTypeObj.label} post for ${selectedMatch.opponent}`,
-        timestamp: new Date().toISOString(),
-        metadata: {
-          postType: postTypeObj.label,
-          opponent: selectedMatch.opponent,
-          date: selectedMatch.date,
-          venue: selectedMatch.venue
-        }
-      };
-
-      // Mock preview image generation
-      const mockPreviewImage = `data:image/svg+xml;base64,${btoa(`
+      const mockImage = `data:image/svg+xml;base64,${btoa(`
         <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
           <rect width="400" height="400" fill="#ffffff" stroke="#000000" stroke-width="2"/>
           <text x="200" y="50" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#000000">${postTypeObj.label}</text>
           <text x="200" y="100" text-anchor="middle" font-family="Arial" font-size="18" fill="#333333">${selectedMatch.opponent}</text>
           <text x="200" y="150" text-anchor="middle" font-family="Arial" font-size="16" fill="#666666">${new Date(selectedMatch.date).toLocaleDateString()}</text>
-          <text x="200" y="200" text-anchor="middle" font-family="Arial" font-size="14" fill="#999999">Generated Post Preview</text>
+          <text x="200" y="200" text-anchor="middle" font-family="Arial" font-size="14" fill="#999999">Generated Post</text>
         </svg>
       `)}`;
 
-      setGeneratedPost(mockPost);
-      setPreviewImage(mockPreviewImage);
+      setGeneratedImage(mockImage);
       
       setSnackbar({
         open: true,
@@ -378,11 +290,13 @@ const SocialMediaPostGenerator = () => {
     return (
       <Box sx={{ display: 'flex' }}>
         <SideMenu />
-        <Box sx={{ flexGrow: 1 }}>
-          <AppNavbar />
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-            <CircularProgress />
-          </Box>
+        <Box sx={{ flexGrow: 1, p: 3 }}>
+          <Header />
+          <Container maxWidth="lg">
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+              <CircularProgress />
+            </Box>
+          </Container>
         </Box>
       </Box>
     );
@@ -391,31 +305,63 @@ const SocialMediaPostGenerator = () => {
   return (
     <Box sx={{ display: 'flex' }}>
       <SideMenu />
-      <Box sx={{ flexGrow: 1 }}>
-        <AppNavbar />
-        <Header title="Social Media Post Generator" />
-        
-        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-          {/* Header */}
+      <Box sx={{ flexGrow: 1, p: 3 }}>
+        <Header />
+        <Container maxWidth="lg">
           <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              {fixtureId && (
-                <Button
-                  startIcon={<ArrowBack />}
-                  onClick={() => navigate('/dashboard')}
-                  sx={{ mr: 2 }}
-                >
-                  Back to Dashboard
-                </Button>
-              )}
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                Social Media Post Generator
-              </Typography>
-            </Box>
+            <Button
+              startIcon={<ArrowBack />}
+              onClick={() => navigate('/dashboard')}
+              sx={{ mb: 2 }}
+            >
+              Back to Dashboard
+            </Button>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+              Social Media Post Generator
+            </Typography>
             <Typography variant="body1" color="text.secondary">
-              Create professional social media posts for your club
+              Generate engaging social media posts for your matches
             </Typography>
           </Box>
+
+          {/* Match Selection */}
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+                Select Match
+              </Typography>
+              <Grid container spacing={2}>
+                {matches.map((match) => (
+                  <Grid item xs={12} sm={6} md={4} key={match.id}>
+                    <Paper
+                      sx={{
+                        p: 2,
+                        cursor: 'pointer',
+                        border: selectedMatch?.id === match.id ? 2 : 1,
+                        borderColor: selectedMatch?.id === match.id ? 'primary.main' : 'divider',
+                        '&:hover': {
+                          backgroundColor: 'action.hover'
+                        }
+                      }}
+                      onClick={() => setSelectedMatch(match)}
+                    >
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        {match.home_away === 'HOME' ? 'HOME' : 'AWAY'} vs {match.opponent}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        {new Date(match.date).toLocaleDateString()} at {match.time_start}
+                      </Typography>
+                      {match.venue && (
+                        <Typography variant="caption" color="text.secondary">
+                          {match.venue}
+                        </Typography>
+                      )}
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
 
           {/* Post Type Selection */}
           <Card sx={{ mb: 3 }}>
@@ -424,66 +370,28 @@ const SocialMediaPostGenerator = () => {
                 Select Post Type
               </Typography>
               <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                   {POST_TYPES.map((postType) => {
-                     const isRestricted = !hasFeatureAccess(postType.featureCode);
-                     const isSelected = selectedPostType === postType.id;
+                <Tabs
+                  value={selectedPostType}
+                  onChange={handlePostTypeChange}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                >
+                  {POST_TYPES.map((postType) => {
+                    const isRestricted = !featureAccess[postType.featureCode];
+                    const isSelected = selectedPostType === postType.id;
                     
                     const tabContent = (
                       <Tab
                         key={postType.id}
                         value={postType.id}
+                        label={postType.label}
+                        icon={isRestricted ? <LockIcon /> : postType.icon}
                         disabled={isRestricted}
-                        label={
-                          <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left', width: '100%' }}>
-                            <Box sx={{ mr: 1, color: isRestricted ? '#cccccc' : '#000000' }}>
-                              {isRestricted ? <LockIcon /> : postType.icon}
-                            </Box>
-                            <Box sx={{ flex: 1 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Typography 
-                                  variant="body2" 
-                                  sx={{ 
-                                    fontWeight: 'bold',
-                                    color: isRestricted ? '#999999' : '#000000'
-                                  }}
-                                >
-                                  {postType.label}
-                                </Typography>
-                                {isRestricted && (
-                                  <Chip 
-                                    label="Upgrade Required" 
-                                    size="small" 
-                                    variant="outlined"
-                                    sx={{ 
-                                      fontSize: '0.7rem', 
-                                      height: 20,
-                                      backgroundColor: '#f5f5f5',
-                                      color: '#666666',
-                                      border: '1px solid #cccccc'
-                                    }}
-                                  />
-                                )}
-                              </Box>
-                              <Typography 
-                                variant="caption" 
-                                sx={{ color: isRestricted ? '#999999' : '#666666' }}
-                              >
-                                {postType.description}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        }
-                        sx={{ 
-                          alignItems: 'flex-start',
-                          minHeight: 60,
+                        sx={{
                           opacity: isRestricted ? 0.6 : 1,
+                          color: isRestricted ? '#999999' : isSelected ? 'primary.main' : 'text.primary',
                           '&.Mui-selected': {
-                            backgroundColor: isRestricted ? '#f5f5f5' : '#f5f5f5',
-                            color: isRestricted ? '#999999' : '#000000'
-                          },
-                          '&.Mui-disabled': {
-                            opacity: 0.6
+                            color: isRestricted ? '#999999' : 'primary.main'
                           }
                         }}
                       />
@@ -500,67 +408,42 @@ const SocialMediaPostGenerator = () => {
                       </Tooltip>
                     ) : tabContent;
                   })}
-                </Box>
+                </Tabs>
+              </Box>
+              
+              {/* Show upgrade required chips for restricted features */}
+              <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {POST_TYPES.filter(postType => !featureAccess[postType.featureCode]).map((postType) => (
+                  <Tooltip
+                    key={postType.id}
+                    title={getTooltipContent(postType)}
+                    arrow
+                    placement="top"
+                  >
+                    <Chip
+                      label={`${postType.label} - Upgrade Required`}
+                      size="small"
+                      icon={<LockIcon />}
+                      sx={{
+                        backgroundColor: '#f5f5f5',
+                        color: '#999999',
+                        border: '1px solid #e0e0e0'
+                      }}
+                    />
+                  </Tooltip>
+                ))}
               </Box>
             </CardContent>
           </Card>
 
-           {/* Selected Match Display */}
-           {selectedMatch && (
-             <Card sx={{ mb: 3 }}>
-               <CardContent>
-                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                   Selected Match
-                 </Typography>
-                 <Paper
-                   sx={{
-                     p: 3,
-                     backgroundColor: '#fafafa',
-                     border: '1px solid #e0e0e0',
-                     borderRadius: 2
-                   }}
-                 >
-                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                     <Box>
-                       <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                         {selectedMatch.home_away === 'HOME' ? 'HOME' : 'AWAY'} vs {selectedMatch.opponent}
-                       </Typography>
-                       <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-                         {new Date(selectedMatch.date).toLocaleDateString('en-GB', {
-                           weekday: 'long',
-                           year: 'numeric',
-                           month: 'long',
-                           day: 'numeric'
-                         })} at {selectedMatch.time_start}
-                       </Typography>
-                       {selectedMatch.venue && (
-                         <Typography variant="body2" color="text.secondary">
-                           📍 {selectedMatch.venue}
-                         </Typography>
-                       )}
-                     </Box>
-                     {selectedMatch.opponent_logo && (
-                       <Box
-                         component="img"
-                         src={selectedMatch.opponent_logo}
-                         alt={`${selectedMatch.opponent} logo`}
-                         sx={{ width: 80, height: 80, ml: 2 }}
-                       />
-                     )}
-                   </Box>
-                 </Paper>
-               </CardContent>
-             </Card>
-           )}
-
           {/* Generate Button */}
           <Card>
             <CardContent>
-               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                 {(() => {
-                   const postTypeObj = POST_TYPES.find(p => p.id === selectedPostType);
-                   const isRestricted = !hasFeatureAccess(postTypeObj.featureCode);
-                  
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                {(() => {
+                  const postTypeObj = POST_TYPES.find(p => p.id === selectedPostType);
+                  const isRestricted = !featureAccess[postTypeObj.featureCode];
+                 
                   const button = (
                     <Button
                       variant="contained"
@@ -572,16 +455,7 @@ const SocialMediaPostGenerator = () => {
                         py: 2,
                         px: 4,
                         fontSize: '1.1rem',
-                        fontWeight: 'bold',
-                        backgroundColor: isRestricted ? '#cccccc' : '#000000',
-                        color: isRestricted ? '#999999' : '#ffffff',
-                        '&:hover': {
-                          backgroundColor: isRestricted ? '#cccccc' : '#333333',
-                        },
-                        '&:disabled': {
-                          backgroundColor: '#cccccc',
-                          color: '#999999',
-                        },
+                        fontWeight: 'bold'
                       }}
                     >
                       {isRestricted ? 'Upgrade Required' : 'Generate Post'}
@@ -608,107 +482,25 @@ const SocialMediaPostGenerator = () => {
             </CardContent>
           </Card>
 
-          {/* Preview and Download Section */}
-          {(generatedPost || previewImage) && (
+          {/* Generated Image Display */}
+          {generatedImage && (
             <Card sx={{ mt: 3 }}>
               <CardContent>
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                  Generated Post Preview
+                  Generated Post
                 </Typography>
-                
-                {/* Preview Image */}
-                {previewImage && (
-                  <Box sx={{ mb: 3, textAlign: 'center' }}>
-                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
-                      Post Preview
-                    </Typography>
-                    <Box
-                      component="img"
-                      src={previewImage}
-                      alt="Generated post preview"
-                      sx={{
-                        maxWidth: '100%',
-                        height: 'auto',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: 2,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                      }}
-                    />
-                  </Box>
-                )}
-
-                {/* Generated Post Content */}
-                {generatedPost && (
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
-                      Post Content
-                    </Typography>
-                    <Paper
-                      sx={{
-                        p: 2,
-                        backgroundColor: '#fafafa',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: 2
-                      }}
-                    >
-                      <Typography variant="body1" sx={{ mb: 1 }}>
-                        <strong>Type:</strong> {generatedPost.metadata.postType}
-                      </Typography>
-                      <Typography variant="body1" sx={{ mb: 1 }}>
-                        <strong>Opponent:</strong> {generatedPost.metadata.opponent}
-                      </Typography>
-                      <Typography variant="body1" sx={{ mb: 1 }}>
-                        <strong>Date:</strong> {new Date(generatedPost.metadata.date).toLocaleDateString()}
-                      </Typography>
-                      {generatedPost.metadata.venue && (
-                        <Typography variant="body1" sx={{ mb: 1 }}>
-                          <strong>Venue:</strong> {generatedPost.metadata.venue}
-                        </Typography>
-                      )}
-                      <Typography variant="body1" sx={{ mt: 2 }}>
-                        <strong>Content:</strong> {generatedPost.content}
-                      </Typography>
-                    </Paper>
-                  </Box>
-                )}
-
-                {/* Download Buttons */}
-                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  {previewImage && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<Download />}
-                      onClick={downloadImage}
-                      sx={{
-                        borderColor: '#000000',
-                        color: '#000000',
-                        '&:hover': {
-                          borderColor: '#333333',
-                          backgroundColor: '#f5f5f5'
-                        }
-                      }}
-                    >
-                      Download Image
-                    </Button>
-                  )}
-                  
-                  {generatedPost && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<Download />}
-                      onClick={downloadPost}
-                      sx={{
-                        borderColor: '#000000',
-                        color: '#000000',
-                        '&:hover': {
-                          borderColor: '#333333',
-                          backgroundColor: '#f5f5f5'
-                        }
-                      }}
-                    >
-                      Download Post Data
-                    </Button>
-                  )}
+                <Box sx={{ textAlign: 'center' }}>
+                  <Box
+                    component="img"
+                    src={generatedImage}
+                    alt="Generated post"
+                    sx={{
+                      maxWidth: '100%',
+                      height: 'auto',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 2
+                    }}
+                  />
                 </Box>
               </CardContent>
             </Card>
