@@ -127,7 +127,7 @@ const SocialMediaPostGenerator = () => {
   // Fetch feature access data
   const checkFeatureAccess = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       if (!token) {
         setAccessLoading(false);
         return;
@@ -186,7 +186,7 @@ const SocialMediaPostGenerator = () => {
   useEffect(() => {
     const fetchMatches = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         if (!token) {
           navigate('/login');
           return;
