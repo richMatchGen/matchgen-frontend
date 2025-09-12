@@ -4,7 +4,7 @@ import './index.css';
 import App from './App.jsx';
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import AppTheme from './themes/AppTheme';
+import MonochromeTheme from './themes/MonochromeTheme';
 import { BrowserRouter } from 'react-router-dom';
 
 import { MaterialUIControllerProvider } from "./context";
@@ -12,12 +12,12 @@ import { MaterialUIControllerProvider } from "./context";
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <MaterialUIControllerProvider>
-      <AppTheme>
+      <ThemeProvider theme={MonochromeTheme}>
         <CssBaseline />
         <BrowserRouter>
           <App />
         </BrowserRouter>
-      </AppTheme>
+      </ThemeProvider>
     </MaterialUIControllerProvider>
   </StrictMode>
 );
