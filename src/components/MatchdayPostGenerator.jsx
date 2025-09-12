@@ -20,7 +20,8 @@ import {
   Tab,
   Divider,
   Container,
-  CssBaseline
+  CssBaseline,
+  Tooltip
 } from '@mui/material';
 import {
   Download,
@@ -37,7 +38,8 @@ import {
   Person,
   Timer,
   Flag,
-  Lock as LockIcon
+  Lock as LockIcon,
+  Upgrade as UpgradeIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 import AppTheme from '../themes/AppTheme';
@@ -224,6 +226,40 @@ const SocialMediaPostGenerator = () => {
     }
   };
 
+  const getRequiredPlan = (featureCode) => {
+    const planMapping = {
+      'post.substitution': 'SemiPro Gen',
+      'post.halftime': 'SemiPro Gen',
+      'post.fulltime': 'SemiPro Gen',
+      'post.goal': 'Prem Gen',
+      'post.potm': 'Prem Gen'
+    };
+    return planMapping[featureCode] || 'Higher Plan';
+  };
+
+  const getTooltipContent = (postType) => {
+    const requiredPlan = getRequiredPlan(postType.featureCode);
+    return (
+      <Box>
+        <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+          {postType.label} requires {requiredPlan}
+        </Typography>
+        <Typography variant="caption" sx={{ display: 'block', mb: 1 }}>
+          {postType.description}
+        </Typography>
+        <Button
+          size="small"
+          variant="contained"
+          startIcon={<UpgradeIcon />}
+          onClick={() => navigate('/subscription')}
+          sx={{ mt: 1 }}
+        >
+          Upgrade Now
+        </Button>
+      </Box>
+    );
+  };
+
   const generatePost = async () => {
     if (!selectedMatch) {
       setSnackbar({
@@ -239,10 +275,21 @@ const SocialMediaPostGenerator = () => {
     if (currentPostType && currentPostType.featureCode) {
       const hasAccess = featureAccess[currentPostType.featureCode] || false;
       if (!hasAccess) {
+        const requiredPlan = getRequiredPlan(currentPostType.featureCode);
         setSnackbar({
           open: true,
-          message: `${currentPostType.label} requires a higher subscription tier. Please upgrade to access this feature.`,
-          severity: 'warning'
+          message: `${currentPostType.label} requires ${requiredPlan}. Click here to upgrade.`,
+          severity: 'warning',
+          action: (
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => navigate('/subscription')}
+              startIcon={<UpgradeIcon />}
+            >
+              Upgrade
+            </Button>
+          )
         });
         return;
       }
@@ -398,11 +445,22 @@ const SocialMediaPostGenerator = () => {
     if (postType && postType.featureCode) {
       const hasAccess = featureAccess[postType.featureCode] || false;
       if (!hasAccess) {
-        // Show upgrade message
+        const requiredPlan = getRequiredPlan(postType.featureCode);
+        // Show upgrade message with link
         setSnackbar({
           open: true,
-          message: `${postType.label} requires a higher subscription tier. Please upgrade to access this feature.`,
-          severity: 'warning'
+          message: `${postType.label} requires ${requiredPlan}. Click here to upgrade.`,
+          severity: 'warning',
+          action: (
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => navigate('/subscription')}
+              startIcon={<UpgradeIcon />}
+            >
+              Upgrade
+            </Button>
+          )
         });
         return; // Don't change the tab
       }
@@ -481,7 +539,7 @@ const SocialMediaPostGenerator = () => {
                         const hasAccess = featureAccess[postType.featureCode] || false;
                         const isRestricted = !hasAccess;
                         
-                        return (
+                        const tabContent = (
                           <Tab
                             key={postType.id}
                             value={postType.id}
@@ -535,6 +593,27 @@ const SocialMediaPostGenerator = () => {
                             }}
                           />
                         );
+
+                        return isRestricted ? (
+                          <Tooltip
+                            key={postType.id}
+                            title={getTooltipContent(postType)}
+                            placement="right"
+                            arrow
+                            componentsProps={{
+                              tooltip: {
+                                sx: {
+                                  maxWidth: 300,
+                                  '& .MuiTooltip-arrow': {
+                                    color: 'primary.main',
+                                  },
+                                },
+                              },
+                            }}
+                          >
+                            <span>{tabContent}</span>
+                          </Tooltip>
+                        ) : tabContent;
                       })}
                     </Tabs>
                   </CardContent>
@@ -833,7 +912,7 @@ const SocialMediaPostGenerator = () => {
                       const hasAccess = currentPostType ? featureAccess[currentPostType.featureCode] || false : true;
                       const isRestricted = !hasAccess;
                       
-                      return (
+                      const buttonContent = (
                         <Button
                           variant="contained"
                           fullWidth
@@ -857,6 +936,26 @@ const SocialMediaPostGenerator = () => {
                            `Generate ${currentPostType?.label} Post`}
                         </Button>
                       );
+
+                      return isRestricted && currentPostType ? (
+                        <Tooltip
+                          title={getTooltipContent(currentPostType)}
+                          placement="top"
+                          arrow
+                          componentsProps={{
+                            tooltip: {
+                              sx: {
+                                maxWidth: 300,
+                                '& .MuiTooltip-arrow': {
+                                  color: 'primary.main',
+                                },
+                              },
+                            },
+                          }}
+                        >
+                          <span>{buttonContent}</span>
+                        </Tooltip>
+                      ) : buttonContent;
                     })()}
                   </CardContent>
                 </Card>
