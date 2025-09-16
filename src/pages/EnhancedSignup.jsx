@@ -22,13 +22,14 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const steps = ['Create Account', 'Setup Club', 'Choose Graphic Pack'];
+const steps = ['Create Account', 'Verify Email', 'Setup Club', 'Choose Graphic Pack'];
 
 const EnhancedSignup = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [emailVerified, setEmailVerified] = useState(false);
   const navigate = useNavigate();
 
   // Step 1: Account creation
@@ -136,9 +137,56 @@ const EnhancedSignup = () => {
       );
 
       setSuccess('Account created successfully! Please check your email to verify your account.');
-      setActiveStep(1);
+      setActiveStep(1); // Move to verification step
     } catch (err) {
       setError(err.response?.data?.error || 'Account creation failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkEmailVerification = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      // Try to login to check if email is verified
+      const response = await axios.post(
+        'https://matchgen-backend-production.up.railway.app/api/users/token/',
+        {
+          email: accountData.email,
+          password: accountData.password
+        }
+      );
+
+      // If login succeeds, email is verified
+      setEmailVerified(true);
+      setSuccess('Email verified successfully! You can now continue with club setup.');
+      setActiveStep(2); // Move to club setup step
+      
+      // Store tokens
+      localStorage.setItem('accessToken', response.data.access);
+      localStorage.setItem('refreshToken', response.data.refresh);
+    } catch (err) {
+      setError('Email not yet verified. Please check your inbox and click the verification link.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      await axios.post(
+        'https://matchgen-backend-production.up.railway.app/api/users/resend-verification/',
+        { email: accountData.email }
+      );
+
+      setSuccess('Verification email sent successfully! Please check your inbox.');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to resend verification email');
     } finally {
       setLoading(false);
     }
@@ -240,8 +288,10 @@ const EnhancedSignup = () => {
     if (activeStep === 0) {
       handleCreateAccount();
     } else if (activeStep === 1) {
-      handleCreateClub();
+      checkEmailVerification();
     } else if (activeStep === 2) {
+      handleCreateClub();
+    } else if (activeStep === 3) {
       handleFinishSetup();
     }
   };
@@ -293,6 +343,49 @@ const EnhancedSignup = () => {
         );
 
       case 1:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Verify Your Email
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
+              We've sent a verification link to <strong>{accountData.email}</strong>. 
+              Please check your inbox and click the link to verify your account.
+            </Typography>
+            
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                {success}
+              </Alert>
+            )}
+            
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+            
+            <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+              <Button
+                variant="contained"
+                onClick={checkEmailVerification}
+                disabled={loading}
+                startIcon={loading ? <CircularProgress size={20} /> : null}
+              >
+                {loading ? 'Checking...' : 'I\'ve Verified My Email'}
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleResendVerification}
+                disabled={loading}
+              >
+                Resend Email
+              </Button>
+            </Box>
+          </Box>
+        );
+
+      case 2:
         return (
           <Box>
             <Typography variant="h6" gutterBottom>
@@ -446,7 +539,7 @@ const EnhancedSignup = () => {
           </Box>
         );
 
-      case 2:
+      case 3:
         return (
           <Box>
             <Typography variant="h6" gutterBottom>

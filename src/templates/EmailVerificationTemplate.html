@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - MatchGen</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #28443f;
+            margin-bottom: 10px;
+        }
+        .tagline {
+            color: #666;
+            font-size: 14px;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .title {
+            font-size: 24px;
+            color: #28443f;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .message {
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #4a7c59;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+        .cta-button:hover {
+            background-color: #3a6b49;
+        }
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .alternative-link {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .alternative-link a {
+            color: #4a7c59;
+            text-decoration: none;
+        }
+        .footer {
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+        .features {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .features h3 {
+            color: #28443f;
+            margin-bottom: 15px;
+        }
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+        .features li {
+            padding: 5px 0;
+            color: #666;
+        }
+        .features li:before {
+            content: "✓ ";
+            color: #4a7c59;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">MatchGen</div>
+            <div class="tagline">Professional Social Media Posts for Sports Clubs</div>
+        </div>
+        
+        <div class="content">
+            <h1 class="title">Welcome to MatchGen! 🎉</h1>
+            
+            <p class="message">
+                Thank you for signing up! To complete your registration and start creating amazing social media posts for your club, please verify your email address.
+            </p>
+            
+            <div class="button-container">
+                <a href="{{verification_link}}" class="cta-button">
+                    Verify My Email Address
+                </a>
+            </div>
+            
+            <div class="features">
+                <h3>What you'll get with MatchGen:</h3>
+                <ul>
+                    <li>Professional matchday post templates</li>
+                    <li>Starting XI announcements</li>
+                    <li>Goal celebration posts</li>
+                    <li>Substitution updates</li>
+                    <li>Half-time and full-time score posts</li>
+                    <li>Player of the match graphics</li>
+                    <li>Custom branding for your club</li>
+                </ul>
+            </div>
+            
+            <p class="message">
+                Once verified, you'll be able to create your club profile and start generating professional social media content in minutes!
+            </p>
+            
+            <div class="alternative-link">
+                <p>If the button doesn't work, copy and paste this link into your browser:</p>
+                <p><a href="{{verification_link}}">{{verification_link}}</a></p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>This email was sent to {{user_email}}. If you didn't create an account with MatchGen, you can safely ignore this email.</p>
+            <p>© 2024 MatchGen. All rights reserved.</p>
+            <p>Need help? Contact us at support@matchgen.com</p>
+        </div>
+    </div>
+</body>
+</html>

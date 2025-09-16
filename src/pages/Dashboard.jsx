@@ -22,6 +22,7 @@ import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
 import MainGrid from "../components/MainGrid";
+import EmailVerificationBanner from '../components/EmailVerificationBanner';
 import ColorModeSelect from '../themes/colormodeselect';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 import Overview from "./profile";
@@ -89,6 +90,23 @@ const Dashboard = () => {
             }}
           >
             <Header />
+            <EmailVerificationBanner 
+              user={user} 
+              onVerificationComplete={() => {
+                // Refresh user data after verification
+                const fetchData = async () => {
+                  try {
+                    const token = localStorage.getItem("accessToken");
+                    const headers = { Authorization: `Bearer ${token}` };
+                    const userRes = await axios.get("/api/users/me/", { headers });
+                    setUser(userRes.data);
+                  } catch (error) {
+                    console.error('Error refreshing user data:', error);
+                  }
+                };
+                fetchData();
+              }}
+            />
             <MainGrid />
 
           </Stack>

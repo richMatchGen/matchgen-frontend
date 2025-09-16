@@ -48,6 +48,7 @@ import AppNavbar from './AppNavBar';
 import Header from './Header';
 import FeatureGate from './FeatureGate';
 import useFeatureAccess from '../hooks/useFeatureAccess';
+import EmailVerificationBanner from './EmailVerificationBanner';
 
 // API Configuration - same as apiClient
 const API_BASE_URL = import.meta.env.MODE === 'production' 
@@ -159,13 +160,32 @@ const SocialMediaPostGenerator = () => {
   // Feature access state
   const [featureAccess, setFeatureAccess] = useState({});
   const [accessLoading, setAccessLoading] = useState(true);
+  
+  // User state for verification check
+  const [user, setUser] = useState(null);
 
   // Fetch matches and players on component mount
   useEffect(() => {
     fetchMatches();
     fetchPlayers();
     checkFeatureAccess();
+    fetchUserData();
   }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        const response = await axios.get(
+          `${API_BASE_URL}users/me/`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setUser(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   const fetchMatches = async () => {
     try {
@@ -261,6 +281,16 @@ const SocialMediaPostGenerator = () => {
   };
 
   const generatePost = async () => {
+    // Check if user is verified
+    if (!user?.email_verified) {
+      setSnackbar({
+        open: true,
+        message: 'Please verify your email address before creating posts. Check the banner above for verification options.',
+        severity: 'warning'
+      });
+      return;
+    }
+
     if (!selectedMatch) {
       setSnackbar({
         open: true,
@@ -494,9 +524,16 @@ const SocialMediaPostGenerator = () => {
         <SideMenu />
         <Box sx={{ flexGrow: 1 }}>
           <AppNavbar />
-          <Header title="Social Media Post Generator" />
-          
-          <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+           <Header title="Social Media Post Generator" />
+           
+           <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+             <EmailVerificationBanner 
+               user={user} 
+               onVerificationComplete={() => {
+                 // Refresh user data after verification
+                 fetchUserData();
+               }}
+             />
             {/* Header */}
             <Box sx={{ mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -907,35 +944,50 @@ const SocialMediaPostGenerator = () => {
                       </Paper>
                     )}
 
-                    {(() => {
-                      const currentPostType = POST_TYPES.find(pt => pt.id === selectedPostType);
-                      const hasAccess = currentPostType ? featureAccess[currentPostType.featureCode] || false : true;
-                      const isRestricted = !hasAccess;
-                      
-                      const buttonContent = (
-                        <Button
-                          variant="contained"
-                          fullWidth
-                          size="large"
-                          onClick={generatePost}
-                          disabled={!selectedMatch || generating || isRestricted}
-                          startIcon={
-                            generating ? <CircularProgress size={20} /> : 
-                            isRestricted ? <LockIcon /> : 
-                            <Image />
-                          }
-                          sx={{ 
-                            py: 1.5,
-                            fontWeight: 'bold',
-                            fontSize: '1.1rem',
-                            opacity: isRestricted ? 0.6 : 1
-                          }}
-                        >
-                          {generating ? 'Generating...' : 
-                           isRestricted ? 'Upgrade Required' :
-                           `Generate ${currentPostType?.label} Post`}
-                        </Button>
-                      );
+                     {(() => {
+                       const currentPostType = POST_TYPES.find(pt => pt.id === selectedPostType);
+                       const hasAccess = currentPostType ? featureAccess[currentPostType.featureCode] || false : true;
+                       const isRestricted = !hasAccess;
+                       const isUnverified = !user?.email_verified;
+                       
+                       const buttonContent = (
+                         <Button
+                           variant="contained"
+                           fullWidth
+                           size="large"
+                           onClick={generatePost}
+                           disabled={!selectedMatch || generating || isRestricted || isUnverified}
+                           startIcon={
+                             generating ? <CircularProgress size={20} /> : 
+                             isUnverified ? <LockIcon /> :
+                             isRestricted ? <LockIcon /> : 
+                             <Image />
+                           }
+                           sx={{ 
+                             py: 1.5,
+                             fontWeight: 'bold',
+                             fontSize: '1.1rem',
+                             opacity: (isRestricted || isUnverified) ? 0.6 : 1
+                           }}
+                         >
+                           {generating ? 'Generating...' : 
+                            isUnverified ? 'Email Verification Required' :
+                            isRestricted ? 'Upgrade Required' :
+                            `Generate ${currentPostType?.label} Post`}
+                         </Button>
+                       );
+
+                      if (isUnverified) {
+                        return (
+                          <Tooltip
+                            title="Please verify your email address to create posts. Check the banner above for verification options."
+                            placement="top"
+                            arrow
+                          >
+                            <span>{buttonContent}</span>
+                          </Tooltip>
+                        );
+                      }
 
                       return isRestricted && currentPostType ? (
                         <Tooltip
