@@ -40,6 +40,10 @@ const EmailVerificationBanner = ({ user, onVerificationComplete }) => {
 
   // Don't show banner if user is verified
   if (user?.email_verified) {
+    // Debug: Log when user is verified (helps identify auto-verification issues)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 User is verified:', user.email, 'email_verified:', user.email_verified);
+    }
     return null;
   }
 
