@@ -180,7 +180,7 @@ const EnhancedSignup = () => {
 
     try {
       await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/users/resend-verification/',
+        'https://matchgen-backend-production.up.railway.app/api/users/resend-verification-signup/',
         { email: accountData.email }
       );
 
