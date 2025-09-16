@@ -2,40 +2,54 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
-  Typography,
-  Button,
   Card,
   CardContent,
-  Grid,
-  Paper,
-  Container,
+  Typography,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
   CircularProgress,
   Alert,
   Snackbar,
-  Tab,
+  Grid,
+  Chip,
+  Paper,
   Tabs,
+  Tab,
   Divider,
-  Tooltip,
-  Chip
+  Container,
+  CssBaseline,
+  Tooltip
 } from '@mui/material';
 import {
-  ArrowBack,
-  Event,
+  Download,
+  Image,
   Schedule,
-  Group,
+  LocationOn,
   SportsSoccer,
-  SwapHoriz,
+  CheckCircle,
+  ArrowBack,
+  Group,
+  Event,
   EmojiEvents,
+  SwapHoriz,
+  Person,
   Timer,
   Flag,
-  Lock as LockIcon
+  Lock as LockIcon,
+  Upgrade as UpgradeIcon
 } from '@mui/icons-material';
 import axios from 'axios';
+import AppTheme from '../themes/AppTheme';
 import SideMenu from './SideMenu';
 import AppNavbar from './AppNavBar';
 import Header from './Header';
+import FeatureGate from './FeatureGate';
+import useFeatureAccess from '../hooks/useFeatureAccess';
 
-// API Configuration
+// API Configuration - same as apiClient
 const API_BASE_URL = import.meta.env.MODE === 'production' 
   ? 'https://matchgen-backend-production.up.railway.app/api/'
   : 'http://localhost:8000/api/';
@@ -47,6 +61,7 @@ const POST_TYPES = [
     label: 'Matchday', 
     icon: <Event />, 
     description: 'Pre-match announcement with fixture details',
+    color: 'primary',
     featureCode: 'post.matchday'
   },
   { 
@@ -54,6 +69,7 @@ const POST_TYPES = [
     label: 'Upcoming Fixture', 
     icon: <Schedule />, 
     description: 'Future fixture announcement',
+    color: 'info',
     featureCode: 'post.upcoming'
   },
   { 
@@ -61,6 +77,7 @@ const POST_TYPES = [
     label: 'Starting XI', 
     icon: <Group />, 
     description: 'Team lineup announcement',
+    color: 'success',
     featureCode: 'post.startingxi'
   },
   { 
@@ -68,6 +85,7 @@ const POST_TYPES = [
     label: 'Goal', 
     icon: <SportsSoccer />, 
     description: 'Goal celebration post',
+    color: 'warning',
     featureCode: 'post.goal'
   },
   { 
@@ -75,6 +93,7 @@ const POST_TYPES = [
     label: 'Substitution', 
     icon: <SwapHoriz />, 
     description: 'Player substitution announcement',
+    color: 'secondary',
     featureCode: 'post.substitution'
   },
   { 
@@ -82,6 +101,7 @@ const POST_TYPES = [
     label: 'Player of the Match', 
     icon: <EmojiEvents />, 
     description: 'Man of the match announcement',
+    color: 'warning',
     featureCode: 'post.potm'
   },
   { 
@@ -89,6 +109,7 @@ const POST_TYPES = [
     label: 'Half Time', 
     icon: <Timer />, 
     description: 'Half-time score update',
+    color: 'info',
     featureCode: 'post.halftime'
   },
   { 
@@ -96,442 +117,946 @@ const POST_TYPES = [
     label: 'Full Time',
     icon: <Flag />, 
     description: 'Final result announcement',
+    color: 'success',
     featureCode: 'post.fulltime'
   }
 ];
 
 const SocialMediaPostGenerator = () => {
-  const { fixtureId, postType } = useParams();
+  const { fixtureId, postType } = useParams(); // Get fixture ID and post type from URL
   const navigate = useNavigate();
   const [matches, setMatches] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedMatch, setSelectedMatch] = useState(fixtureId || '');
   const [selectedPostType, setSelectedPostType] = useState(postType || 'matchday');
-  const [selectedMatch, setSelectedMatch] = useState(null);
+  
+  // Debug logging
+  console.log('🔍 URL fixtureId:', fixtureId, 'type:', typeof fixtureId);
+  console.log('🔍 selectedMatch:', selectedMatch, 'type:', typeof selectedMatch);
+  console.log('🔍 !fixtureId condition:', !fixtureId);
+  const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null);
+  const [error, setError] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [debugData, setDebugData] = useState(null);
+  
+  // Substitution-specific state
+  const [playerOn, setPlayerOn] = useState('');
+  const [playerOff, setPlayerOff] = useState('');
+  const [minute, setMinute] = useState('');
+  const [players, setPlayers] = useState([]);
+  
+  // Score-specific state
+  const [homeScoreHt, setHomeScoreHt] = useState('0');
+  const [awayScoreHt, setAwayScoreHt] = useState('0');
+  const [homeScoreFt, setHomeScoreFt] = useState('0');
+  const [awayScoreFt, setAwayScoreFt] = useState('0');
+  
+  // Starting XI state
+  const [startingLineup, setStartingLineup] = useState([]);
+  const [substitutes, setSubstitutes] = useState([]);
   
   // Feature access state
   const [featureAccess, setFeatureAccess] = useState({});
   const [accessLoading, setAccessLoading] = useState(true);
 
-  // Fetch feature access data
-  const checkFeatureAccess = async () => {
+  // Fetch matches and players on component mount
+  useEffect(() => {
+    fetchMatches();
+    fetchPlayers();
+    checkFeatureAccess();
+  }, []);
+
+  const fetchMatches = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(
+        'https://matchgen-backend-production.up.railway.app/api/content/matches/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMatches(response.data.results || []);
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+      setError('Failed to load matches');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPlayers = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const selectedClubId = localStorage.getItem('selectedClubId');
+      const response = await axios.get(
+        'https://matchgen-backend-production.up.railway.app/api/content/players/substitution/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setPlayers(response.data || []);
+    } catch (error) {
+      console.error('Error fetching players:', error);
+      // Don't set error here as it's not critical for the main functionality
+    }
+  };
+
+  const checkFeatureAccess = async () => {
+    try {
+      setAccessLoading(true);
+      const token = localStorage.getItem('accessToken');
+      const clubId = localStorage.getItem('selectedClubId');
       
-      if (!token) {
-        setAccessLoading(false);
-        return;
-      }
-
-      if (!selectedClubId || selectedClubId === 'null') {
-        console.warn('No club selected for feature access check');
-        setAccessLoading(false);
-        return;
-      }
-
-      const response = await axios.get(`${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}&t=${Date.now()}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (response.data) {
-        setFeatureAccess(response.data.feature_access || {});
+      if (token && clubId) {
+        const response = await axios.get(
+          `${API_BASE_URL}users/feature-access/?club_id=${clubId}&t=${Date.now()}`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        
+        const { feature_access } = response.data;
+        setFeatureAccess(feature_access || {});
+      } else {
+        // Default to no access if no club ID
+        setFeatureAccess({});
       }
     } catch (error) {
-      console.error('Error fetching feature access:', error);
-      // Set empty feature access on error to prevent UI issues
+      console.error('Error checking feature access:', error);
       setFeatureAccess({});
     } finally {
       setAccessLoading(false);
     }
   };
 
-  useEffect(() => {
-    checkFeatureAccess();
-  }, []);
-
-  // Helper function to get required plan for a feature
   const getRequiredPlan = (featureCode) => {
-    const planMap = {
-      'post.goal': 'Prem Gen',
-      'post.potm': 'Prem Gen',
+    const planMapping = {
       'post.substitution': 'SemiPro Gen',
       'post.halftime': 'SemiPro Gen',
       'post.fulltime': 'SemiPro Gen',
+      'post.goal': 'Prem Gen',
+      'post.potm': 'Prem Gen'
     };
-    return planMap[featureCode] || 'SemiPro Gen';
+    return planMapping[featureCode] || 'Higher Plan';
   };
 
-  // Helper function to generate tooltip content
-  const getTooltipContent = (postType) => (
-    <Box>
-      <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-        {postType.label} requires {getRequiredPlan(postType.featureCode)}
-      </Typography>
-      <Typography variant="caption" sx={{ display: 'block', mb: 1 }}>
-        {postType.description}
-      </Typography>
-      <Button
-        size="small"
-        variant="contained"
-        onClick={() => navigate('/subscription')}
-        sx={{ mt: 1 }}
-      >
-        Upgrade Now
-      </Button>
-    </Box>
-  );
-
-  useEffect(() => {
-    const fetchMatches = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-          navigate('/login');
-          return;
-        }
-
-        const response = await axios.get(`${API_BASE_URL}content/matches/`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (response.data && response.data.results) {
-          setMatches(response.data.results);
-          
-          // If fixtureId is provided, find and select that match
-          if (fixtureId) {
-            const match = response.data.results.find(m => m.id === parseInt(fixtureId));
-            if (match) {
-              setSelectedMatch(match);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching matches:', error);
-        setSnackbar({
-          open: true,
-          message: 'Error fetching matches. Please try again.',
-          severity: 'error'
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMatches();
-  }, [fixtureId, navigate]);
-
-  const handlePostTypeChange = (event, newValue) => {
-    const postTypeObj = POST_TYPES.find(p => p.id === newValue);
-    const isRestricted = !featureAccess[postTypeObj.featureCode];
-    
-    if (isRestricted) {
-      const requiredPlan = getRequiredPlan(postTypeObj.featureCode);
-      setSnackbar({
-        open: true,
-        message: `${postTypeObj.label} requires ${requiredPlan} plan. Upgrade to access this feature.`,
-        severity: 'warning'
-      });
-      return; // Don't change the tab
-    }
-    
-    setSelectedPostType(newValue);
-    setGeneratedImage(null); // Clear previous generated image
+  const getTooltipContent = (postType) => {
+    const requiredPlan = getRequiredPlan(postType.featureCode);
+    return (
+      <Box>
+        <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+          {postType.label} requires {requiredPlan}
+        </Typography>
+        <Typography variant="caption" sx={{ display: 'block', mb: 1 }}>
+          {postType.description}
+        </Typography>
+        <Button
+          size="small"
+          variant="contained"
+          startIcon={<UpgradeIcon />}
+          onClick={() => navigate('/subscription')}
+          sx={{ mt: 1 }}
+        >
+          Upgrade Now
+        </Button>
+      </Box>
+    );
   };
 
   const generatePost = async () => {
     if (!selectedMatch) {
       setSnackbar({
         open: true,
-        message: 'Please select a match first.',
+        message: 'Please select a fixture first',
         severity: 'warning'
       });
       return;
     }
 
-    const postTypeObj = POST_TYPES.find(p => p.id === selectedPostType);
-    const isRestricted = !featureAccess[postTypeObj.featureCode];
-    
-    if (isRestricted) {
-      const requiredPlan = getRequiredPlan(postTypeObj.featureCode);
-      setSnackbar({
-        open: true,
-        message: `${postTypeObj.label} requires ${requiredPlan} plan. Upgrade to access this feature.`,
-        severity: 'warning'
-      });
-      return;
+    // Check feature access before generating
+    const currentPostType = POST_TYPES.find(pt => pt.id === selectedPostType);
+    if (currentPostType && currentPostType.featureCode) {
+      const hasAccess = featureAccess[currentPostType.featureCode] || false;
+      if (!hasAccess) {
+        const requiredPlan = getRequiredPlan(currentPostType.featureCode);
+        setSnackbar({
+          open: true,
+          message: `${currentPostType.label} requires ${requiredPlan}. Click here to upgrade.`,
+          severity: 'warning',
+          action: (
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => navigate('/subscription')}
+              startIcon={<UpgradeIcon />}
+            >
+              Upgrade
+            </Button>
+          )
+        });
+        return;
+      }
     }
 
     try {
-      setLoading(true);
+      console.log('=== FRONTEND: Starting post generation ===');
+      console.log('Selected match ID:', selectedMatch);
+      console.log('Selected post type:', selectedPostType);
       
-      // Mock post generation - replace with actual API call
-      const mockImage = `data:image/svg+xml;base64,${btoa(`
-        <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
-          <rect width="400" height="400" fill="#ffffff" stroke="#000000" stroke-width="2"/>
-          <text x="200" y="50" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#000000">${postTypeObj.label}</text>
-          <text x="200" y="100" text-anchor="middle" font-family="Arial" font-size="18" fill="#333333">${selectedMatch.opponent}</text>
-          <text x="200" y="150" text-anchor="middle" font-family="Arial" font-size="16" fill="#666666">${new Date(selectedMatch.date).toLocaleDateString()}</text>
-          <text x="200" y="200" text-anchor="middle" font-family="Arial" font-size="14" fill="#999999">Generated Post</text>
-        </svg>
-      `)}`;
+      setGenerating(true);
+      setError(null);
+      
+      const token = localStorage.getItem('accessToken');
+      console.log('Making API request to generate post...');
+      
+      // Use the appropriate endpoint based on post type
+      const endpoint = selectedPostType === 'matchday' 
+        ? '/api/graphicpack/generate-matchday-post/'
+        : `/api/graphicpack/generate-${selectedPostType}-post/`;
+      
+      // Prepare request data
+      const requestData = { match_id: selectedMatch };
+      
+      // Add substitution-specific data if post type is 'sub'
+      if (selectedPostType === 'sub') {
+        requestData.player_on = playerOn || 'Player On';
+        requestData.player_off = playerOff || 'Player Off';
+        requestData.minute = minute || 'Minute';
+      }
+      
+      // Add halftime score data if post type is 'halftime'
+      if (selectedPostType === 'halftime') {
+        requestData.home_score_ht = homeScoreHt || '0';
+        requestData.away_score_ht = awayScoreHt || '0';
+      }
+      
+      // Add fulltime score data if post type is 'fulltime'
+      if (selectedPostType === 'fulltime') {
+        requestData.home_score_ft = homeScoreFt || '0';
+        requestData.away_score_ft = awayScoreFt || '0';
+      }
+      
+      // Add starting XI data if post type is 'startingXI'
+      if (selectedPostType === 'startingXI') {
+        requestData.starting_lineup = startingLineup || [];
+        requestData.substitutes = substitutes || [];
+      }
+      
+      const response = await axios.post(
+        `https://matchgen-backend-production.up.railway.app${endpoint}`,
+        requestData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      console.log('=== FRONTEND: API Response ===');
+      console.log('Response status:', response.status);
+      console.log('Response data:', response.data);
 
-      setGeneratedImage(mockImage);
-      
-      setSnackbar({
-        open: true,
-        message: 'Post generated successfully!',
-        severity: 'success'
-      });
-      
+      if (response.data.success) {
+        setGeneratedImage(response.data.image_url);
+        setSnackbar({
+          open: true,
+          message: `${POST_TYPES.find(pt => pt.id === selectedPostType)?.label} post generated successfully!`,
+          severity: 'success'
+        });
+      } else {
+        throw new Error(response.data.error || 'Failed to generate post');
+      }
     } catch (error) {
+      console.log('=== FRONTEND: Error occurred ===');
       console.error('Error generating post:', error);
+      console.log('Error response:', error.response);
+      console.log('Error message:', error.message);
+      
+      setError(error.response?.data?.error || error.message || 'Failed to generate post');
       setSnackbar({
         open: true,
-        message: 'Error generating post. Please try again.',
+        message: error.response?.data?.error || error.message || 'Failed to generate post',
         severity: 'error'
       });
     } finally {
-      setLoading(false);
+      setGenerating(false);
     }
+  };
+
+  const downloadImage = async () => {
+    if (!generatedImage) return;
+
+    try {
+      const response = await fetch(generatedImage);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${selectedPostType}-post-${selectedMatch}.png`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      setSnackbar({
+        open: true,
+        message: 'Image downloaded successfully!',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to download image',
+        severity: 'error'
+      });
+    }
+  };
+
+  const getSelectedMatchData = () => {
+    console.log('🔍 getSelectedMatchData - selectedMatch:', selectedMatch, 'type:', typeof selectedMatch);
+    console.log('🔍 matches:', matches);
+    const match = matches.find(match => match.id === parseInt(selectedMatch));
+    console.log('🔍 found match:', match);
+    return match;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Date TBC';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatTime = (timeString) => {
+    if (!timeString) return 'Time TBC';
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const time = new Date(2000, 0, 1, parseInt(hours), parseInt(minutes));
+      return time.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return timeString;
+    }
+  };
+
+  const handlePostTypeChange = async (event, newValue) => {
+    // Check if user has access to this feature using cached data
+    const postType = POST_TYPES.find(pt => pt.id === newValue);
+    if (postType && postType.featureCode) {
+      const hasAccess = featureAccess[postType.featureCode] || false;
+      if (!hasAccess) {
+        const requiredPlan = getRequiredPlan(postType.featureCode);
+        // Show upgrade message with link
+        setSnackbar({
+          open: true,
+          message: `${postType.label} requires ${requiredPlan}. Click here to upgrade.`,
+          severity: 'warning',
+          action: (
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => navigate('/subscription')}
+              startIcon={<UpgradeIcon />}
+            >
+              Upgrade
+            </Button>
+          )
+        });
+        return; // Don't change the tab
+      }
+    }
+    
+    setSelectedPostType(newValue);
+    setGeneratedImage(null); // Clear previous generated image
   };
 
   if (loading || accessLoading) {
     return (
-      <Box sx={{ display: 'flex' }}>
-        <SideMenu />
-        <Box sx={{ flexGrow: 1, p: 3 }}>
-          <Header />
-          <Container maxWidth="lg">
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+      <AppTheme>
+        <CssBaseline />
+        <Box sx={{ display: 'flex' }}>
+          <SideMenu />
+          <Box sx={{ flexGrow: 1 }}>
+            <AppNavbar />
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
               <CircularProgress />
             </Box>
-          </Container>
+          </Box>
         </Box>
-      </Box>
+      </AppTheme>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <SideMenu />
-      <Box sx={{ flexGrow: 1, p: 3 }}>
-        <Header />
-        <Container maxWidth="lg">
-          <Box sx={{ mb: 3 }}>
-            <Button
-              startIcon={<ArrowBack />}
-              onClick={() => navigate('/dashboard')}
-              sx={{ mb: 2 }}
-            >
-              Back to Dashboard
-            </Button>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
-              Social Media Post Generator
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Generate engaging social media posts for your matches
-            </Typography>
-          </Box>
-
-          {/* Match Selection */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                Select Match
-              </Typography>
-              <Grid container spacing={2}>
-                {matches.map((match) => (
-                  <Grid item xs={12} sm={6} md={4} key={match.id}>
-                    <Paper
-                      sx={{
-                        p: 2,
-                        cursor: 'pointer',
-                        border: selectedMatch?.id === match.id ? 2 : 1,
-                        borderColor: selectedMatch?.id === match.id ? 'primary.main' : 'divider',
-                        '&:hover': {
-                          backgroundColor: 'action.hover'
-                        }
-                      }}
-                      onClick={() => setSelectedMatch(match)}
-                    >
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                        {match.home_away === 'HOME' ? 'HOME' : 'AWAY'} vs {match.opponent}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {new Date(match.date).toLocaleDateString()} at {match.time_start}
-                      </Typography>
-                      {match.venue && (
-                        <Typography variant="caption" color="text.secondary">
-                          {match.venue}
-                        </Typography>
-                      )}
-                    </Paper>
-                  </Grid>
-                ))}
-              </Grid>
-            </CardContent>
-          </Card>
-
-          {/* Post Type Selection */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                Select Post Type
-              </Typography>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs
-                  value={selectedPostType}
-                  onChange={handlePostTypeChange}
-                  variant="scrollable"
-                  scrollButtons="auto"
-                >
-                  {POST_TYPES.map((postType) => {
-                    const isRestricted = !featureAccess[postType.featureCode];
-                    const isSelected = selectedPostType === postType.id;
-                    
-                    const tabContent = (
-                      <Tab
-                        key={postType.id}
-                        value={postType.id}
-                        label={postType.label}
-                        icon={isRestricted ? <LockIcon /> : postType.icon}
-                        disabled={isRestricted}
-                        sx={{
-                          opacity: isRestricted ? 0.6 : 1,
-                          color: isRestricted ? '#999999' : isSelected ? 'primary.main' : 'text.primary',
-                          '&.Mui-selected': {
-                            color: isRestricted ? '#999999' : 'primary.main'
-                          }
-                        }}
-                      />
-                    );
-
-                    return isRestricted ? (
-                      <Tooltip
-                        key={postType.id}
-                        title={getTooltipContent(postType)}
-                        arrow
-                        placement="top"
-                      >
-                        <span>{tabContent}</span>
-                      </Tooltip>
-                    ) : tabContent;
-                  })}
-                </Tabs>
-              </Box>
-              
-              {/* Show upgrade required chips for restricted features */}
-              <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {POST_TYPES.filter(postType => !featureAccess[postType.featureCode]).map((postType) => (
-                  <Tooltip
-                    key={postType.id}
-                    title={getTooltipContent(postType)}
-                    arrow
-                    placement="top"
+    <AppTheme>
+      <CssBaseline />
+      <Box sx={{ display: 'flex' }}>
+        <SideMenu />
+        <Box sx={{ flexGrow: 1 }}>
+          <AppNavbar />
+          <Header title="Social Media Post Generator" />
+          
+          <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+            {/* Header */}
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                {fixtureId && (
+                  <Button
+                    startIcon={<ArrowBack />}
+                    onClick={() => navigate('/dashboard')}
+                    sx={{ mr: 2 }}
                   >
-                    <Chip
-                      label={`${postType.label} - Upgrade Required`}
-                      size="small"
-                      icon={<LockIcon />}
-                      sx={{
-                        backgroundColor: '#f5f5f5',
-                        color: '#999999',
-                        border: '1px solid #e0e0e0'
-                      }}
-                    />
-                  </Tooltip>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-
-          {/* Generate Button */}
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                {(() => {
-                  const postTypeObj = POST_TYPES.find(p => p.id === selectedPostType);
-                  const isRestricted = !featureAccess[postTypeObj.featureCode];
-                 
-                  const button = (
-                    <Button
-                      variant="contained"
-                      size="large"
-                      disabled={!selectedMatch || isRestricted}
-                      startIcon={isRestricted ? <LockIcon /> : <SportsSoccer />}
-                      onClick={generatePost}
-                      sx={{
-                        py: 2,
-                        px: 4,
-                        fontSize: '1.1rem',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {isRestricted ? 'Upgrade Required' : 'Generate Post'}
-                    </Button>
-                  );
-
-                  return isRestricted ? (
-                    <Tooltip
-                      title={getTooltipContent(postTypeObj)}
-                      arrow
-                      placement="top"
-                    >
-                      <span>{button}</span>
-                    </Tooltip>
-                  ) : button;
-                })()}
+                    Back to Dashboard
+                  </Button>
+                )}
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                  Social Media Post Generator
+                </Typography>
               </Box>
               
-              {!selectedMatch && (
-                <Typography variant="body2" color="text.secondary" textAlign="center">
-                  Please select a match to generate a post
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
+              <Typography variant="body1" color="text.secondary">
+                Generate professional social media posts for your club's matches and events.
+              </Typography>
+            </Box>
 
-          {/* Generated Image Display */}
-          {generatedImage && (
-            <Card sx={{ mt: 3 }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                  Generated Post
-                </Typography>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Box
-                    component="img"
-                    src={generatedImage}
-                    alt="Generated post"
-                    sx={{
-                      maxWidth: '100%',
-                      height: 'auto',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 2
-                    }}
-                  />
-                </Box>
-              </CardContent>
-            </Card>
-          )}
+            <Grid container spacing={3}>
+              {/* Left Panel - Post Type Selection */}
+              <Grid item xs={12} md={4}>
+                <Card elevation={3}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                      Post Type
+                    </Typography>
+                    
+                    <Tabs
+                      value={selectedPostType}
+                      onChange={handlePostTypeChange}
+                      orientation="vertical"
+                      variant="scrollable"
+                      sx={{ borderRight: 1, borderColor: 'divider', minHeight: 400 }}
+                    >
+                      {POST_TYPES.map((postType) => {
+                        const hasAccess = featureAccess[postType.featureCode] || false;
+                        const isRestricted = !hasAccess;
+                        
+                        const tabContent = (
+                          <Tab
+                            key={postType.id}
+                            value={postType.id}
+                            disabled={isRestricted}
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'left', width: '100%' }}>
+                                <Box sx={{ mr: 1, color: isRestricted ? 'text.disabled' : `${postType.color}.main` }}>
+                                  {isRestricted ? <LockIcon /> : postType.icon}
+                                </Box>
+                                <Box sx={{ flex: 1 }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Typography 
+                                      variant="body2" 
+                                      sx={{ 
+                                        fontWeight: 'bold',
+                                        color: isRestricted ? 'text.disabled' : 'inherit'
+                                      }}
+                                    >
+                                      {postType.label}
+                                    </Typography>
+                                    {isRestricted && (
+                                      <Chip 
+                                        label="Upgrade Required" 
+                                        size="small" 
+                                        color="warning" 
+                                        variant="outlined"
+                                        sx={{ fontSize: '0.7rem', height: 20 }}
+                                      />
+                                    )}
+                                  </Box>
+                                  <Typography 
+                                    variant="caption" 
+                                    color={isRestricted ? 'text.disabled' : 'text.secondary'}
+                                  >
+                                    {postType.description}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            }
+                            sx={{ 
+                              alignItems: 'flex-start',
+                              minHeight: 60,
+                              opacity: isRestricted ? 0.6 : 1,
+                              '&.Mui-selected': {
+                                backgroundColor: isRestricted ? 'grey.100' : `${postType.color}.50`,
+                                color: isRestricted ? 'text.disabled' : `${postType.color}.main`
+                              },
+                              '&.Mui-disabled': {
+                                opacity: 0.6
+                              }
+                            }}
+                          />
+                        );
 
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={6000}
-            onClose={() => setSnackbar({ ...snackbar, open: false })}
-          >
-            <Alert 
-              onClose={() => setSnackbar({ ...snackbar, open: false })} 
-              severity={snackbar.severity}
+                        return isRestricted ? (
+                          <Tooltip
+                            key={postType.id}
+                            title={getTooltipContent(postType)}
+                            placement="right"
+                            arrow
+                            componentsProps={{
+                              tooltip: {
+                                sx: {
+                                  maxWidth: 300,
+                                  '& .MuiTooltip-arrow': {
+                                    color: 'primary.main',
+                                  },
+                                },
+                              },
+                            }}
+                          >
+                            <span>{tabContent}</span>
+                          </Tooltip>
+                        ) : tabContent;
+                      })}
+                    </Tabs>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Center Panel - Fixture Selection & Details */}
+              <Grid item xs={12} md={4}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                      {fixtureId ? 'Fixture Details' : 'Select Fixture'}
+                    </Typography>
+                    
+                    {!fixtureId && (
+                      <FormControl fullWidth sx={{ mb: 3 }}>
+                        <InputLabel>Choose a fixture</InputLabel>
+                        <Select
+                          value={selectedMatch}
+                          onChange={(e) => setSelectedMatch(e.target.value)}
+                          label="Choose a fixture"
+                        >
+                          {matches.map((match) => (
+                            <MenuItem key={match.id} value={match.id}>
+                              <Box>
+                                <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                                  {match.opponent || 'Opponent TBC'}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {formatDate(match.date)} at {formatTime(match.time_start)}
+                                </Typography>
+                              </Box>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+
+                    {selectedMatch && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'grey.50' }}>
+                        {(() => {
+                          const match = getSelectedMatchData();
+                          return (
+                            <Box>
+                              <Chip 
+                                icon={<SportsSoccer />}
+                                label={`${match?.home_away || 'HOME'} vs ${match?.opponent || 'Opponent TBC'}`}
+                                color={match?.home_away === 'HOME' ? 'primary' : 'secondary'}
+                                sx={{ mb: 2, fontWeight: 'bold' }}
+                              />
+                              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                <Schedule sx={{ mr: 1, fontSize: 16, color: 'primary.main' }} />
+                                <Typography variant="body2">
+                                  {formatDate(match?.date)} at {formatTime(match?.time_start)}
+                                </Typography>
+                              </Box>
+                              {match?.venue && (
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                  <LocationOn sx={{ mr: 1, fontSize: 16, color: 'primary.main' }} />
+                                  <Typography variant="body2">
+                                    {match.venue}
+                                  </Typography>
+                                </Box>
+                              )}
+                            </Box>
+                          );
+                        })()}
+                      </Paper>
+                    )}
+
+                    {/* Substitution Form - Only show for substitution posts */}
+                    {selectedPostType === 'sub' && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'blue.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Substitution Details
+                        </Typography>
+                        
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                          <InputLabel>Player Coming On</InputLabel>
+                          <Select
+                            value={playerOn}
+                            onChange={(e) => setPlayerOn(e.target.value)}
+                            label="Player Coming On"
+                          >
+                            {players.map((player) => (
+                              <MenuItem key={player.id} value={player.name}>
+                                {player.name} ({player.squad_no}) - {player.position}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                          <InputLabel>Player Going Off</InputLabel>
+                          <Select
+                            value={playerOff}
+                            onChange={(e) => setPlayerOff(e.target.value)}
+                            label="Player Going Off"
+                          >
+                            {players.map((player) => (
+                              <MenuItem key={player.id} value={player.name}>
+                                {player.name} ({player.squad_no}) - {player.position}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                          <InputLabel>Minute</InputLabel>
+                          <Select
+                            value={minute}
+                            onChange={(e) => setMinute(e.target.value)}
+                            label="Minute"
+                          >
+                            {Array.from({ length: 90 }, (_, i) => i + 1).map((min) => (
+                              <MenuItem key={min} value={min.toString()}>
+                                {min}'
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Paper>
+                    )}
+
+                    {/* Halftime Score Form - Only show for halftime posts */}
+                    {selectedPostType === 'halftime' && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'orange.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Half Time Score
+                        </Typography>
+                        
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                          <FormControl fullWidth>
+                            <InputLabel>Home Team Score</InputLabel>
+                            <Select
+                              value={homeScoreHt}
+                              onChange={(e) => setHomeScoreHt(e.target.value)}
+                              label="Home Team Score"
+                            >
+                              {Array.from({ length: 21 }, (_, i) => i).map((score) => (
+                                <MenuItem key={score} value={score.toString()}>
+                                  {score}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+
+                          <FormControl fullWidth>
+                            <InputLabel>Away Team Score</InputLabel>
+                            <Select
+                              value={awayScoreHt}
+                              onChange={(e) => setAwayScoreHt(e.target.value)}
+                              label="Away Team Score"
+                            >
+                              {Array.from({ length: 21 }, (_, i) => i).map((score) => (
+                                <MenuItem key={score} value={score.toString()}>
+                                  {score}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </Paper>
+                    )}
+
+                    {/* Fulltime Score Form - Only show for fulltime posts */}
+                    {selectedPostType === 'fulltime' && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'green.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Full Time Score
+                        </Typography>
+                        
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                          <FormControl fullWidth>
+                            <InputLabel>Home Team Score</InputLabel>
+                            <Select
+                              value={homeScoreFt}
+                              onChange={(e) => setHomeScoreFt(e.target.value)}
+                              label="Home Team Score"
+                            >
+                              {Array.from({ length: 21 }, (_, i) => i).map((score) => (
+                                <MenuItem key={score} value={score.toString()}>
+                                  {score}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+
+                          <FormControl fullWidth>
+                            <InputLabel>Away Team Score</InputLabel>
+                            <Select
+                              value={awayScoreFt}
+                              onChange={(e) => setAwayScoreFt(e.target.value)}
+                              label="Away Team Score"
+                            >
+                              {Array.from({ length: 21 }, (_, i) => i).map((score) => (
+                                <MenuItem key={score} value={score.toString()}>
+                                  {score}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </Paper>
+                    )}
+
+                    {/* Starting XI Form - Only show for starting XI posts */}
+                    {selectedPostType === 'startingXI' && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'purple.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Starting XI & Substitutes
+                        </Typography>
+                        
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+                          {/* Starting Lineup */}
+                          <Box>
+                            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                              Starting Lineup (Select 11 players)
+                            </Typography>
+                            <FormControl fullWidth>
+                              <Select
+                                multiple
+                                value={startingLineup}
+                                onChange={(e) => {
+                                  const selected = e.target.value;
+                                  // Limit to 11 players
+                                  if (selected.length <= 11) {
+                                    setStartingLineup(selected);
+                                  }
+                                }}
+                                renderValue={(selected) => (
+                                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selected.map((value) => (
+                                      <Chip key={value} label={value} size="small" />
+                                    ))}
+                                  </Box>
+                                )}
+                              >
+                                {players
+                                  .filter(player => !substitutes.includes(player.name))
+                                  .map((player) => (
+                                    <MenuItem key={player.id} value={player.name}>
+                                      {player.name} ({player.squad_no}) - {player.position}
+                                    </MenuItem>
+                                  ))}
+                              </Select>
+                            </FormControl>
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              {startingLineup.length}/11 players selected
+                            </Typography>
+                          </Box>
+
+                          {/* Substitutes */}
+                          <Box>
+                            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                              Substitutes (Select up to 7 players)
+                            </Typography>
+                            <FormControl fullWidth>
+                              <Select
+                                multiple
+                                value={substitutes}
+                                onChange={(e) => {
+                                  const selected = e.target.value;
+                                  // Limit to 7 substitutes
+                                  if (selected.length <= 7) {
+                                    setSubstitutes(selected);
+                                  }
+                                }}
+                                renderValue={(selected) => (
+                                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selected.map((value) => (
+                                      <Chip key={value} label={value} size="small" />
+                                    ))}
+                                  </Box>
+                                )}
+                              >
+                                {players
+                                  .filter(player => !startingLineup.includes(player.name))
+                                  .map((player) => (
+                                    <MenuItem key={player.id} value={player.name}>
+                                      {player.name} ({player.squad_no}) - {player.position}
+                                    </MenuItem>
+                                  ))}
+                              </Select>
+                            </FormControl>
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              {substitutes.length}/7 substitutes selected
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Paper>
+                    )}
+
+                    {(() => {
+                      const currentPostType = POST_TYPES.find(pt => pt.id === selectedPostType);
+                      const hasAccess = currentPostType ? featureAccess[currentPostType.featureCode] || false : true;
+                      const isRestricted = !hasAccess;
+                      
+                      const buttonContent = (
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          size="large"
+                          onClick={generatePost}
+                          disabled={!selectedMatch || generating || isRestricted}
+                          startIcon={
+                            generating ? <CircularProgress size={20} /> : 
+                            isRestricted ? <LockIcon /> : 
+                            <Image />
+                          }
+                          sx={{ 
+                            py: 1.5,
+                            fontWeight: 'bold',
+                            fontSize: '1.1rem',
+                            opacity: isRestricted ? 0.6 : 1
+                          }}
+                        >
+                          {generating ? 'Generating...' : 
+                           isRestricted ? 'Upgrade Required' :
+                           `Generate ${currentPostType?.label} Post`}
+                        </Button>
+                      );
+
+                      return isRestricted && currentPostType ? (
+                        <Tooltip
+                          title={getTooltipContent(currentPostType)}
+                          placement="top"
+                          arrow
+                          componentsProps={{
+                            tooltip: {
+                              sx: {
+                                maxWidth: 300,
+                                '& .MuiTooltip-arrow': {
+                                  color: 'primary.main',
+                                },
+                              },
+                            },
+                          }}
+                        >
+                          <span>{buttonContent}</span>
+                        </Tooltip>
+                      ) : buttonContent;
+                    })()}
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Right Panel - Generated Image */}
+              <Grid item xs={12} md={4}>
+                <Card elevation={3}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                      Generated Post
+                    </Typography>
+                    
+                    {error && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                      </Alert>
+                    )}
+
+                    {generatedImage ? (
+                      <Box>
+                        <Paper elevation={2} sx={{ p: 1, mb: 2, backgroundColor: 'grey.50' }}>
+                          <img 
+                            src={generatedImage} 
+                            alt="Generated social media post"
+                            style={{ 
+                              width: '100%', 
+                              height: 'auto', 
+                              maxHeight: '400px',
+                              objectFit: 'contain',
+                              borderRadius: '8px',
+                              border: '2px solid #e0e0e0'
+                            }}
+                          />
+                        </Paper>
+                        
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                          <Button
+                            variant="contained"
+                            fullWidth
+                            onClick={downloadImage}
+                            startIcon={<Download />}
+                            sx={{ 
+                              py: 1.5,
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            Download Image
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={() => {
+                              setGeneratedImage(null);
+                              setSelectedMatch('');
+                            }}
+                            startIcon={<CheckCircle />}
+                            sx={{ 
+                              py: 1.5,
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            Generate Another
+                          </Button>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        minHeight: 300,
+                        backgroundColor: 'grey.50',
+                        borderRadius: 2,
+                        border: '2px dashed #ccc'
+                      }}>
+                        <Typography variant="body1" color="text.secondary">
+                          Generated post will appear here
+                        </Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+
+            <Snackbar
+              open={snackbar.open}
+              autoHideDuration={6000}
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
             >
-              {snackbar.message}
-            </Alert>
-          </Snackbar>
-        </Container>
+              <Alert 
+                onClose={() => setSnackbar({ ...snackbar, open: false })} 
+                severity={snackbar.severity}
+              >
+                {snackbar.message}
+              </Alert>
+            </Snackbar>
+          </Container>
+        </Box>
       </Box>
-    </Box>
+    </AppTheme>
   );
 };
 
