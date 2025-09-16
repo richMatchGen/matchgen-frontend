@@ -15,7 +15,8 @@ import {
   Tab,
   Tabs,
   Divider,
-  Tooltip
+  Tooltip,
+  Chip
 } from '@mui/material';
 import {
   ArrowBack,
@@ -117,12 +118,20 @@ const SocialMediaPostGenerator = () => {
   const checkFeatureAccess = async () => {
     try {
       const token = localStorage.getItem('accessToken');
+      const selectedClubId = localStorage.getItem('selectedClubId');
+      
       if (!token) {
         setAccessLoading(false);
         return;
       }
 
-      const response = await axios.get(`${API_BASE_URL}users/feature-access/`, {
+      if (!selectedClubId || selectedClubId === 'null') {
+        console.warn('No club selected for feature access check');
+        setAccessLoading(false);
+        return;
+      }
+
+      const response = await axios.get(`${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}&t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -131,6 +140,8 @@ const SocialMediaPostGenerator = () => {
       }
     } catch (error) {
       console.error('Error fetching feature access:', error);
+      // Set empty feature access on error to prevent UI issues
+      setFeatureAccess({});
     } finally {
       setAccessLoading(false);
     }
