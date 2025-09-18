@@ -27,6 +27,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import useClubSingleton from '../hooks/useClubSingleton';
+import axios from 'axios';
 
 const TodoList = () => {
   const navigate = useNavigate();
@@ -37,6 +38,63 @@ const TodoList = () => {
     const saved = localStorage.getItem('completedTasks');
     return saved ? JSON.parse(saved) : {};
   });
+  
+  // State for dynamic data
+  const [playersCount, setPlayersCount] = useState(0);
+  const [fixturesCount, setFixturesCount] = useState(0);
+  const [selectedPackId, setSelectedPackId] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch dynamic data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) return;
+
+        const headers = { Authorization: `Bearer ${token}` };
+
+        // Fetch players count
+        try {
+          const playersRes = await axios.get(
+            'https://matchgen-backend-production.up.railway.app/api/content/players/',
+            { headers }
+          );
+          setPlayersCount(playersRes.data.results?.length || 0);
+        } catch (error) {
+          console.warn('Failed to fetch players:', error);
+        }
+
+        // Fetch fixtures count
+        try {
+          const fixturesRes = await axios.get(
+            'https://matchgen-backend-production.up.railway.app/api/content/matches/',
+            { headers }
+          );
+          setFixturesCount(fixturesRes.data.results?.length || 0);
+        } catch (error) {
+          console.warn('Failed to fetch fixtures:', error);
+        }
+
+        // Fetch user data to check selected pack
+        try {
+          const userRes = await axios.get(
+            'https://matchgen-backend-production.up.railway.app/api/users/me/',
+            { headers }
+          );
+          setSelectedPackId(userRes.data.selected_pack_id);
+        } catch (error) {
+          console.warn('Failed to fetch user data:', error);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Define todo items with their routes and completion logic
   const todoItems = [
@@ -55,7 +113,7 @@ const TodoList = () => {
       description: 'Add your upcoming matches and fixtures',
       icon: <EventIcon />,
       route: '/fixture/creatematch',
-      isCompleted: () => completedTasks['create-fixtures'] || false,
+      isCompleted: () => fixturesCount > 0,
       severity: 'warning'
     },
     {
@@ -64,7 +122,7 @@ const TodoList = () => {
       description: 'Add your team members and player profiles',
       icon: <PersonIcon />,
       route: '/squad/createplayer',
-      isCompleted: () => completedTasks['create-players'] || false,
+      isCompleted: () => playersCount > 0,
       severity: 'success'
     },
     {
@@ -73,17 +131,8 @@ const TodoList = () => {
       description: 'Select a graphic template pack for your posts',
       icon: <PaletteIcon />,
       route: '/gen/templates',
-      isCompleted: () => completedTasks['choose-template'] || false,
+      isCompleted: () => selectedPackId && selectedPackId !== null && selectedPackId !== '',
       severity: 'secondary'
-    },
-    {
-      id: 'choose-payment',
-      title: 'Choose Payment Plan',
-      description: 'Select a subscription plan that fits your needs',
-      icon: <PaymentIcon />,
-      route: '/subscription',
-      isCompleted: () => completedTasks['choose-payment'] || false,
-      severity: 'error'
     }
   ];
 
@@ -174,7 +223,15 @@ const TodoList = () => {
                           boxShadow: 3
                         },
                         opacity: isCompleted ? 0.8 : 1,
-                        position: 'relative'
+                        position: 'relative',
+                        // Green background for completed tasks
+                        ...(isCompleted && {
+                          backgroundColor: 'success.light',
+                          color: 'success.contrastText',
+                          '& .MuiAlert-icon': {
+                            color: 'success.contrastText'
+                          }
+                        })
                       }}
                       onClick={() => handleTaskClick(item)}
                     >

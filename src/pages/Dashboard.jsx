@@ -90,23 +90,26 @@ const Dashboard = () => {
             }}
           >
             <Header />
-            <EmailVerificationBanner 
-              user={user} 
-              onVerificationComplete={() => {
-                // Refresh user data after verification
-                const fetchData = async () => {
-                  try {
-                    const token = localStorage.getItem("accessToken");
-                    const headers = { Authorization: `Bearer ${token}` };
-                    const userRes = await axios.get("/api/users/me/", { headers });
-                    setUser(userRes.data);
-                  } catch (error) {
-                    console.error('Error refreshing user data:', error);
-                  }
-                };
-                fetchData();
-              }}
-            />
+            {/* Only show email verification banner if user is not verified */}
+            {!user?.email_verified && (
+              <EmailVerificationBanner 
+                user={user} 
+                onVerificationComplete={() => {
+                  // Refresh user data after verification
+                  const fetchData = async () => {
+                    try {
+                      const token = localStorage.getItem("accessToken");
+                      const headers = { Authorization: `Bearer ${token}` };
+                      const userRes = await axios.get("/api/users/me/", { headers });
+                      setUser(userRes.data);
+                    } catch (error) {
+                      console.error('Error refreshing user data:', error);
+                    }
+                  };
+                  fetchData();
+                }}
+              />
+            )}
             <MainGrid />
 
           </Stack>
