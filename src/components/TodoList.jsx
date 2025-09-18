@@ -76,17 +76,17 @@ const TodoList = () => {
           console.warn('Failed to fetch fixtures:', error);
         }
 
-        // Fetch user data to check selected pack
+        // Fetch club data to check selected pack (selected_pack_id is stored in club, not user)
         try {
-          const userRes = await axios.get(
-            'https://matchgen-backend-production.up.railway.app/api/users/me/',
+          const clubRes = await axios.get(
+            'https://matchgen-backend-production.up.railway.app/api/users/my-club/',
             { headers }
           );
-          console.log('🔍 User data for template pack:', userRes.data);
-          console.log('🔍 selected_pack_id:', userRes.data.selected_pack_id);
-          setSelectedPackId(userRes.data.selected_pack_id);
+          console.log('🔍 Club data for template pack:', clubRes.data);
+          console.log('🔍 selected_pack_id from club:', clubRes.data.selected_pack);
+          setSelectedPackId(clubRes.data.selected_pack);
         } catch (error) {
-          console.warn('Failed to fetch user data:', error);
+          console.warn('Failed to fetch club data:', error);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
