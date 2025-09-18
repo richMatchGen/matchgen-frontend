@@ -123,7 +123,12 @@ const TodoList = () => {
       icon: <PaletteIcon />,
       route: '/gen/templates',
       isCompleted: () => {
-        const completed = selectedPackId != null && selectedPackId !== '';
+        // More robust template pack completion check
+        const completed = selectedPackId != null && 
+                        selectedPackId !== '' && 
+                        selectedPackId !== undefined &&
+                        selectedPackId !== 'null' &&
+                        selectedPackId !== 'undefined';
         console.log('🔍 Template pack completion check:', {
           selectedPackId,
           completed,
@@ -136,8 +141,15 @@ const TodoList = () => {
     }
   ];
 
-  // Check if all tasks are completed
-  const allCompleted = todoItems.every(item => item.isCompleted());
+  // Check if all tasks are completed with more robust logic
+  const allCompleted = todoItems.every(item => {
+    try {
+      return item.isCompleted();
+    } catch (error) {
+      console.warn(`Error checking completion for ${item.id}:`, error);
+      return false;
+    }
+  });
   
   // Debug logging for completion status
   useEffect(() => {
@@ -176,8 +188,14 @@ const TodoList = () => {
     setExpanded(!expanded);
   };
 
-  // Don't show the todo list if all tasks are completed
+  // Don't show the todo list if all tasks are completed or while loading
   if (allCompleted) {
+    console.log('✅ All tasks completed, hiding TodoList');
+    return null;
+  }
+
+  // Show loading state while fetching data
+  if (loading) {
     return null;
   }
 
