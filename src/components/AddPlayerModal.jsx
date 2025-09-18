@@ -97,7 +97,7 @@ export default function NestedModal() {
         aria-labelledby="parent-modal-title"
         aria-describedby="parent-modal-description"
       >
-        <Box sx={{ ...style, width: 400 }}>
+        <Box sx={{ ...style,  }}>
           {/* <h2 id="parent-modal-title">Add Player</h2> */}
           {/* <p id="parent-modal-description">
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.

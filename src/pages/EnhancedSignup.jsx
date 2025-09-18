@@ -22,7 +22,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const steps = ['Create Account', 'Verify Email', 'Setup Club', 'Choose Graphic Pack'];
+const steps = ['Create Account', 'Verify Email', 'Setup Club'];
 
 const EnhancedSignup = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -54,10 +54,7 @@ const EnhancedSignup = () => {
     logo: null
   });
 
-  // Step 3: Graphic pack selection
-  const [selectedGraphicPack, setSelectedGraphicPack] = useState('');
-
-  const [graphicPacks, setGraphicPacks] = useState([]);
+  // Removed graphic pack selection step
 
   const handleAccountChange = (e) => {
     setAccountData({
@@ -240,8 +237,10 @@ const EnhancedSignup = () => {
         }
       );
 
-      setSuccess('Club created successfully! Now choose your graphic pack.');
-      setActiveStep(2);
+      setSuccess('Club created successfully! Redirecting to dashboard...');
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
       localStorage.setItem('accessToken', token);
       localStorage.setItem('refreshToken', loginResponse.data.refresh);
     } catch (err) {
@@ -251,38 +250,7 @@ const EnhancedSignup = () => {
     }
   };
 
-  const handleFinishSetup = async () => {
-    if (!selectedGraphicPack) {
-      setError('Please select a graphic pack or choose "Choose Later"');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      // Update club with graphic pack selection
-      const token = localStorage.getItem('accessToken');
-      const clubResponse = await axios.patch(
-        'https://matchgen-backend-production.up.railway.app/api/users/club/enhanced/',
-        { graphic_pack_id: selectedGraphicPack },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      setSuccess('Setup complete! Redirecting to dashboard...');
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 2000);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to complete setup');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Removed handleFinishSetup function - no longer needed
 
   const handleNext = () => {
     if (activeStep === 0) {
@@ -291,8 +259,6 @@ const EnhancedSignup = () => {
       checkEmailVerification();
     } else if (activeStep === 2) {
       handleCreateClub();
-    } else if (activeStep === 3) {
-      handleFinishSetup();
     }
   };
 
@@ -539,136 +505,7 @@ const EnhancedSignup = () => {
           </Box>
         );
 
-      case 3:
-        return (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Choose Your Graphic Pack
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Select a graphic pack to get started with professional templates, or choose to select later from your dashboard.
-            </Typography>
-            
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <Card 
-                  variant={selectedGraphicPack === '' ? "elevation" : "outlined"}
-                  sx={{ 
-                    cursor: 'pointer',
-                    border: selectedGraphicPack === '' ? '2px solid #1976d2' : '1px solid #e0e0e0',
-                    transform: selectedGraphicPack === '' ? 'scale(1.02)' : 'scale(1)',
-                    transition: 'all 0.2s ease-in-out'
-                  }}
-                  onClick={() => setSelectedGraphicPack('')}
-                >
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <Typography variant="h6" gutterBottom>
-                      Choose Later
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      No graphic pack selected
-                    </Typography>
-                    <Typography variant="caption" sx={{ mt: 2, display: 'block' }}>
-                      You can select from our full catalog later
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Card 
-                  variant={selectedGraphicPack === 'default' ? "elevation" : "outlined"}
-                  sx={{ 
-                    cursor: 'pointer',
-                    border: selectedGraphicPack === 'default' ? '2px solid #1976d2' : '1px solid #e0e0e0',
-                    transform: selectedGraphicPack === 'default' ? 'scale(1.02)' : 'scale(1)',
-                    transition: 'all 0.2s ease-in-out'
-                  }}
-                  onClick={() => setSelectedGraphicPack('default')}
-                >
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <Typography variant="h6" gutterBottom>
-                      Default Pack
-                    </Typography>
-                    <Box sx={{ 
-                      width: '100%', 
-                      height: '120px', 
-                      bgcolor: '#f5f5f5', 
-                      borderRadius: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mb: 2
-                    }}>
-                      <Typography variant="h4" color="text.secondary">
-                        🎨
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Professional templates for all sports
-                    </Typography>
-                    <Typography variant="caption" sx={{ mt: 2, display: 'block' }}>
-                      Includes 10+ base templates
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Card 
-                  variant={selectedGraphicPack === 'premium' ? "elevation" : "outlined"}
-                  sx={{ 
-                    cursor: 'pointer',
-                    border: selectedGraphicPack === 'premium' ? '2px solid #1976d2' : '1px solid #e0e0e0',
-                    transform: selectedGraphicPack === 'premium' ? 'scale(1.02)' : 'scale(1)',
-                    transition: 'all 0.2s ease-in-out'
-                  }}
-                  onClick={() => setSelectedGraphicPack('premium')}
-                >
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <Typography variant="h6" gutterBottom>
-                      Premium Pack
-                    </Typography>
-                    <Box sx={{ 
-                      width: '100%', 
-                      height: '120px', 
-                      bgcolor: '#f5f5f5', 
-                      borderRadius: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mb: 2
-                    }}>
-                      <Typography variant="h4" color="text.secondary">
-                        ⭐
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Advanced templates with customization
-                    </Typography>
-                    <Typography variant="caption" sx={{ mt: 2, display: 'block' }}>
-                      Includes 25+ premium templates
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-
-            {selectedGraphicPack && (
-              <Box sx={{ mt: 3, p: 2, bgcolor: '#f8f9fa', borderRadius: 1 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Selected: {selectedGraphicPack === 'default' ? 'Default Pack' : 'Premium Pack'}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {selectedGraphicPack === 'default' 
-                    ? 'You\'ll have access to our professional default templates for all sports.' 
-                    : 'You\'ll have access to our premium templates with advanced customization options.'
-                  }
-                </Typography>
-              </Box>
-            )}
-          </Box>
-        );
+      // Removed case 3 - Choose Graphic Pack step
 
       default:
         return null;
@@ -726,9 +563,9 @@ const EnhancedSignup = () => {
               ) : activeStep === 0 ? (
                 'Create Account'
               ) : activeStep === 1 ? (
-                'Create Club'
+                'Verify Email'
               ) : (
-                'Complete Setup'
+                'Create Club'
               )}
             </Button>
           </Box>
