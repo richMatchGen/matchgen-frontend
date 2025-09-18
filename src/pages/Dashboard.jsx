@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
 import useClubSingleton from "../hooks/useClubSingleton";
+import { apiClient } from "../api/config";
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -47,9 +48,15 @@ const Dashboard = () => {
   
     const fetchData = async () => {
       try {
-        const userRes = await axios.get("/api/users/me/", { headers });
+        console.log('🔍 Dashboard: Starting user data fetch...');
+        const userRes = await apiClient.get("/users/me/");
+        console.log('🔍 Dashboard user data response:', userRes);
+        console.log('🔍 Dashboard user data:', userRes.data);
+        console.log('🔍 Dashboard email_verified:', userRes.data?.email_verified);
         setUser(userRes.data);
-      } catch {
+      } catch (error) {
+        console.error('🔍 Dashboard user fetch error:', error);
+        console.error('🔍 Dashboard error response:', error.response);
         logout();
         return;
       } finally {
@@ -105,9 +112,8 @@ const Dashboard = () => {
                   // Refresh user data after verification
                   const fetchData = async () => {
                     try {
-                      const token = localStorage.getItem("accessToken");
-                      const headers = { Authorization: `Bearer ${token}` };
-                      const userRes = await axios.get("/api/users/me/", { headers });
+                      const userRes = await apiClient.get("/users/me/");
+                      console.log('🔍 Dashboard user data after verification:', userRes.data);
                       setUser(userRes.data);
                     } catch (error) {
                       console.error('Error refreshing user data:', error);

@@ -38,6 +38,11 @@ const EmailVerificationBanner = ({ user, onVerificationComplete }) => {
     }
   };
 
+  // Debug: Log user data received by EmailVerificationBanner
+  console.log('🔍 EmailVerificationBanner user data:', user);
+  console.log('🔍 EmailVerificationBanner email_verified:', user?.email_verified);
+  console.log('🔍 EmailVerificationBanner should show banner:', !user?.email_verified);
+
   // Don't show banner if user is verified
   if (user?.email_verified) {
     // Debug: Log when user is verified (helps identify auto-verification issues)
