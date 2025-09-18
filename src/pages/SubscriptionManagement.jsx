@@ -89,6 +89,9 @@ const SubscriptionManagement = () => {
           ? 'https://matchgen-backend-production.up.railway.app/api/'
           : 'http://localhost:8000/api/';
           
+        console.log('Fetching feature access for club:', clubId);
+        console.log('API URL:', `${API_BASE_URL}users/feature-access/?club_id=${clubId}`);
+        
         const response = await axios.get(
           `${API_BASE_URL}users/feature-access/?club_id=${clubId}`,
           {
@@ -96,6 +99,7 @@ const SubscriptionManagement = () => {
           }
         );
         
+        console.log('Feature access response:', response.data);
         setSubscriptionInfo(response.data);
       } else {
         // Set default subscription info for users without clubs
@@ -107,7 +111,14 @@ const SubscriptionManagement = () => {
       }
     } catch (error) {
       console.error('Error fetching subscription info:', error);
-      setError('Failed to load subscription information');
+      
+      // Check if it's a 403 error (permission issue)
+      if (error.response?.status === 403) {
+        console.log('403 error - likely permission issue, using fallback data');
+        setError(null); // Don't show error for 403, use fallback
+      } else {
+        setError('Failed to load subscription information');
+      }
       
       // Set default subscription info on error
       setSubscriptionInfo({
