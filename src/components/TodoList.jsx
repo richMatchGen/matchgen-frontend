@@ -82,6 +82,8 @@ const TodoList = () => {
             'https://matchgen-backend-production.up.railway.app/api/users/me/',
             { headers }
           );
+          console.log('🔍 User data for template pack:', userRes.data);
+          console.log('🔍 selected_pack_id:', userRes.data.selected_pack_id);
           setSelectedPackId(userRes.data.selected_pack_id);
         } catch (error) {
           console.warn('Failed to fetch user data:', error);
@@ -131,13 +133,33 @@ const TodoList = () => {
       description: 'Select a graphic template pack for your posts',
       icon: <PaletteIcon />,
       route: '/gen/templates',
-      isCompleted: () => selectedPackId && selectedPackId !== null && selectedPackId !== '',
+      isCompleted: () => {
+        const completed = selectedPackId && selectedPackId !== null && selectedPackId !== '';
+        console.log('🔍 Template pack completion check:', {
+          selectedPackId,
+          completed,
+          type: typeof selectedPackId
+        });
+        return completed;
+      },
       severity: 'secondary'
     }
   ];
 
   // Check if all tasks are completed
   const allCompleted = todoItems.every(item => item.isCompleted());
+  
+  // Debug logging for completion status
+  useEffect(() => {
+    console.log('🔍 TodoList completion status:', {
+      allCompleted,
+      tasks: todoItems.map(item => ({
+        id: item.id,
+        title: item.title,
+        completed: item.isCompleted()
+      }))
+    });
+  }, [allCompleted, selectedPackId, playersCount, fixturesCount, club]);
 
   // Save completed tasks to localStorage whenever it changes
   useEffect(() => {

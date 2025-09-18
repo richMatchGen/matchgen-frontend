@@ -91,7 +91,14 @@ const Dashboard = () => {
           >
             <Header />
             {/* Only show email verification banner if user is not verified */}
-            {!user?.email_verified && (
+            {(() => {
+              console.log('🔍 Email verification check:', {
+                user: user,
+                email_verified: user?.email_verified,
+                shouldShowBanner: !user?.email_verified
+              });
+              return !user?.email_verified;
+            })() && (
               <EmailVerificationBanner 
                 user={user} 
                 onVerificationComplete={() => {
