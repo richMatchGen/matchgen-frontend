@@ -42,8 +42,10 @@ const TodoList = () => {
   // State for dynamic data
   const [playersCount, setPlayersCount] = useState(0);
   const [fixturesCount, setFixturesCount] = useState(0);
-  const [selectedPackId, setSelectedPackId] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Get selected pack from existing club data (avoid rate limiting)
+  const selectedPackId = club?.selected_pack;
 
   // Fetch dynamic data on component mount
   useEffect(() => {
@@ -74,19 +76,6 @@ const TodoList = () => {
           setFixturesCount(fixturesRes.data.results?.length || 0);
         } catch (error) {
           console.warn('Failed to fetch fixtures:', error);
-        }
-
-        // Fetch club data to check selected pack (selected_pack_id is stored in club, not user)
-        try {
-          const clubRes = await axios.get(
-            'https://matchgen-backend-production.up.railway.app/api/users/my-club/',
-            { headers }
-          );
-          console.log('🔍 Club data for template pack:', clubRes.data);
-          console.log('🔍 selected_pack_id from club:', clubRes.data.selected_pack);
-          setSelectedPackId(clubRes.data.selected_pack);
-        } catch (error) {
-          console.warn('Failed to fetch club data:', error);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -138,7 +127,8 @@ const TodoList = () => {
         console.log('🔍 Template pack completion check:', {
           selectedPackId,
           completed,
-          type: typeof selectedPackId
+          type: typeof selectedPackId,
+          club: club
         });
         return completed;
       },
@@ -153,6 +143,10 @@ const TodoList = () => {
   useEffect(() => {
     console.log('🔍 TodoList completion status:', {
       allCompleted,
+      club: club,
+      selectedPackId: selectedPackId,
+      playersCount,
+      fixturesCount,
       tasks: todoItems.map(item => ({
         id: item.id,
         title: item.title,
