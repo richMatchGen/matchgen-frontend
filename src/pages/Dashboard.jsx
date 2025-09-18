@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
 import useClubSingleton from "../hooks/useClubSingleton";
-import { apiClient } from "../api/config";
+import apiClient from "../api/config";
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
