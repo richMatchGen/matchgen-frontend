@@ -903,8 +903,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
                 Back
               </Button>
               
-              <FeatureRestrictedButton
-                featureCode="match_creation"
+              <Button
                 variant="contained"
                 size="large"
                 onClick={handleCreate}
@@ -921,12 +920,9 @@ const CreateMatch = ({ onFixtureAdded }) => {
                     background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
                   },
                 }}
-                tooltipText="Match creation requires Basic Gen or higher"
-                upgradeDialogTitle="Match Creation Feature"
-                upgradeDialogDescription="Create and manage match fixtures for your club's schedule."
               >
                 {loading ? "Creating Match..." : "Create Match"}
-              </FeatureRestrictedButton>
+              </Button>
             </Stack>
           </Box>
         </Paper>

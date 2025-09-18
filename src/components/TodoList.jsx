@@ -134,7 +134,7 @@ const TodoList = () => {
       icon: <PaletteIcon />,
       route: '/gen/templates',
       isCompleted: () => {
-        const completed = selectedPackId && selectedPackId !== null && selectedPackId !== '';
+        const completed = selectedPackId != null && selectedPackId !== '';
         console.log('🔍 Template pack completion check:', {
           selectedPackId,
           completed,
