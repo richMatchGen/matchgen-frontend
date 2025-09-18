@@ -56,8 +56,8 @@ export default function QuickLinksCard() {
           <Stack spacing={1} direction="column">
             <NestedModal />
             <AddFixtureModal />
-            <AddResultModal />
-            <PSDProcessorLink />
+            {/* <AddResultModal />
+            <PSDProcessorLink /> */}
           </Stack>
         </Box>
       </CardContent>
