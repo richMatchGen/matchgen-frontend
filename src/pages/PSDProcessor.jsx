@@ -396,12 +396,20 @@ const PSDProcessor = () => {
                 Layer Information
               </Typography>
               
+              <Alert severity="info" sx={{ mb: 2 }}>
+                <Typography variant="body2">
+                  <strong>Center Point Analysis:</strong> Each layer now includes center coordinates for precise positioning, 
+                  alignment, and design automation. Use center points for rotation anchors, scaling operations, and layout calculations.
+                </Typography>
+              </Alert>
+              
               <TableContainer component={Paper} variant="outlined">
                 <Table size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell>Layer Name</TableCell>
                       <TableCell>Position (X, Y)</TableCell>
+                      <TableCell>Center Point</TableCell>
                       <TableCell>Size (W × H)</TableCell>
                       <TableCell>Bounding Box</TableCell>
                       <TableCell>Visible</TableCell>
@@ -421,6 +429,14 @@ const PSDProcessor = () => {
                             label={`${layer.x}, ${layer.y}`} 
                             size="small" 
                             variant="outlined" 
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Chip 
+                            label={`${layer.center_x?.toFixed(1) || '0.0'}, ${layer.center_y?.toFixed(1) || '0.0'}`} 
+                            size="small" 
+                            color="primary" 
+                            variant="filled"
                           />
                         </TableCell>
                         <TableCell>
