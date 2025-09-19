@@ -196,12 +196,12 @@ const PSDProcessor = () => {
       </Typography>
 
       {/* Upload Section */}
-      <FeatureRestrictedElement
+      {/* <FeatureRestrictedElement
         featureCode="psd_processor"
         tooltipText="PSD processing requires SemiPro Gen or higher"
         upgradeDialogTitle="PSD Processing Feature"
         upgradeDialogDescription="Upload and process PSD files to extract design elements for your social media posts."
-      >
+      > */}
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -264,7 +264,7 @@ const PSDProcessor = () => {
             </Grid>
           </CardContent>
         </Card>
-      </FeatureRestrictedElement>
+      {/* </FeatureRestrictedElement> */}
 
       {/* Messages */}
       {error && (
