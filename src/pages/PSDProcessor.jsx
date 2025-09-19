@@ -247,7 +247,7 @@ const PSDProcessor = () => {
                 />
               </Grid>
               <Grid item xs={12} sm={2}>
-                <FeatureRestrictedButton
+                <Button
                   featureCode="psd_processor"
                   variant="contained"
                   onClick={handleUpload}
@@ -259,7 +259,7 @@ const PSDProcessor = () => {
                   upgradeDialogDescription="Upload and process PSD files to extract design elements for your social media posts."
                 >
                   {uploading ? 'Processing...' : 'Upload'}
-                </FeatureRestrictedButton>
+                </Button>
               </Grid>
             </Grid>
           </CardContent>
