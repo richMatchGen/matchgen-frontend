@@ -3,30 +3,25 @@ import {
   Box,
   Card,
   CardContent,
+  CardActions,
   Typography,
   Button,
   Grid,
   Chip,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Divider,
   Alert,
   CircularProgress,
   Container,
-  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions
 } from '@mui/material';
 import {
-  CheckCircle as CheckIcon,
-  Star as StarIcon,
-  Upgrade as UpgradeIcon,
-  Close as CloseIcon,
-  Payment as PaymentIcon
+  CheckCircleRounded as CheckIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  Payment as PaymentIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 import AppTheme from '../themes/AppTheme';
@@ -74,7 +69,7 @@ const SubscriptionManagement = () => {
           console.warn('User might not have a club yet:', clubError);
           // Set default subscription info for users without clubs
           setSubscriptionInfo({
-            subscription_tier: 'basic',
+            subscription_tier: null,
             subscription_active: false,
             feature_access: {}
           });
@@ -104,7 +99,7 @@ const SubscriptionManagement = () => {
       } else {
         // Set default subscription info for users without clubs
         setSubscriptionInfo({
-          subscription_tier: 'basic',
+          subscription_tier: null,
           subscription_active: false,
           feature_access: {}
         });
@@ -122,7 +117,7 @@ const SubscriptionManagement = () => {
       
       // Set default subscription info on error
       setSubscriptionInfo({
-        subscription_tier: 'basic',
+        subscription_tier: null,
         subscription_active: false,
         feature_access: {}
       });
@@ -134,25 +129,25 @@ const SubscriptionManagement = () => {
   const getSubscriptionTierInfo = (tier) => {
     const tiers = {
       basic: {
-        name: 'Basic Gen',
-        price: '£9.99',
-        period: 'month',
-        description: 'Perfect for small clubs getting started',
-        features: [
+        title: 'Basic Gen',
+        price: '9.99',
+        description: [
           'Upcoming Fixture Posts',
           'Matchday Posts', 
           'Starting XI Posts',
           '1 Team',
           'Basic Templates'
         ],
+        buttonText: 'Choose Basic Gen',
+        buttonVariant: 'outlined',
+        buttonColor: 'primary',
         color: 'primary'
       },
       semipro: {
-        name: 'SemiPro Gen',
-        price: '£14.99',
-        period: 'month',
-        description: 'Ideal for growing clubs with more content needs',
-        features: [
+        title: 'SemiPro Gen',
+        subheader: 'Recommended',
+        price: '14.99',
+        description: [
           'Upcoming Fixture Posts',
           'Matchday Posts',
           'Starting XI Posts',
@@ -162,14 +157,15 @@ const SubscriptionManagement = () => {
           '1 Team',
           'Enhanced Templates'
         ],
+        buttonText: 'Choose SemiPro Gen',
+        buttonVariant: 'contained',
+        buttonColor: 'secondary',
         color: 'secondary'
       },
       prem: {
-        name: 'Prem Gen',
-        price: '£24.99',
-        period: 'month',
-        description: 'Complete solution for professional clubs',
-        features: [
+        title: 'Prem Gen',
+        price: '24.99',
+        description: [
           'Upcoming Fixture Posts',
           'Matchday Posts',
           'Starting XI Posts',
@@ -182,17 +178,13 @@ const SubscriptionManagement = () => {
           'Bespoke Templates',
           'Priority Support'
         ],
+        buttonText: 'Choose Prem Gen',
+        buttonVariant: 'outlined',
+        buttonColor: 'primary',
         color: 'warning'
       }
     };
     return tiers[tier] || tiers.basic;
-  };
-
-  const tierOrder = ['basic', 'semipro', 'prem'];
-  
-  const getNextTier = (currentTier) => {
-    const currentIndex = tierOrder.indexOf(currentTier);
-    return currentIndex < tierOrder.length - 1 ? tierOrder[currentIndex + 1] : null;
   };
 
   const handleUpgrade = (tier) => {
@@ -234,11 +226,12 @@ const SubscriptionManagement = () => {
     );
   }
 
-  const currentTier = subscriptionInfo?.subscription_tier || 'basic';
-  const currentTierInfo = getSubscriptionTierInfo(currentTier);
-  const nextTier = getNextTier(currentTier);
-  const nextTierInfo = nextTier ? getSubscriptionTierInfo(nextTier) : null;
+  const currentTier = subscriptionInfo?.subscription_tier;
+  const hasActiveSubscription = subscriptionInfo?.subscription_active === true;
   const clubId = localStorage.getItem('selectedClubId');
+  
+  // Only show current plan if user has an active subscription
+  const currentTierInfo = hasActiveSubscription && currentTier ? getSubscriptionTierInfo(currentTier) : null;
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -268,201 +261,147 @@ const SubscriptionManagement = () => {
                 </Typography>
               </Alert>
             )}
-            <Grid container spacing={3}>
-              {/* Current Plan */}
-              <Grid item xs={12} md={6}>
-                <Card elevation={3}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={1} mb={2}>
-                      <Typography variant="h5" fontWeight="bold">
-                        Current Plan
-                      </Typography>
-                      <Chip 
-                        label={currentTierInfo.name} 
-                        color={currentTierInfo.color}
-                        variant="outlined"
-                      />
-                    </Box>
-                    
-                    <Typography variant="h4" color="primary" gutterBottom>
-                      {currentTierInfo.price}/{currentTierInfo.period}
-                    </Typography>
-                    
-                    <Typography variant="body1" color="text.secondary" paragraph>
-                      {currentTierInfo.description}
-                    </Typography>
 
-                    <Typography variant="h6" gutterBottom>
-                      Your Features:
-                    </Typography>
-                    
-                    <List dense>
-                      {currentTierInfo.features.map((feature, index) => (
-                        <ListItem key={index} sx={{ py: 0.5 }}>
-                          <ListItemIcon sx={{ minWidth: 36 }}>
-                            <CheckIcon color="success" fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText primary={feature} />
-                        </ListItem>
-                      ))}
-                    </List>
-
-                    {subscriptionInfo?.subscription_active === false && (
-                      <Alert severity="warning" sx={{ mt: 2 }}>
-                        Your subscription is currently inactive. Please contact support.
-                      </Alert>
-                    )}
-
-                    <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<PaymentIcon />}
-                        onClick={async () => {
-                          try {
-                            console.log('Manage Billing button clicked');
-                            const clubId = localStorage.getItem('selectedClubId');
-                            console.log('Club ID:', clubId);
-                            await stripeService.redirectToBillingPortal(clubId);
-                          } catch (error) {
-                            console.error('Error redirecting to billing portal:', error);
-                            alert('Failed to open billing portal. Please try again.');
-                          }
-                        }}
-                        fullWidth
-                      >
-                        Manage Billing
-                      </Button>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Available Plans */}
-              <Grid item xs={12} md={6}>
-                <Card elevation={3}>
-                  <CardContent>
-                    <Typography variant="h5" fontWeight="bold" gutterBottom>
-                      Available Plans
-                    </Typography>
-                    
-                    <Typography variant="body2" color="text.secondary" paragraph>
-                      Choose the plan that best fits your club's needs
-                    </Typography>
-
-                    {['basic', 'semipro', 'prem'].map((tier) => {
-                      const tierInfo = getSubscriptionTierInfo(tier);
-                      const isCurrentTier = tier === currentTier;
-                      const isUpgrade = tierOrder.indexOf(tier) > tierOrder.indexOf(currentTier);
-                      
-                      return (
-                        <Paper 
-                          key={tier} 
-                          elevation={isCurrentTier ? 4 : 1}
-                          sx={{ 
-                            p: 2, 
-                            mb: 2, 
-                          
-                            border: isCurrentTier ? 2 : 1,
-                            borderColor: isCurrentTier ? 'primary.main' : 'divider',
-                            position: 'relative'
+            {/* Current Plan Section - Only show if user has active subscription */}
+            {currentTierInfo && (
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
+                  Your Current Plan
+                </Typography>
+                <Grid container justifyContent="center">
+                  <Grid item xs={12} md={6}>
+                    <Card elevation={3} sx={{ 
+                      p: 2, 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: 4,
+                      border: '2px solid',
+                      borderColor: 'primary.main'
+                    }}>
+                      <CardContent>
+                        <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
+                          <Typography component="h3" variant="h6">{currentTierInfo.title}</Typography>
+                          <Chip label="Current Plan" color="primary" />
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
+                          <Typography component="h3" variant="h2">£{currentTierInfo.price}</Typography>
+                          <Typography component="h3" variant="h6"> per month</Typography>
+                        </Box>
+                        <Divider sx={{ my: 2, opacity: 0.8, borderColor: 'divider' }} />
+                        {currentTierInfo.description.map((line) => (
+                          <Box key={line} sx={{ py: 1, display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                            <CheckIcon sx={{ width: 20, color: 'primary.main' }} />
+                            <Typography variant="subtitle2" component="span">{line}</Typography>
+                          </Box>
+                        ))}
+                      </CardContent>
+                      <CardActions>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          startIcon={<PaymentIcon />}
+                          onClick={async () => {
+                            try {
+                              const clubId = localStorage.getItem('selectedClubId');
+                              await stripeService.redirectToBillingPortal(clubId);
+                            } catch (error) {
+                              console.error('Error redirecting to billing portal:', error);
+                              alert('Failed to open billing portal. Please try again.');
+                            }
                           }}
                         >
-                          {isCurrentTier && (
-                            <Chip 
-                              label="Current Plan" 
-                              color="primary" 
-                              size="small"
-                              sx={{ position: 'absolute', top: 8, right: 8 }}
-                            />
-                          )}
-                          
-                          <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                            <Typography variant="h6" fontWeight="bold">
-                              {tierInfo.name}
-                            </Typography>
-                            <Typography variant="h5" color="primary">
-                              {tierInfo.price}/{tierInfo.period}
-                            </Typography>
-                          </Box>
-                          
-                          <Typography variant="body2" color="text.secondary" paragraph>
-                            {tierInfo.description}
-                          </Typography>
+                          Manage Billing
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                </Grid>
+              </Box>
+            )}
 
-                          <List dense sx={{ mb: 2 }}>
-                            {tierInfo.features.slice(0, 3).map((feature, index) => (
-                              <ListItem key={index} sx={{ py: 0 }}>
-                                <ListItemIcon sx={{ minWidth: 24 }}>
-                                  <CheckIcon color="success" fontSize="small" />
-                                </ListItemIcon>
-                                <ListItemText primary={feature} />
-                              </ListItem>
-                            ))}
-                            {tierInfo.features.length > 3 && (
-                              <ListItem sx={{ py: 0 }}>
-                                <ListItemText 
-                                  primary={`+${tierInfo.features.length - 3} more features`}
-                                  sx={{ fontStyle: 'italic' }}
-                                />
-                              </ListItem>
-                            )}
-                          </List>
+            {/* Available Plans Section */}
+            <Box sx={{ width: { sm: '100%', md: '60%' }, textAlign: { sm: 'left', md: 'center' }, mx: 'auto', mb: 4 }}>
+              <Typography component="h2" variant="h4" gutterBottom sx={{ color: 'text.primary' }}>
+                Choose Your Plan
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                Select the subscription plan that best fits your club's needs and start creating amazing content.
+              </Typography>
+            </Box>
 
-                          <Button
-                            variant={isCurrentTier ? "outlined" : "contained"}
-                            fullWidth
-                            disabled={isCurrentTier}
-                            onClick={() => handleUpgrade(tier)}
-                            startIcon={isCurrentTier ? null : <UpgradeIcon />}
-
-                          >
-                            {isCurrentTier ? 'Current Plan' : 'Upgrade'}
-                          </Button>
-                        </Paper>
-                      );
-                    })}
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Feature Access */}
-              {/* <Grid item xs={12}>
-                <Card elevation={3}>
-                  <CardContent>
-                    <Typography variant="h5" fontWeight="bold" gutterBottom>
-                      Feature Access
-                    </Typography>
-                    
-                    <Grid container spacing={2}>
-                      {Object.entries(subscriptionInfo?.feature_access || {}).map(([feature, hasAccess]) => (
-                        <Grid item xs={12} sm={6} md={4} key={feature}>
-                          <Box 
-                            display="flex" 
-                            alignItems="center" 
-                            gap={1}
-                            sx={{ 
-                              p: 1, 
-                              borderRadius: 1,
-                              backgroundColor: hasAccess ? 'success.50' : 'grey.50'
-                            }}
-                          >
-                            <CheckIcon 
-                              color={hasAccess ? 'success' : 'disabled'} 
-                              fontSize="small" 
-                            />
+            <Grid container spacing={3} sx={{ alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+              {['basic', 'semipro', 'prem'].map((tier) => {
+                const tierInfo = getSubscriptionTierInfo(tier);
+                const isCurrentTier = hasActiveSubscription && tier === currentTier;
+                
+                return (
+                  <Grid item xs={12} sm={tier === 'prem' ? 12 : 6} md={4} key={tier}>
+                    <Card sx={{ 
+                      p: 2, 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: 4, 
+                      ...(tier === 'semipro' && { 
+                        background: 'radial-gradient(circle at 50% 0%, hsl(220, 20%, 35%), hsl(220, 30%, 6%))' 
+                      }),
+                      ...(isCurrentTier && {
+                        border: '2px solid',
+                        borderColor: 'primary.main'
+                      })
+                    }}>
+                      <CardContent>
+                        <Box sx={{ 
+                          mb: 1, 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center', 
+                          gap: 2, 
+                          ...(tier === 'semipro' && { color: 'grey.100' }) 
+                        }}>
+                          <Typography component="h3" variant="h6">{tierInfo.title}</Typography>
+                          {tier === 'semipro' && <Chip icon={<AutoAwesomeIcon />} label={tierInfo.subheader} />}
+                          {isCurrentTier && <Chip label="Current Plan" color="primary" size="small" />}
+                        </Box>
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'baseline', 
+                          ...(tier === 'semipro' && { color: 'grey.50' }) 
+                        }}>
+                          <Typography component="h3" variant="h2">£{tierInfo.price}</Typography>
+                          <Typography component="h3" variant="h6"> per month</Typography>
+                        </Box>
+                        <Divider sx={{ my: 2, opacity: 0.8, borderColor: 'divider' }} />
+                        {tierInfo.description.map((line) => (
+                          <Box key={line} sx={{ py: 1, display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                            <CheckIcon sx={{ 
+                              width: 20, 
+                              color: tier === 'semipro' ? 'primary.light' : 'primary.main' 
+                            }} />
                             <Typography 
-                              variant="body2"
-                              color={hasAccess ? 'text.primary' : 'text.secondary'}
+                              variant="subtitle2" 
+                              component="span" 
+                              sx={tier === 'semipro' ? { color: 'grey.50' } : {}}
                             >
-                              {feature.replace('post.', '').replace(/([A-Z])/g, ' $1').trim()}
+                              {line}
                             </Typography>
                           </Box>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </CardContent>
-                </Card>
-              </Grid> */}
+                        ))}
+                      </CardContent>
+                      <CardActions>
+                        <Button 
+                          fullWidth 
+                          variant={tierInfo.buttonVariant} 
+                          color={tierInfo.buttonColor}
+                          disabled={isCurrentTier}
+                          onClick={() => handleUpgrade(tier)}
+                        >
+                          {isCurrentTier ? 'Current Plan' : tierInfo.buttonText}
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                );
+              })}
             </Grid>
           </Container>
         </Box>
@@ -490,28 +429,21 @@ const SubscriptionManagement = () => {
           {selectedTier && (
             <Box>
               <Typography variant="h5" color="primary" gutterBottom>
-                {getSubscriptionTierInfo(selectedTier).name}
+                {getSubscriptionTierInfo(selectedTier).title}
               </Typography>
               <Typography variant="h4" color="primary" gutterBottom>
-                {getSubscriptionTierInfo(selectedTier).price}/{getSubscriptionTierInfo(selectedTier).period}
-              </Typography>
-              <Typography variant="body1" paragraph>
-                {getSubscriptionTierInfo(selectedTier).description}
+                £{getSubscriptionTierInfo(selectedTier).price}/month
               </Typography>
               
               <Typography variant="h6" gutterBottom>
-                New Features You'll Get:
+                Features You'll Get:
               </Typography>
-              <List dense>
-                {getSubscriptionTierInfo(selectedTier).features.map((feature, index) => (
-                  <ListItem key={index}>
-                    <ListItemIcon>
-                      <CheckIcon color="success" />
-                    </ListItemIcon>
-                    <ListItemText primary={feature} />
-                  </ListItem>
-                ))}
-              </List>
+              {getSubscriptionTierInfo(selectedTier).description.map((feature, index) => (
+                <Box key={index} sx={{ py: 1, display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                  <CheckIcon sx={{ width: 20, color: 'primary.main' }} />
+                  <Typography variant="body2">{feature}</Typography>
+                </Box>
+              ))}
             </Box>
           )}
         </DialogContent>
