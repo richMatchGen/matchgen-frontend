@@ -14,6 +14,7 @@ import { createMatchGenTheme } from "./themes/MatchGenTheme";
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import('./pages/Signup'));
 const EnhancedSignup = lazy(() => import('./pages/EnhancedSignup'));
+const EnhancedSignup2 = lazy(() => import('./pages/EnhancedSignup2'));
 const EmailVerification = lazy(() => import('./pages/EmailVerification'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const EditClub = lazy(() => import('./pages/editclub'));
@@ -80,6 +81,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Signup />} />
           <Route path="/enhanced-signup" element={<EnhancedSignup />} />
+          <Route path="/enhanced-signup2" element={<EnhancedSignup2 />} />
           <Route path="/verify-email" element={<EmailVerification />} />
           <Route path="/dashboard" element={
             <PrivateRoute>
