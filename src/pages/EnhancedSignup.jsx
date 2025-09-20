@@ -237,9 +237,9 @@ const EnhancedSignup = () => {
         }
       );
 
-      setSuccess('Club created successfully! Redirecting to dashboard...');
+      setSuccess('Club created successfully! Please choose your subscription plan to get started.');
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/subscription');
       }, 2000);
       localStorage.setItem('accessToken', token);
       localStorage.setItem('refreshToken', loginResponse.data.refresh);
