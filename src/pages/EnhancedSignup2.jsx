@@ -199,7 +199,7 @@ const EnhancedSignup2 = () => {
           bio: '',
           league: '',
           website: '',
-          founded_year: ''
+          founded_year: null
         },
         {
           headers: {
