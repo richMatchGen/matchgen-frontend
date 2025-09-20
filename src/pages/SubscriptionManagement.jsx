@@ -426,7 +426,7 @@ const SubscriptionManagement = () => {
               </Grid>
 
               {/* Feature Access */}
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <Card elevation={3}>
                   <CardContent>
                     <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -462,7 +462,7 @@ const SubscriptionManagement = () => {
                     </Grid>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Container>
         </Box>
