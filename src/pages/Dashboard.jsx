@@ -24,6 +24,7 @@ import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
 import MainGrid from "../components/MainGrid";
 import EmailVerificationBanner from '../components/EmailVerificationBanner';
+import SubscriptionBanner from '../components/SubscriptionBanner';
 import ColorModeSelect from '../themes/colormodeselect';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 import Overview from "./profile";
@@ -123,6 +124,28 @@ const Dashboard = () => {
                 }}
               />
             )}
+            
+            {/* Show subscription banner if user doesn't have a subscription */}
+            {user?.email_verified && (
+              <SubscriptionBanner 
+                user={user}
+                club={club}
+                onSubscriptionComplete={() => {
+                  // Refresh user data after subscription
+                  const fetchData = async () => {
+                    try {
+                      const userRes = await apiClient.get("/users/me/");
+                      console.log('🔍 Dashboard user data after subscription:', userRes.data);
+                      setUser(userRes.data);
+                    } catch (error) {
+                      console.error('Error refreshing user data:', error);
+                    }
+                  };
+                  fetchData();
+                }}
+              />
+            )}
+            
             <MainGrid />
 
           </Stack>
