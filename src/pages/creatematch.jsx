@@ -198,11 +198,26 @@ const CreateMatch = ({ onFixtureAdded }) => {
         }
       );
       
+      console.log("Fixtures API response:", response.data);
+      
+      // Handle different response structures
       if (response.data) {
-        setFixtures(response.data);
+        if (Array.isArray(response.data)) {
+          setFixtures(response.data);
+        } else if (response.data.results && Array.isArray(response.data.results)) {
+          setFixtures(response.data.results);
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          setFixtures(response.data.data);
+        } else {
+          console.warn("Unexpected fixtures response structure:", response.data);
+          setFixtures([]);
+        }
+      } else {
+        setFixtures([]);
       }
     } catch (err) {
       console.warn("Could not fetch fixtures:", err);
+      setFixtures([]);
     } finally {
       setFixturesLoading(false);
     }
@@ -578,7 +593,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
               />
               <Tab 
                 icon={<ListIcon />} 
-                label={`Fixtures (${fixtures.length})`} 
+                label={`Fixtures (${Array.isArray(fixtures) ? fixtures.length : 0})`} 
                 iconPosition="start"
                 sx={{ textTransform: 'none', fontWeight: 600 }}
               />
@@ -1004,7 +1019,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
             <Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
-                  Your Fixtures ({fixtures.length})
+                  Your Fixtures ({Array.isArray(fixtures) ? fixtures.length : 0})
                 </Typography>
                 <Button
                   variant="outlined"
@@ -1020,7 +1035,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
                   <CircularProgress />
                 </Box>
-              ) : fixtures.length === 0 ? (
+              ) : !Array.isArray(fixtures) || fixtures.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
                   <EventIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
                   <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -1051,7 +1066,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {fixtures.map((fixture) => (
+                      {Array.isArray(fixtures) && fixtures.map((fixture) => (
                         <TableRow key={fixture.id} hover>
                           <TableCell>
                             <Chip 
@@ -1098,7 +1113,15 @@ const CreateMatch = ({ onFixtureAdded }) => {
                             />
                           </TableCell>
                         </TableRow>
-                      ))}
+                      )) || (
+                        <TableRow>
+                          <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              No fixtures data available
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>
