@@ -442,13 +442,36 @@ const CreateMatch = ({ onFixtureAdded }) => {
         matchData.opponent_logo = opponentLogoUrl;
         setUploadProgress(100);
       } else if (opponentLogoFile) {
-        // For now, we'll skip file upload since endpoint might not be available
-        setUploadProgress(100);
-        setSnackbar({
-          open: true,
-          message: "Opponent logo will be added later (upload endpoint not available)",
-          severity: "info"
-        });
+        // Convert file to data URL for immediate upload
+        try {
+          setUploadProgress(25);
+          
+          // Create a Promise to handle FileReader async operation
+          const logoDataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => reject(new Error("Failed to read logo file"));
+            reader.readAsDataURL(opponentLogoFile);
+          });
+          
+          setUploadProgress(75);
+          matchData.opponent_logo = logoDataUrl;
+          setUploadProgress(100);
+          
+          setSnackbar({
+            open: true,
+            message: "Opponent logo processed successfully!",
+            severity: "success"
+          });
+        } catch (error) {
+          console.error("Logo processing failed:", error);
+          setSnackbar({
+            open: true,
+            message: "Failed to process opponent logo. Creating match without logo.",
+            severity: "warning"
+          });
+          // Continue without logo
+        }
       }
 
       // Remove null/empty values to avoid validation issues
