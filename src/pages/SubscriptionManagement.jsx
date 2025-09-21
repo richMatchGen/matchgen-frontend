@@ -21,7 +21,9 @@ import {
   CheckCircleRounded as CheckIcon,
   AutoAwesome as AutoAwesomeIcon,
   Payment as PaymentIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  Cancel as CancelIcon,
+  Warning as WarningIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 import AppTheme from '../themes/AppTheme';
@@ -36,6 +38,9 @@ const SubscriptionManagement = () => {
   const [error, setError] = useState(null);
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [canceling, setCanceling] = useState(false);
+  const [cancelSuccess, setCancelSuccess] = useState(false);
 
   useEffect(() => {
     fetchSubscriptionInfo();
@@ -187,26 +192,190 @@ const SubscriptionManagement = () => {
     return tiers[tier] || tiers.basic;
   };
 
-  const handleUpgrade = (tier) => {
+  // Define tier hierarchy for upgrade/downgrade detection
+  const tierHierarchy = {
+    'basic': 1,
+    'semipro': 2,
+    'prem': 3
+  };
+
+  const isUpgrade = (currentTier, newTier) => {
+    return tierHierarchy[newTier] > tierHierarchy[currentTier];
+  };
+
+  const isDowngrade = (currentTier, newTier) => {
+    return tierHierarchy[newTier] < tierHierarchy[currentTier];
+  };
+
+  const handlePlanChange = (tier) => {
     setSelectedTier(tier);
     setUpgradeDialogOpen(true);
   };
 
-  const confirmUpgrade = async () => {
+  const confirmPlanChange = async () => {
     if (!selectedTier) return;
     
     try {
       const clubId = localStorage.getItem('selectedClubId');
+      const currentTier = subscriptionInfo?.subscription_tier;
       
-      // Redirect to Stripe checkout
-      await stripeService.redirectToCheckout(selectedTier, clubId);
+      if (!currentTier) {
+        // No current subscription, use checkout for new subscription
+        await stripeService.redirectToCheckout(selectedTier, clubId);
+        return;
+      }
       
-      // Note: The page will redirect to Stripe, so we don't need to handle the response here
-      // The webhook will handle the subscription update when payment is completed
+      // Determine if it's an upgrade or downgrade
+      if (isUpgrade(currentTier, selectedTier)) {
+        // Handle upgrade with immediate proration
+        await handleUpgrade(currentTier, selectedTier, clubId);
+      } else if (isDowngrade(currentTier, selectedTier)) {
+        // Handle downgrade scheduled for next period
+        await handleDowngrade(currentTier, selectedTier, clubId);
+      } else {
+        // Same tier - no action needed
+        alert('You are already on this plan.');
+        setUpgradeDialogOpen(false);
+      }
       
     } catch (error) {
-      console.error('Error redirecting to checkout:', error);
-      alert('Failed to redirect to payment. Please try again.');
+      console.error('Error processing plan change:', error);
+      alert('Failed to process plan change. Please try again.');
+    }
+  };
+
+  const handleUpgrade = async (currentTier, newTier, clubId) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL || 'https://matchgen-backend-production.up.railway.app'}/api/users/stripe/upgrade-subscription/`,
+        { 
+          club_id: clubId,
+          tier: newTier
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        alert('Subscription upgraded successfully! You now have immediate access to the new features.');
+        setUpgradeDialogOpen(false);
+        // Refresh subscription info
+        await fetchSubscriptionInfo();
+      }
+    } catch (error) {
+      console.error('Error upgrading subscription:', error);
+      throw error;
+    }
+  };
+
+  const handleDowngrade = async (currentTier, newTier, clubId) => {
+    const confirmed = window.confirm(
+      `Your subscription will be downgraded to ${getSubscriptionTierInfo(newTier).title} at the end of your current billing period. ` +
+      `You'll continue to have access to your current features until then. Continue?`
+    );
+    
+    if (!confirmed) {
+      setUpgradeDialogOpen(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL || 'https://matchgen-backend-production.up.railway.app'}/api/users/stripe/downgrade-subscription/`,
+        { 
+          club_id: clubId,
+          tier: newTier
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        alert('Subscription downgrade scheduled successfully! The change will take effect at the end of your current billing period.');
+        setUpgradeDialogOpen(false);
+        // Refresh subscription info
+        await fetchSubscriptionInfo();
+      }
+    } catch (error) {
+      console.error('Error scheduling downgrade:', error);
+      throw error;
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    try {
+      setCanceling(true);
+      const clubId = localStorage.getItem('selectedClubId');
+      
+      if (!clubId) {
+        alert('No club selected. Please select a club first.');
+        return;
+      }
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL || 'https://matchgen-backend-production.up.railway.app'}/api/users/stripe/cancel-subscription/`,
+        { club_id: clubId },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setCancelSuccess(true);
+        setCancelDialogOpen(false);
+        // Refresh subscription info
+        await fetchSubscriptionInfo();
+      }
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      alert('Failed to cancel subscription. Please try again.');
+    } finally {
+      setCanceling(false);
+    }
+  };
+
+  const handleReactivateSubscription = async () => {
+    try {
+      setCanceling(true);
+      const clubId = localStorage.getItem('selectedClubId');
+      
+      if (!clubId) {
+        alert('No club selected. Please select a club first.');
+        return;
+      }
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL || 'https://matchgen-backend-production.up.railway.app'}/api/users/stripe/reactivate-subscription/`,
+        { club_id: clubId },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setCancelSuccess(false);
+        // Refresh subscription info
+        await fetchSubscriptionInfo();
+      }
+    } catch (error) {
+      console.error('Error reactivating subscription:', error);
+      alert('Failed to reactivate subscription. Please try again.');
+    } finally {
+      setCanceling(false);
     }
   };
 
@@ -295,7 +464,7 @@ const SubscriptionManagement = () => {
                           </Box>
                         ))}
                       </CardContent>
-                      <CardActions>
+                      <CardActions sx={{ flexDirection: 'column', gap: 1 }}>
                         <Button
                           fullWidth
                           variant="outlined"
@@ -312,6 +481,37 @@ const SubscriptionManagement = () => {
                         >
                           Manage Billing
                         </Button>
+                        
+                        {/* Cancellation Status and Actions */}
+                        {subscriptionInfo?.subscription_canceled ? (
+                          <Box sx={{ width: '100%', textAlign: 'center' }}>
+                            <Alert severity="warning" sx={{ mb: 2 }}>
+                              <Typography variant="body2">
+                                Your subscription is set to cancel at the end of the current billing period.
+                              </Typography>
+                            </Alert>
+                            <Button
+                              fullWidth
+                              variant="contained"
+                              color="success"
+                              startIcon={<CheckIcon />}
+                              onClick={handleReactivateSubscription}
+                              disabled={canceling}
+                            >
+                              {canceling ? 'Reactivating...' : 'Reactivate Subscription'}
+                            </Button>
+                          </Box>
+                        ) : (
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            color="error"
+                            startIcon={<CancelIcon />}
+                            onClick={() => setCancelDialogOpen(true)}
+                          >
+                            Cancel Subscription
+                          </Button>
+                        )}
                       </CardActions>
                     </Card>
                   </Grid>
@@ -393,7 +593,7 @@ const SubscriptionManagement = () => {
                           variant={tierInfo.buttonVariant} 
                           color={tierInfo.buttonColor}
                           disabled={isCurrentTier}
-                          onClick={() => handleUpgrade(tier)}
+                          onClick={() => handlePlanChange(tier)}
                         >
                           {isCurrentTier ? 'Current Plan' : tierInfo.buttonText}
                         </Button>
@@ -407,7 +607,7 @@ const SubscriptionManagement = () => {
         </Box>
       </AppTheme>
 
-      {/* Upgrade Dialog */}
+      {/* Plan Change Dialog */}
       <Dialog 
         open={upgradeDialogOpen} 
         onClose={() => setUpgradeDialogOpen(false)}
@@ -416,7 +616,12 @@ const SubscriptionManagement = () => {
       >
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">Upgrade Subscription</Typography>
+            <Typography variant="h6">
+              {selectedTier && subscriptionInfo?.subscription_tier ? 
+                (isUpgrade(subscriptionInfo.subscription_tier, selectedTier) ? 'Upgrade Subscription' :
+                 isDowngrade(subscriptionInfo.subscription_tier, selectedTier) ? 'Downgrade Subscription' :
+                 'Change Subscription') : 'Select Plan'}
+            </Typography>
             <Button
               icon={<CloseIcon />}
               onClick={() => setUpgradeDialogOpen(false)}
@@ -435,8 +640,29 @@ const SubscriptionManagement = () => {
                 £{getSubscriptionTierInfo(selectedTier).price}/month
               </Typography>
               
+              {/* Show different messages based on upgrade/downgrade */}
+              {subscriptionInfo?.subscription_tier && (
+                <>
+                  {isUpgrade(subscriptionInfo.subscription_tier, selectedTier) && (
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      <Typography variant="body2">
+                        <strong>Immediate Upgrade:</strong> You'll be charged a prorated amount and get immediate access to new features.
+                      </Typography>
+                    </Alert>
+                  )}
+                  
+                  {isDowngrade(subscriptionInfo.subscription_tier, selectedTier) && (
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      <Typography variant="body2">
+                        <strong>Scheduled Downgrade:</strong> The change will take effect at the end of your current billing period. You'll keep current features until then.
+                      </Typography>
+                    </Alert>
+                  )}
+                </>
+              )}
+              
               <Typography variant="h6" gutterBottom>
-                Features You'll Get:
+                Features You'll {subscriptionInfo?.subscription_tier && isDowngrade(subscriptionInfo.subscription_tier, selectedTier) ? 'Have After Downgrade:' : 'Get:'}
               </Typography>
               {getSubscriptionTierInfo(selectedTier).description.map((feature, index) => (
                 <Box key={index} sx={{ py: 1, display: 'flex', gap: 1.5, alignItems: 'center' }}>
@@ -453,13 +679,80 @@ const SubscriptionManagement = () => {
           </Button>
           <Button 
             variant="contained" 
-            onClick={confirmUpgrade}
+            onClick={confirmPlanChange}
             startIcon={<PaymentIcon />}
           >
-            Upgrade Now
+            {selectedTier && subscriptionInfo?.subscription_tier && isDowngrade(subscriptionInfo.subscription_tier, selectedTier) 
+              ? 'Schedule Downgrade' 
+              : 'Confirm Change'}
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Cancellation Confirmation Dialog */}
+      <Dialog 
+        open={cancelDialogOpen} 
+        onClose={() => setCancelDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={1}>
+            <WarningIcon color="warning" />
+            <Typography variant="h6">Cancel Subscription</Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" gutterBottom>
+            Are you sure you want to cancel your subscription?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            Your subscription will remain active until the end of your current billing period. 
+            You'll continue to have access to all features until then.
+          </Typography>
+          <Alert severity="info" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              You can reactivate your subscription at any time before the end of your billing period.
+            </Typography>
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setCancelDialogOpen(false)}
+            disabled={canceling}
+          >
+            Keep Subscription
+          </Button>
+          <Button 
+            variant="contained" 
+            color="error"
+            onClick={handleCancelSubscription}
+            disabled={canceling}
+            startIcon={canceling ? <CircularProgress size={20} /> : <CancelIcon />}
+          >
+            {canceling ? 'Canceling...' : 'Cancel Subscription'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Success Message */}
+      {cancelSuccess && (
+        <Alert 
+          severity="success" 
+          sx={{ 
+            position: 'fixed', 
+            top: 20, 
+            right: 20, 
+            zIndex: 9999,
+            minWidth: 300
+          }}
+          onClose={() => setCancelSuccess(false)}
+        >
+          <Typography variant="body1">
+            Subscription canceled successfully. You'll continue to have access until the end of your billing period.
+          </Typography>
+        </Alert>
+      )}
     </Box>
   );
 };
