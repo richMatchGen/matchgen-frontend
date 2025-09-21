@@ -101,7 +101,7 @@ const TodoList = () => {
     {
       id: 'create-fixtures',
       title: 'Create Fixtures',
-      description: 'Add your upcoming matches and fixtures',
+      description: 'Add your first upcoming fixtures',
       icon: <EventIcon />,
       route: '/fixture/creatematch',
       isCompleted: () => fixturesCount > 0,
@@ -110,7 +110,7 @@ const TodoList = () => {
     {
       id: 'create-players',
       title: 'Create Players',
-      description: 'Add your team members and player profiles',
+      description: 'Create your first player profile',
       icon: <PersonIcon />,
       route: '/squad/createplayer',
       isCompleted: () => playersCount > 0,
