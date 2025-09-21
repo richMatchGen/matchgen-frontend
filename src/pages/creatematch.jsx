@@ -31,6 +31,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  MenuItem,
   Tabs,
   Tab,
   Table,
@@ -153,7 +154,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
   
   // Form state
   const [formData, setFormData] = useState({
-    match_type: "",
+    match_type: "League",
     opponent: "",
     home_away: "HOME",
     date: null,
@@ -537,7 +538,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
       
       // Enhanced form reset
       setFormData({
-        match_type: "",
+        match_type: "League",
         opponent: "",
         home_away: "HOME",
         date: null,
@@ -736,32 +737,32 @@ const CreateMatch = ({ onFixtureAdded }) => {
                     
                     <Stack spacing={3}>
                       {/* Enhanced Match Type field */}
-                      <TextField
-                        fullWidth
-                        label="Match Type"
-                        value={formData.match_type}
-                        onChange={(e) => handleInputChange("match_type", e.target.value)}
-                        error={!!errors.match_type}
-                        helperText={errors.match_type || "e.g., League, Cup, Friendly"}
-                        required
-                        InputProps={{
-                          startAdornment: (
+                      <FormControl fullWidth required error={!!errors.match_type}>
+                        <InputLabel>Match Type</InputLabel>
+                        <Select
+                          value={formData.match_type}
+                          onChange={(e) => handleInputChange("match_type", e.target.value)}
+                          label="Match Type"
+                          startAdornment={
                             <InputAdornment position="start">
                               <EventIcon color="action" />
                             </InputAdornment>
-                          ),
-                        }}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            "&.Mui-focused": {
-                              "& .MuiOutlinedInput-notchedOutline": {
-                                borderColor: theme.palette.primary.main,
-                                borderWidth: 2,
-                              },
-                            },
-                          },
-                        }}
-                      />
+                          }
+                        >
+                          <MenuItem value="League">League</MenuItem>
+                          <MenuItem value="Cup">Cup</MenuItem>
+                          <MenuItem value="Friendly">Friendly</MenuItem>
+                          <MenuItem value="Playoff">Playoff</MenuItem>
+                          <MenuItem value="Championship">Championship</MenuItem>
+                          <MenuItem value="Exhibition">Exhibition</MenuItem>
+                          <MenuItem value="Other">Other</MenuItem>
+                        </Select>
+                        {errors.match_type && (
+                          <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                            {errors.match_type}
+                          </Typography>
+                        )}
+                      </FormControl>
 
                       {/* Enhanced Opponent field */}
                       <TextField
