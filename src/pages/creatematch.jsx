@@ -431,7 +431,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
         match_type: formData.match_type.trim(),
         opponent: formData.opponent.trim(),
         home_away: formData.home_away,
-        date: formData.date?.toISOString().split("T")[0],
+        date: formData.date?.toISOString(), // Send full datetime ISO string
         time_start: formData.time_start.trim(),
         venue: formData.venue.trim(),
         location: formData.location.trim() || null,
