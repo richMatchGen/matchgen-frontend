@@ -166,7 +166,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
   const [opponentLogoFile, setOpponentLogoFile] = useState(null);
   const [opponentLogoPreview, setOpponentLogoPreview] = useState(null);
   const [opponentLogoUrl, setOpponentLogoUrl] = useState("");
-  const [useOpponentLogoUrl, setUseOpponentLogoUrl] = useState(true);
+  const [useOpponentLogoUrl, setUseOpponentLogoUrl] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -442,15 +442,42 @@ const CreateMatch = ({ onFixtureAdded }) => {
         matchData.opponent_logo = opponentLogoUrl;
         setUploadProgress(100);
       } else if (opponentLogoFile) {
-        // For now, skip file upload and show warning
-        // TODO: Implement proper file upload endpoint
-        setUploadProgress(100);
-        setSnackbar({
-          open: true,
-          message: "File upload not yet implemented. Creating match without logo.",
-          severity: "info"
-        });
-        // Don't include opponent_logo in matchData
+        // Upload file to backend and get URL
+        try {
+          setUploadProgress(25);
+          
+          const formData = new FormData();
+          formData.append('logo', opponentLogoFile);
+          
+          const uploadResponse = await axios.post(
+            "https://matchgen-backend-production.up.railway.app/api/content/matches/upload-opponent-logo/",
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          
+          setUploadProgress(75);
+          matchData.opponent_logo = uploadResponse.data.logo_url;
+          setUploadProgress(100);
+          
+          setSnackbar({
+            open: true,
+            message: "Opponent logo uploaded successfully!",
+            severity: "success"
+          });
+        } catch (uploadError) {
+          console.error("Logo upload failed:", uploadError);
+          setSnackbar({
+            open: true,
+            message: "Failed to upload opponent logo. Creating match without logo.",
+            severity: "warning"
+          });
+          // Continue without logo
+        }
       }
 
       // Remove null/empty values to avoid validation issues
@@ -889,12 +916,6 @@ const CreateMatch = ({ onFixtureAdded }) => {
                         Opponent Logo
                       </Typography>
                       
-                      <Alert severity="info" sx={{ mb: 2 }}>
-                        <Typography variant="body2">
-                          <strong>Note:</strong> File upload is not yet available. Please use the URL option to add opponent logos.
-                        </Typography>
-                      </Alert>
-                      
                       {/* Opponent Logo Upload Options */}
                       <Stack spacing={2}>
                         {/* Enhanced toggle between file upload and URL */}
@@ -904,9 +925,8 @@ const CreateMatch = ({ onFixtureAdded }) => {
                             size="small"
                             onClick={() => setUseOpponentLogoUrl(false)}
                             startIcon={<CloudUploadIcon />}
-                            disabled={true}
                           >
-                            Upload File (Coming Soon)
+                            Upload File
                           </Button>
                           <Button
                             variant={useOpponentLogoUrl ? "contained" : "outlined"}
