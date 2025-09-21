@@ -166,7 +166,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
   const [opponentLogoFile, setOpponentLogoFile] = useState(null);
   const [opponentLogoPreview, setOpponentLogoPreview] = useState(null);
   const [opponentLogoUrl, setOpponentLogoUrl] = useState("");
-  const [useOpponentLogoUrl, setUseOpponentLogoUrl] = useState(false);
+  const [useOpponentLogoUrl, setUseOpponentLogoUrl] = useState(true);
   const [isDragOver, setIsDragOver] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -442,36 +442,15 @@ const CreateMatch = ({ onFixtureAdded }) => {
         matchData.opponent_logo = opponentLogoUrl;
         setUploadProgress(100);
       } else if (opponentLogoFile) {
-        // Convert file to data URL for immediate upload
-        try {
-          setUploadProgress(25);
-          
-          // Create a Promise to handle FileReader async operation
-          const logoDataUrl = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = () => reject(new Error("Failed to read logo file"));
-            reader.readAsDataURL(opponentLogoFile);
-          });
-          
-          setUploadProgress(75);
-          matchData.opponent_logo = logoDataUrl;
-          setUploadProgress(100);
-          
-          setSnackbar({
-            open: true,
-            message: "Opponent logo processed successfully!",
-            severity: "success"
-          });
-        } catch (error) {
-          console.error("Logo processing failed:", error);
-          setSnackbar({
-            open: true,
-            message: "Failed to process opponent logo. Creating match without logo.",
-            severity: "warning"
-          });
-          // Continue without logo
-        }
+        // For now, skip file upload and show warning
+        // TODO: Implement proper file upload endpoint
+        setUploadProgress(100);
+        setSnackbar({
+          open: true,
+          message: "File upload not yet implemented. Creating match without logo.",
+          severity: "info"
+        });
+        // Don't include opponent_logo in matchData
       }
 
       // Remove null/empty values to avoid validation issues
@@ -910,6 +889,12 @@ const CreateMatch = ({ onFixtureAdded }) => {
                         Opponent Logo
                       </Typography>
                       
+                      <Alert severity="info" sx={{ mb: 2 }}>
+                        <Typography variant="body2">
+                          <strong>Note:</strong> File upload is not yet available. Please use the URL option to add opponent logos.
+                        </Typography>
+                      </Alert>
+                      
                       {/* Opponent Logo Upload Options */}
                       <Stack spacing={2}>
                         {/* Enhanced toggle between file upload and URL */}
@@ -919,8 +904,9 @@ const CreateMatch = ({ onFixtureAdded }) => {
                             size="small"
                             onClick={() => setUseOpponentLogoUrl(false)}
                             startIcon={<CloudUploadIcon />}
+                            disabled={true}
                           >
-                            Upload File
+                            Upload File (Coming Soon)
                           </Button>
                           <Button
                             variant={useOpponentLogoUrl ? "contained" : "outlined"}
