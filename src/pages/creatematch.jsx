@@ -31,6 +31,14 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Tabs,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import {
   CloudUpload as CloudUploadIcon,
@@ -46,6 +54,9 @@ import {
   ArrowBack as ArrowBackIcon,
   Home as HomeIcon,
   FlightTakeoff as AwayIcon,
+  Add as AddIcon,
+  List as ListIcon,
+  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import { styled, alpha } from "@mui/material/styles";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -165,8 +176,39 @@ const CreateMatch = ({ onFixtureAdded }) => {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
   const [uploadProgress, setUploadProgress] = useState(0);
   const [userClub, setUserClub] = useState(null);
+  
+  // Tab and fixtures state
+  const [activeTab, setActiveTab] = useState(0);
+  const [fixtures, setFixtures] = useState([]);
+  const [fixturesLoading, setFixturesLoading] = useState(false);
 
-  // Fetch user's club on component mount
+  // Fetch fixtures function
+  const fetchFixtures = useCallback(async () => {
+    setFixturesLoading(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      const response = await axios.get(
+        "https://matchgen-backend-production.up.railway.app/api/content/matches/",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      if (response.data) {
+        setFixtures(response.data);
+      }
+    } catch (err) {
+      console.warn("Could not fetch fixtures:", err);
+    } finally {
+      setFixturesLoading(false);
+    }
+  }, []);
+
+  // Fetch user's club and fixtures on component mount
   useEffect(() => {
     const fetchUserClub = async () => {
       try {
@@ -192,7 +234,8 @@ const CreateMatch = ({ onFixtureAdded }) => {
     };
 
     fetchUserClub();
-  }, []);
+    fetchFixtures();
+  }, [fetchFixtures]);
 
   // Memoized values for performance
   const isFormValid = useMemo(() => {
@@ -404,7 +447,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
 
       console.log("Match creation response:", response.data);
 
-      setSuccess("Match created successfully! Redirecting to dashboard...");
+      setSuccess("Match created successfully!");
       setSnackbar({
         open: true,
         message: "Match created successfully!",
@@ -431,10 +474,9 @@ const CreateMatch = ({ onFixtureAdded }) => {
       handleRemoveLogo();
       setActiveStep(0);
       
-      // Redirect to dashboard after 3 seconds
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 3000);
+      // Refresh fixtures list and switch to fixtures tab
+      await fetchFixtures();
+      setActiveTab(1);
       
     } catch (err) {
       console.error("Error creating match:", err);
@@ -479,12 +521,20 @@ const CreateMatch = ({ onFixtureAdded }) => {
       setLoading(false);
       setUploadProgress(0);
     }
-  }, [validateForm, useOpponentLogoUrl, opponentLogoUrl, opponentLogoFile, formData, navigate, handleRemoveLogo, onFixtureAdded]);
+  }, [validateForm, useOpponentLogoUrl, opponentLogoUrl, opponentLogoFile, formData, navigate, handleRemoveLogo, onFixtureAdded, fetchFixtures]);
 
   // Close snackbar
   const handleCloseSnackbar = useCallback(() => {
     setSnackbar(prev => ({ ...prev, open: false }));
   }, []);
+
+  // Tab change handler
+  const handleTabChange = useCallback((event, newValue) => {
+    setActiveTab(newValue);
+    if (newValue === 1) {
+      fetchFixtures();
+    }
+  }, [fetchFixtures]);
 
   return (
     <>
@@ -509,52 +559,73 @@ const CreateMatch = ({ onFixtureAdded }) => {
                   mb: 2
                 }}
               >
-                Create New Match
+                Fixtures Management
               </Typography>
             </Fade>
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: "auto" }}>
-              Add a new fixture to your schedule. Fill in the details below to get started.
+              Create new fixtures and manage your existing matches.
             </Typography>
           </Box>
 
-          {/* Enhanced error/success messages */}
-          <Collapse in={!!error || !!success}>
-            {error && (
-              <Alert 
-                severity="error" 
-                sx={{ mb: 3 }}
-                action={
-                  <IconButton
-                    color="inherit"
-                    size="small"
-                    onClick={() => setError("")}
+          {/* Tabs */}
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+            <Tabs value={activeTab} onChange={handleTabChange} aria-label="fixtures tabs">
+              <Tab 
+                icon={<AddIcon />} 
+                label="Create Fixture" 
+                iconPosition="start"
+                sx={{ textTransform: 'none', fontWeight: 600 }}
+              />
+              <Tab 
+                icon={<ListIcon />} 
+                label={`Fixtures (${fixtures.length})`} 
+                iconPosition="start"
+                sx={{ textTransform: 'none', fontWeight: 600 }}
+              />
+            </Tabs>
+          </Box>
+
+          {/* Tab Content */}
+          {activeTab === 0 && (
+            <>
+              {/* Enhanced error/success messages */}
+              <Collapse in={!!error || !!success}>
+                {error && (
+                  <Alert 
+                    severity="error" 
+                    sx={{ mb: 3 }}
+                    action={
+                      <IconButton
+                        color="inherit"
+                        size="small"
+                        onClick={() => setError("")}
+                      >
+                        <ErrorIcon />
+                      </IconButton>
+                    }
                   >
-                    <ErrorIcon />
-                  </IconButton>
-                }
-              >
-                {error}
-              </Alert>
-            )}
-            
-            {success && (
-              <Alert 
-                severity="success" 
-                sx={{ mb: 3 }}
-                action={
-                  <IconButton
-                    color="inherit"
-                    size="small"
-                    onClick={() => setSuccess("")}
+                    {error}
+                  </Alert>
+                )}
+                
+                {success && (
+                  <Alert 
+                    severity="success" 
+                    sx={{ mb: 3 }}
+                    action={
+                      <IconButton
+                        color="inherit"
+                        size="small"
+                        onClick={() => setSuccess("")}
+                      >
+                        <CheckCircleIcon />
+                      </IconButton>
+                    }
                   >
-                    <CheckCircleIcon />
-                  </IconButton>
-                }
-              >
-                {success}
-              </Alert>
-            )}
-          </Collapse>
+                    {success}
+                  </Alert>
+                )}
+              </Collapse>
 
           {/* Club Display (if available) */}
           {userClub && (
@@ -925,6 +996,115 @@ const CreateMatch = ({ onFixtureAdded }) => {
               </Button>
             </Stack>
           </Box>
+            </>
+          )}
+
+          {/* Fixtures Tab Content */}
+          {activeTab === 1 && (
+            <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+                  Your Fixtures ({fixtures.length})
+                </Typography>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={fetchFixtures}
+                  disabled={fixturesLoading}
+                >
+                  Refresh
+                </Button>
+              </Box>
+
+              {fixturesLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : fixtures.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <EventIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    No fixtures found
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    Create your first fixture to get started.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => setActiveTab(0)}
+                  >
+                    Create First Fixture
+                  </Button>
+                </Box>
+              ) : (
+                <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+                  <Table stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Match Type</TableCell>
+                        <TableCell>Opponent</TableCell>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Time</TableCell>
+                        <TableCell>Venue</TableCell>
+                        <TableCell>Home/Away</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {fixtures.map((fixture) => (
+                        <TableRow key={fixture.id} hover>
+                          <TableCell>
+                            <Chip 
+                              label={fixture.match_type || 'N/A'} 
+                              color="primary" 
+                              variant="outlined"
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              {fixture.opponent_logo && (
+                                <Avatar 
+                                  src={fixture.opponent_logo} 
+                                  sx={{ width: 24, height: 24 }}
+                                />
+                              )}
+                              <Typography variant="body2">
+                                {fixture.opponent || 'N/A'}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {fixture.date ? new Date(fixture.date).toLocaleDateString() : 'N/A'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {fixture.time_start || 'N/A'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {fixture.venue || 'N/A'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip 
+                              label={fixture.home_away || 'N/A'} 
+                              color={fixture.home_away === 'HOME' ? 'success' : 'warning'}
+                              variant="outlined"
+                              size="small"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </Box>
+          )}
         </Paper>
       </Container>
 
