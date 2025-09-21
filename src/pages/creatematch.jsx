@@ -391,6 +391,17 @@ const CreateMatch = ({ onFixtureAdded }) => {
     });
   }, []);
 
+  // Silent logo removal for form reset (no snackbar)
+  const handleRemoveLogoSilent = useCallback(() => {
+    setOpponentLogoFile(null);
+    setOpponentLogoPreview(null);
+    setOpponentLogoUrl("");
+    setUseOpponentLogoUrl(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, []);
+
   // Enhanced form submission
   const handleCreate = useCallback(async () => {
     setError("");
@@ -486,12 +497,11 @@ const CreateMatch = ({ onFixtureAdded }) => {
       });
       setOpponentLogoUrl("");
       setUseOpponentLogoUrl(false);
-      handleRemoveLogo();
+      handleRemoveLogoSilent();
       setActiveStep(0);
       
-      // Refresh fixtures list and switch to fixtures tab
+      // Refresh fixtures list but stay on create tab
       await fetchFixtures();
-      setActiveTab(1);
       
     } catch (err) {
       console.error("Error creating match:", err);
@@ -536,7 +546,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
       setLoading(false);
       setUploadProgress(0);
     }
-  }, [validateForm, useOpponentLogoUrl, opponentLogoUrl, opponentLogoFile, formData, navigate, handleRemoveLogo, onFixtureAdded, fetchFixtures]);
+  }, [validateForm, useOpponentLogoUrl, opponentLogoUrl, opponentLogoFile, formData, navigate, handleRemoveLogoSilent, onFixtureAdded, fetchFixtures]);
 
   // Close snackbar
   const handleCloseSnackbar = useCallback(() => {
