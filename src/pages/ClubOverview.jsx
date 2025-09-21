@@ -152,8 +152,8 @@ const ClubOverview = () => {
   const [logoUrl, setLogoUrl] = useState("");
   const [useLogoUrl, setUseLogoUrl] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [success, setSuccess] = useState("");
   const [errors, setErrors] = useState({});
   const [activeStep, setActiveStep] = useState(0);
@@ -329,11 +329,11 @@ const ClubOverview = () => {
 
     const token = localStorage.getItem("accessToken");
     if (!token) {
-      setError("You must be logged in to update club details.");
+      setSaveError("You must be logged in to update club details.");
       return;
     }
 
-    setLoading(true);
+    setSaving(true);
     setUploadProgress(0);
 
     try {
@@ -422,14 +422,14 @@ const ClubOverview = () => {
         }
       }
       
-      setError(errorMessage);
+      setSaveError(errorMessage);
       setSnackbar({
         open: true,
         message: errorMessage,
         severity: "error"
       });
     } finally {
-      setLoading(false);
+      setSaving(false);
       setUploadProgress(0);
     }
   }, [validateForm, useLogoUrl, logoUrl, logoFile, formData, club?.id]);
@@ -589,8 +589,8 @@ const ClubOverview = () => {
               </Box>
 
               {/* Enhanced error/success messages */}
-              <Collapse in={!!error || !!success}>
-                {error && (
+              <Collapse in={!!saveError || !!success}>
+                {saveError && (
                   <Alert 
                     severity="error" 
                     sx={{ mb: 3 }}
@@ -598,13 +598,13 @@ const ClubOverview = () => {
                       <IconButton
                         color="inherit"
                         size="small"
-                        onClick={() => setError("")}
+                        onClick={() => setSaveError("")}
                       >
                         <ErrorIcon />
                       </IconButton>
                     }
                   >
-                    {error}
+                    {saveError}
                   </Alert>
                 )}
                 
@@ -901,7 +901,7 @@ const ClubOverview = () => {
 
               {/* Enhanced Submit Button with Progress */}
               <Box sx={{ mt: 4, textAlign: "center" }}>
-                {loading && (
+                {saving && (
                   <Box sx={{ mb: 2 }}>
                     <LinearProgress 
                       variant="determinate" 
@@ -919,7 +919,7 @@ const ClubOverview = () => {
                     variant="outlined"
                     onClick={() => navigate(-1)}
                     startIcon={<ArrowBackIcon />}
-                    disabled={loading}
+                    disabled={saving}
                   >
                     Back
                   </Button>
@@ -928,8 +928,8 @@ const ClubOverview = () => {
                     variant="contained"
                     size="large"
                     onClick={handleSave}
-                    disabled={loading || !isFormValid}
-                    startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
+                    disabled={saving || !isFormValid}
+                    startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
                     sx={{
                       px: 4,
                       py: 1.5,
@@ -942,7 +942,7 @@ const ClubOverview = () => {
                       },
                     }}
                   >
-                    {loading ? "Updating Club..." : "Update Club"}
+                    {saving ? "Updating Club..." : "Update Club"}
                   </Button>
                 </Stack>
               </Box>
@@ -971,7 +971,7 @@ const ClubOverview = () => {
       {/* Loading backdrop */}
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
+        open={saving}
       >
         <Box textAlign="center">
           <CircularProgress color="inherit" size={60} />
