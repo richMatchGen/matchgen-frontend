@@ -4,22 +4,19 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
-import SportsIcon from '@mui/icons-material/Sports';
 import TodayIcon from '@mui/icons-material/Today';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import { Link as RouterLink } from 'react-router-dom';
-import Stack from '@mui/material/Stack';  
-import NestedModal from './AddPlayerModal';
-import AddFixtureModal from './AddFixtureModal';
-import AddResultModal from './AddResultModal';
-import PSDProcessorLink from './PSDProcessorLink';
+import Stack from '@mui/material/Stack';
+import { useNavigate } from 'react-router-dom';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import EventIcon from '@mui/icons-material/Event';
 
 export default function QuickLinksCard() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
   const [match, setMatch] = React.useState(null);
 
   React.useEffect(() => {
@@ -54,10 +51,30 @@ export default function QuickLinksCard() {
             Quick Links
           </Typography>
           <Stack spacing={1} direction="column">
-            <NestedModal />
-            <AddFixtureModal />
-            {/* <AddResultModal />
-            <PSDProcessorLink /> */}
+            <Button
+              variant="outlined"
+              startIcon={<PersonAddIcon />}
+              onClick={() => navigate('/squad/createplayer')}
+              sx={{
+                justifyContent: 'flex-start',
+                textTransform: 'none',
+                fontWeight: 500
+              }}
+            >
+              Create Player
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<EventIcon />}
+              onClick={() => navigate('/fixture/creatematch')}
+              sx={{
+                justifyContent: 'flex-start',
+                textTransform: 'none',
+                fontWeight: 500
+              }}
+            >
+              Create Fixture
+            </Button>
           </Stack>
         </Box>
       </CardContent>
