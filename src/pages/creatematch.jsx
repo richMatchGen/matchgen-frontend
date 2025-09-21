@@ -482,6 +482,8 @@ const CreateMatch = ({ onFixtureAdded }) => {
       });
 
       console.log("Sending match data:", matchData);
+      console.log("API endpoint:", "https://matchgen-backend-production.up.railway.app/api/content/matches/");
+      console.log("Authorization header:", `Bearer ${token}`);
 
       const response = await axios.post(
         "https://matchgen-backend-production.up.railway.app/api/content/matches/",
@@ -495,13 +497,32 @@ const CreateMatch = ({ onFixtureAdded }) => {
       );
 
       console.log("Match creation response:", response.data);
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
 
-      setSuccess("Match created successfully!");
-      setSnackbar({
-        open: true,
-        message: "Match created successfully!",
-        severity: "success"
-      });
+      // Check if the response is successful
+      if (response.status >= 200 && response.status < 300) {
+        if (response.data && (response.data.id || response.data.opponent)) {
+          console.log("✅ Match created successfully with data:", response.data);
+          setSuccess("Match created successfully!");
+          setSnackbar({
+            open: true,
+            message: "Match created successfully!",
+            severity: "success"
+          });
+        } else {
+          console.warn("⚠️ Unexpected response format:", response.data);
+          setSuccess("Match created successfully!");
+          setSnackbar({
+            open: true,
+            message: "Match created successfully!",
+            severity: "success"
+          });
+        }
+      } else {
+        console.error("❌ Non-success status code:", response.status);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
       
       // Call the callback if provided
       if (onFixtureAdded) {
