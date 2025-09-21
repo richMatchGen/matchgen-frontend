@@ -28,6 +28,14 @@ import {
   useMediaQuery,
   Snackbar,
   Backdrop,
+  Tabs,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import {
   CloudUpload as CloudUploadIcon,
@@ -40,6 +48,9 @@ import {
   Error as ErrorIcon,
   Save as SaveIcon,
   ArrowBack as ArrowBackIcon,
+  Add as AddIcon,
+  List as ListIcon,
+  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import { styled, alpha } from "@mui/material/styles";
 import axios from "axios";
@@ -157,6 +168,9 @@ const CreatePlayer = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
   const [uploadProgress, setUploadProgress] = useState(0);
   const [userClub, setUserClub] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
+  const [players, setPlayers] = useState([]);
+  const [playersLoading, setPlayersLoading] = useState(false);
 
   // Fetch user's club on component mount
   useEffect(() => {
@@ -185,6 +199,50 @@ const CreatePlayer = () => {
 
     fetchUserClub();
   }, []);
+
+  // Fetch players function
+  const fetchPlayers = useCallback(async () => {
+    setPlayersLoading(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      const response = await axios.get(
+        "https://matchgen-backend-production.up.railway.app/api/content/players/",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Handle different response structures
+      let playersData = [];
+      if (Array.isArray(response.data)) {
+        playersData = response.data;
+      } else if (response.data.results && Array.isArray(response.data.results)) {
+        playersData = response.data.results;
+      } else if (response.data.data && Array.isArray(response.data.data)) {
+        playersData = response.data.data;
+      }
+
+      setPlayers(playersData);
+      console.log("Fetched players:", playersData);
+    } catch (err) {
+      console.error("Error fetching players:", err);
+      setPlayers([]);
+    } finally {
+      setPlayersLoading(false);
+    }
+  }, []);
+
+  // Handle tab change
+  const handleTabChange = useCallback((event, newValue) => {
+    setActiveTab(newValue);
+    if (newValue === 1) {
+      fetchPlayers();
+    }
+  }, [fetchPlayers]);
 
   // Memoized values for performance
   const isFormValid = useMemo(() => {
@@ -424,7 +482,7 @@ const CreatePlayer = () => {
 
       console.log("Player creation response:", response.data);
 
-      setSuccess("Player created successfully! Redirecting to dashboard...");
+      setSuccess("Player created successfully!");
       setSnackbar({
         open: true,
         message: "Player created successfully!",
@@ -448,10 +506,8 @@ const CreatePlayer = () => {
       handleRemovePhoto('formatted');
       setActiveStep(0);
       
-      // Redirect to dashboard after 3 seconds
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 3000);
+      // Refresh players list and stay on create tab
+      fetchPlayers();
       
     } catch (err) {
       console.error("Error creating player:", err);
@@ -496,7 +552,7 @@ const CreatePlayer = () => {
       setLoading(false);
       setUploadProgress(0);
     }
-  }, [validateForm, usePlayerPicUrl, playerPicUrl, useFormattedPicUrl, formattedPicUrl, playerPicFile, formattedPicFile, formData, navigate, handleRemovePhoto]);
+  }, [validateForm, usePlayerPicUrl, playerPicUrl, useFormattedPicUrl, formattedPicUrl, playerPicFile, formattedPicFile, formData, handleRemovePhoto, fetchPlayers]);
 
   // Close snackbar
   const handleCloseSnackbar = useCallback(() => {
@@ -582,20 +638,41 @@ const CreatePlayer = () => {
             </Box>
           )}
 
-          {/* Mobile: Stepper for better UX */}
-          {isMobile && (
-            <Box sx={{ mb: 4 }}>
-              <Stepper activeStep={activeStep} orientation="horizontal">
-                {formSteps.map((step, index) => (
-                  <Step key={step.label}>
-                    <StepLabel>{step.label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-            </Box>
-          )}
+          {/* Tabs */}
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+            <Tabs value={activeTab} onChange={handleTabChange} aria-label="player management tabs">
+              <Tab 
+                icon={<AddIcon />} 
+                label="Create Player" 
+                iconPosition="start"
+                sx={{ textTransform: 'none', fontWeight: 500 }}
+              />
+              <Tab 
+                icon={<ListIcon />} 
+                label={`Players (${Array.isArray(players) ? players.length : 0})`}
+                iconPosition="start"
+                sx={{ textTransform: 'none', fontWeight: 500 }}
+              />
+            </Tabs>
+          </Box>
 
-          <Grid container spacing={4}>
+          {/* Tab Content */}
+          {activeTab === 0 && (
+            <>
+              {/* Mobile: Stepper for better UX */}
+              {isMobile && (
+                <Box sx={{ mb: 4 }}>
+                  <Stepper activeStep={activeStep} orientation="horizontal">
+                    {formSteps.map((step, index) => (
+                      <Step key={step.label}>
+                        <StepLabel>{step.label}</StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
+                </Box>
+              )}
+
+              <Grid container spacing={4}>
             {/* Left Column - Basic Information */}
             <Grid item xs={12} md={6}>
               <Zoom in timeout={600}>
@@ -986,6 +1063,125 @@ const CreatePlayer = () => {
               </Button>
             </Stack>
           </Box>
+            </>
+          )}
+
+          {/* Players Tab Content */}
+          {activeTab === 1 && (
+            <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h5" component="h2">
+                  Your Players
+                </Typography>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={fetchPlayers}
+                  disabled={playersLoading}
+                >
+                  Refresh
+                </Button>
+              </Box>
+
+              {playersLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : !Array.isArray(players) || players.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    No players found
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    Create your first player to get started
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => setActiveTab(0)}
+                  >
+                    Create First Player
+                  </Button>
+                </Box>
+              ) : (
+                <TableContainer component={Paper} elevation={1}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Position</TableCell>
+                        <TableCell>Squad #</TableCell>
+                        <TableCell>Sponsor</TableCell>
+                        <TableCell>Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {Array.isArray(players) && players.map((player) => (
+                        <TableRow key={player.id}>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              {player.player_pic && (
+                                <Avatar
+                                  src={player.player_pic}
+                                  alt={player.name}
+                                  sx={{ width: 40, height: 40 }}
+                                />
+                              )}
+                              <Typography variant="body1" fontWeight={500}>
+                                {player.name}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Chip 
+                              label={player.position} 
+                              color="primary" 
+                              variant="outlined"
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {player.squad_no ? (
+                              <Chip 
+                                label={`#${player.squad_no}`} 
+                                color="secondary" 
+                                variant="outlined"
+                              />
+                            ) : (
+                              <Typography variant="body2" color="text.secondary">
+                                -
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {player.sponsor ? (
+                              <Typography variant="body2">{player.sponsor}</Typography>
+                            ) : (
+                              <Typography variant="body2" color="text.secondary">
+                                -
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => {
+                                // TODO: Implement edit functionality
+                                console.log('Edit player:', player);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </Box>
+          )}
         </Paper>
       </Container>
 
