@@ -18,7 +18,12 @@ import {
   Alert,
   CircularProgress,
   Paper,
+  CssBaseline,
 } from "@mui/material";
+import { alpha } from '@mui/material/styles';
+import AppTheme from '../themes/AppTheme';
+import SideMenu from '../components/SideMenu';
+import AppNavbar from '../components/AppNavBar';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -91,10 +96,26 @@ const ClubOverview = () => {
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1200, mx: "auto" }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
-        Club Management
-      </Typography>
+    <AppTheme>
+      <CssBaseline enableColorScheme />
+      <Box sx={{ display: 'flex' }}>
+        <SideMenu />
+        <AppNavbar />
+        {/* Main content */}
+        <Box
+          component="main"
+          sx={(theme) => ({
+            flexGrow: 1,
+            backgroundColor: theme.vars
+              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+              : alpha(theme.palette.background.default, 1),
+            overflow: 'auto',
+          })}
+        >
+          <Box sx={{ p: 3, maxWidth: 1200, mx: "auto" }}>
+            <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
+              Club Management
+            </Typography>
 
       {!club ? (
         // No club exists - show create club option
@@ -343,7 +364,10 @@ const ClubOverview = () => {
           </Grid>
         </Grid>
       )}
-    </Box>
+          </Box>
+        </Box>
+      </Box>
+    </AppTheme>
   );
 };
 

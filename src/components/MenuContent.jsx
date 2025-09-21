@@ -63,7 +63,7 @@ const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
 
 const mainListItems = [
   { text: 'Dashboard', icon: <HomeRoundedIcon />, link: '/dashboard' },
-  { text: 'Gen Posts', icon: <AnalyticsRoundedIcon />, link: '/gen/posts' },
+  // { text: 'Gen Posts', icon: <AnalyticsRoundedIcon />, link: '/gen/posts' },
   { text: 'Club', icon: <PeopleRoundedIcon />, link: '/club' },
   // { text: 'Fixtures', icon: <EventIcon />, link: '/fixtures-management' },
   { text: 'Templates', icon: <AssignmentRoundedIcon />, link: '/gen/templates' },

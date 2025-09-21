@@ -36,7 +36,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  CssBaseline,
 } from "@mui/material";
+import { alpha } from '@mui/material/styles';
+import AppTheme from '../themes/AppTheme';
+import SideMenu from '../components/SideMenu';
+import AppNavbar from '../components/AppNavBar';
 import {
   CloudUpload as CloudUploadIcon,
   Delete as DeleteIcon,
@@ -560,11 +565,26 @@ const CreatePlayer = () => {
   }, []);
 
   return (
-    <>
-      {/* Progress indicator */}
-      <ProgressIndicator sx={{ width: `${formProgress}%` }} />
-      
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+    <AppTheme>
+      <CssBaseline enableColorScheme />
+      <Box sx={{ display: 'flex' }}>
+        <SideMenu />
+        <AppNavbar />
+        {/* Main content */}
+        <Box
+          component="main"
+          sx={(theme) => ({
+            flexGrow: 1,
+            backgroundColor: theme.vars
+              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+              : alpha(theme.palette.background.default, 1),
+            overflow: 'auto',
+          })}
+        >
+          {/* Progress indicator */}
+          <ProgressIndicator sx={{ width: `${formProgress}%` }} />
+          
+          <Container maxWidth="lg" sx={{ py: 4 }}>
         <Paper elevation={3} sx={{ p: 4, borderRadius: 3, position: "relative" }}>
           {/* Header with enhanced styling */}
           <Box textAlign="center" sx={{ mb: 4 }}>
@@ -1214,7 +1234,9 @@ const CreatePlayer = () => {
           </Typography>
         </Box>
       </Backdrop>
-    </>
+        </Box>
+      </Box>
+    </AppTheme>
   );
 };
 
