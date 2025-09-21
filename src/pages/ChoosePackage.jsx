@@ -1,7 +1,11 @@
 
 import axios from "axios";
 import GraphicPackList from "../components/GraphicPackList";
-import { Container, Typography, Alert, Snackbar } from "@mui/material";
+import { Container, Typography, Alert, Snackbar, Box, CssBaseline } from "@mui/material";
+import { alpha } from '@mui/material/styles';
+import AppTheme from '../themes/AppTheme';
+import SideMenu from '../components/SideMenu';
+import AppNavbar from '../components/AppNavBar';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -62,24 +66,43 @@ export default function ChoosePackPage() {
   };
 
   return (
-    <Container sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Choose a Template Pack
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        Select a graphic template pack for your social media posts. If the packs are not loading, 
-        sample packs will be shown for demonstration purposes.
-      </Typography>
-      
-      <GraphicPackList onSelect={handleSelect} />
-      
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar({ open: false, message: "", severity: "info" })}
-        message={snackbar.message}
-      />
-    </Container>
+    <AppTheme>
+      <CssBaseline enableColorScheme />
+      <Box sx={{ display: 'flex' }}>
+        <SideMenu />
+        <AppNavbar />
+        {/* Main content */}
+        <Box
+          component="main"
+          sx={(theme) => ({
+            flexGrow: 1,
+            backgroundColor: theme.vars
+              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+              : alpha(theme.palette.background.default, 1),
+            overflow: 'auto',
+          })}
+        >
+          <Container sx={{ py: 4 }}>
+            <Typography variant="h4" component="h1" gutterBottom>
+              Choose a Template Pack
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+              Select a graphic template pack for your social media posts. If the packs are not loading, 
+              sample packs will be shown for demonstration purposes.
+            </Typography>
+            
+            <GraphicPackList onSelect={handleSelect} />
+            
+            <Snackbar
+              open={snackbar.open}
+              autoHideDuration={4000}
+              onClose={() => setSnackbar({ open: false, message: "", severity: "info" })}
+              message={snackbar.message}
+            />
+          </Container>
+        </Box>
+      </Box>
+    </AppTheme>
   );
 }
 
