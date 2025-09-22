@@ -92,15 +92,55 @@ const SubscriptionManagement = () => {
         console.log('Fetching feature access for club:', clubId);
         console.log('API URL:', `${API_BASE_URL}users/feature-access/?club_id=${clubId}`);
         
-        const response = await axios.get(
-          `${API_BASE_URL}users/feature-access/?club_id=${clubId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}users/feature-access/?club_id=${clubId}`,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+          
+          console.log('Feature access response:', response.data);
+          setSubscriptionInfo(response.data);
+        } catch (error) {
+          if (error.response?.status === 403) {
+            // User doesn't have access to this club, clear the selectedClubId and try to get the correct one
+            console.warn('User does not have access to selected club, clearing localStorage and fetching correct club');
+            localStorage.removeItem('selectedClubId');
+            
+            // Try to get the user's actual club
+            try {
+              const clubResponse = await axios.get(
+                `${API_BASE_URL}users/my-club/`,
+                {
+                  headers: { Authorization: `Bearer ${token}` }
+                }
+              );
+              
+              if (clubResponse.data && clubResponse.data.id) {
+                const correctClubId = clubResponse.data.id.toString();
+                localStorage.setItem('selectedClubId', correctClubId);
+                
+                // Retry with the correct club ID
+                const retryResponse = await axios.get(
+                  `${API_BASE_URL}users/feature-access/?club_id=${correctClubId}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` }
+                  }
+                );
+                
+                console.log('Feature access response (retry):', retryResponse.data);
+                setSubscriptionInfo(retryResponse.data);
+                return;
+              }
+            } catch (clubError) {
+              console.warn('Could not fetch user club:', clubError);
+            }
           }
-        );
-        
-        console.log('Feature access response:', response.data);
-        setSubscriptionInfo(response.data);
+          
+          // If we get here, something went wrong
+          throw error;
+        }
       } else {
         // Set default subscription info for users without clubs
         setSubscriptionInfo({

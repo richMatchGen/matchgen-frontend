@@ -241,3 +241,5 @@ You can add console logging to the `useFeatureAccess` hook to debug feature acce
 const { hasAccess, loading, subscriptionInfo } = useFeatureAccess('your_feature_code');
 console.log('Feature access:', { hasAccess, loading, subscriptionInfo });
 ```
+
+

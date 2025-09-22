@@ -20,19 +20,64 @@ export const useFeatureAccess = (featureCode) => {
       const token = localStorage.getItem('accessToken');
       
       if (selectedClubId && selectedClubId !== 'null' && featureCode) {
-        const response = await axios.get(
-          `${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}&t=${Date.now()}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}users/feature-access/?club_id=${selectedClubId}&t=${Date.now()}`,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+          
+          const { feature_access, subscription_tier, subscription_active } = response.data;
+          setHasAccess(feature_access[featureCode] || false);
+          setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
+          
+          // Get feature info
+          await getFeatureInfo();
+        } catch (error) {
+          if (error.response?.status === 403) {
+            // User doesn't have access to this club, clear the selectedClubId and try to get the correct one
+            console.warn('User does not have access to selected club, clearing localStorage and fetching correct club');
+            localStorage.removeItem('selectedClubId');
+            
+            // Try to get the user's actual club
+            try {
+              const clubResponse = await axios.get(
+                `${API_BASE_URL}users/my-club/`,
+                {
+                  headers: { Authorization: `Bearer ${token}` }
+                }
+              );
+              
+              if (clubResponse.data && clubResponse.data.id) {
+                const correctClubId = clubResponse.data.id.toString();
+                localStorage.setItem('selectedClubId', correctClubId);
+                
+                // Retry with the correct club ID
+                const retryResponse = await axios.get(
+                  `${API_BASE_URL}users/feature-access/?club_id=${correctClubId}&t=${Date.now()}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` }
+                  }
+                );
+                
+                const { feature_access, subscription_tier, subscription_active } = retryResponse.data;
+                setHasAccess(feature_access[featureCode] || false);
+                setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
+                
+                await getFeatureInfo();
+                return;
+              }
+            } catch (clubError) {
+              console.warn('Could not fetch user club:', clubError);
+            }
           }
-        );
-        
-        const { feature_access, subscription_tier, subscription_active } = response.data;
-        setHasAccess(feature_access[featureCode] || false);
-        setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
-        
-        // Get feature info
-        await getFeatureInfo();
+          
+          // If we get here, something went wrong
+          console.error('Error checking feature access:', error);
+          setHasAccess(false);
+          setSubscriptionInfo({ tier: 'basic', active: false });
+        }
       } else {
         setHasAccess(false);
         setSubscriptionInfo({ tier: 'basic', active: false });
@@ -142,3 +187,5 @@ export const useFeatureAccess = (featureCode) => {
 };
 
 export default useFeatureAccess;
+
+
