@@ -22,7 +22,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const steps = ['Create Account', 'Verify Email', 'Choose Plan', 'Setup Club'];
+const steps = ['Create Account', 'Verify Email', 'Setup Club'];
 
 const EnhancedSignup = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -39,10 +39,7 @@ const EnhancedSignup = () => {
     confirmPassword: ''
   });
 
-  // Step 2: Plan selection
-  const [selectedPlan, setSelectedPlan] = useState('');
-
-  // Step 3: Club creation
+  // Step 2: Club creation
   const [clubData, setClubData] = useState({
     name: '',
     sport: '',
@@ -109,13 +106,6 @@ const EnhancedSignup = () => {
     return true;
   };
 
-  const validatePlanSelection = () => {
-    if (!selectedPlan) {
-      setError('Please select a pricing plan');
-      return false;
-    }
-    return true;
-  };
 
   const validateClubData = () => {
     if (!clubData.name || !clubData.sport) {
@@ -229,7 +219,7 @@ const EnhancedSignup = () => {
       formData.append('bio', clubData.bio);
       formData.append('league', clubData.league);
       formData.append('website', clubData.website);
-      formData.append('subscription_tier', selectedPlan); // Add selected plan
+      // No subscription tier - user will choose later
       if (clubData.founded_year) {
         formData.append('founded_year', clubData.founded_year);
       }
@@ -249,7 +239,7 @@ const EnhancedSignup = () => {
         }
       );
 
-      setSuccess('Club created successfully! Redirecting to subscription setup...');
+      setSuccess('Club created successfully! Please choose your subscription plan to get started.');
       setTimeout(() => {
         navigate('/subscription');
       }, 2000);
@@ -270,10 +260,6 @@ const EnhancedSignup = () => {
     } else if (activeStep === 1) {
       checkEmailVerification();
     } else if (activeStep === 2) {
-      if (validatePlanSelection()) {
-        setActiveStep(3);
-      }
-    } else if (activeStep === 3) {
       handleCreateClub();
     }
   };
@@ -368,118 +354,6 @@ const EnhancedSignup = () => {
         );
 
       case 2:
-        return (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Choose Your Plan
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
-              Select the pricing plan that best fits your needs. You can always upgrade or downgrade later.
-            </Typography>
-            
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <Card 
-                  sx={{ 
-                    cursor: 'pointer',
-                    border: selectedPlan === 'basic' ? '2px solid #1976d2' : '1px solid #e0e0e0',
-                    backgroundColor: selectedPlan === 'basic' ? '#f3f8ff' : 'white'
-                  }}
-                  onClick={() => setSelectedPlan('basic')}
-                >
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Basic Gen
-                    </Typography>
-                    <Typography variant="h4" color="primary" gutterBottom>
-                      £9.99
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      per month
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Upcoming Fixture Posts</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Matchday Posts</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Starting XI Posts</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ 1 Team</Typography>
-                      <Typography variant="body2">✓ Basic Templates</Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-              
-              <Grid item xs={12} md={4}>
-                <Card 
-                  sx={{ 
-                    cursor: 'pointer',
-                    border: selectedPlan === 'semipro' ? '2px solid #9c27b0' : '1px solid #e0e0e0',
-                    backgroundColor: selectedPlan === 'semipro' ? '#faf5ff' : 'white',
-                    position: 'relative'
-                  }}
-                  onClick={() => setSelectedPlan('semipro')}
-                >
-                  <Chip 
-                    label="Recommended" 
-                    color="secondary" 
-                    size="small" 
-                    sx={{ position: 'absolute', top: 8, right: 8 }}
-                  />
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      SemiPro Gen
-                    </Typography>
-                    <Typography variant="h4" color="secondary" gutterBottom>
-                      £14.99
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      per month
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Everything in Basic</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Substitution Posts</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Half Time Posts</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Full Time Posts</Typography>
-                      <Typography variant="body2">✓ Enhanced Templates</Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-              
-              <Grid item xs={12} md={4}>
-                <Card 
-                  sx={{ 
-                    cursor: 'pointer',
-                    border: selectedPlan === 'prem' ? '2px solid #ed6c02' : '1px solid #e0e0e0',
-                    backgroundColor: selectedPlan === 'prem' ? '#fff8f0' : 'white'
-                  }}
-                  onClick={() => setSelectedPlan('prem')}
-                >
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Prem Gen
-                    </Typography>
-                    <Typography variant="h4" color="warning.main" gutterBottom>
-                      £24.99
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      per month
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Everything in SemiPro</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Goal Posts</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Player of the Match Posts</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Multiple Teams</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>✓ Bespoke Templates</Typography>
-                      <Typography variant="body2">✓ Priority Support</Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Box>
-        );
-
-      case 3:
         return (
           <Box>
             <Typography variant="h6" gutterBottom>
@@ -692,8 +566,6 @@ const EnhancedSignup = () => {
                 'Create Account'
               ) : activeStep === 1 ? (
                 'Verify Email'
-              ) : activeStep === 2 ? (
-                'Choose Plan'
               ) : (
                 'Create Club'
               )}

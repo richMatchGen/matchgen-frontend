@@ -29,8 +29,15 @@ export const useFeatureAccess = (featureCode) => {
           );
           
           const { feature_access, subscription_tier, subscription_active } = response.data;
-          setHasAccess(feature_access[featureCode] || false);
-          setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
+          
+          // If no subscription tier is set, user needs to choose a plan
+          if (!subscription_tier) {
+            setHasAccess(false);
+            setSubscriptionInfo({ tier: null, active: false });
+          } else {
+            setHasAccess(feature_access[featureCode] || false);
+            setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
+          }
           
           // Get feature info
           await getFeatureInfo();
@@ -62,8 +69,15 @@ export const useFeatureAccess = (featureCode) => {
                 );
                 
                 const { feature_access, subscription_tier, subscription_active } = retryResponse.data;
-                setHasAccess(feature_access[featureCode] || false);
-                setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
+                
+                // If no subscription tier is set, user needs to choose a plan
+                if (!subscription_tier) {
+                  setHasAccess(false);
+                  setSubscriptionInfo({ tier: null, active: false });
+                } else {
+                  setHasAccess(feature_access[featureCode] || false);
+                  setSubscriptionInfo({ tier: subscription_tier, active: subscription_active });
+                }
                 
                 await getFeatureInfo();
                 return;
@@ -76,16 +90,16 @@ export const useFeatureAccess = (featureCode) => {
           // If we get here, something went wrong
           console.error('Error checking feature access:', error);
           setHasAccess(false);
-          setSubscriptionInfo({ tier: 'basic', active: false });
+          setSubscriptionInfo({ tier: null, active: false });
         }
       } else {
         setHasAccess(false);
-        setSubscriptionInfo({ tier: 'basic', active: false });
+        setSubscriptionInfo({ tier: null, active: false });
       }
     } catch (error) {
       console.error('Error checking feature access:', error);
       setHasAccess(false);
-      setSubscriptionInfo({ tier: 'basic', active: false });
+      setSubscriptionInfo({ tier: null, active: false });
     } finally {
       setLoading(false);
     }
@@ -151,9 +165,17 @@ export const useFeatureAccess = (featureCode) => {
           'Bespoke Templates',
           'Multiple Teams'
         ]
+      },
+      null: {
+        name: 'No Plan Selected',
+        price: 'Choose a Plan',
+        period: '',
+        features: [
+          'Please select a subscription plan to access features'
+        ]
       }
     };
-    return tiers[tier] || tiers.basic;
+    return tiers[tier] || tiers.null;
   }, []);
 
   const getNextTier = useCallback((currentTier) => {
