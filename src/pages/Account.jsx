@@ -49,6 +49,7 @@ const Account = () => {
   const [success, setSuccess] = useState(null);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
   
   // Password change form
   const [passwordForm, setPasswordForm] = useState({
@@ -144,20 +145,31 @@ const Account = () => {
   };
 
   const handleDeleteAccount = async () => {
+    // Check if user has typed their email correctly
+    if (deleteConfirmation !== user?.email) {
+      setError('Please type your email address correctly to confirm account deletion.');
+      return;
+    }
+
     try {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       
-      await axios.delete(`${API_BASE_URL}users/delete-account/`, {
+      const response = await axios.delete(`${API_BASE_URL}users/delete-account/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
+      // Show success message briefly before redirecting
+      setSuccess('Account deleted successfully. Redirecting...');
+      
       // Clear local storage and redirect to login
-      localStorage.clear();
-      window.location.href = '/login';
+      setTimeout(() => {
+        localStorage.clear();
+        window.location.href = '/login';
+      }, 2000);
     } catch (error) {
       console.error('Error deleting account:', error);
-      setError('Failed to delete account');
+      setError(error.response?.data?.error || 'Failed to delete account. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -527,23 +539,40 @@ const Account = () => {
           <Typography variant="body1" paragraph>
             Are you sure you want to delete your account? This action cannot be undone.
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" paragraph>
             All your data, including club information, posts, and settings will be permanently deleted.
           </Typography>
+          
+          <Typography variant="body2" color="text.secondary" paragraph>
+            To confirm deletion, please type your email address: <strong>{user?.email}</strong>
+          </Typography>
+          
+          <TextField
+            fullWidth
+            label="Type your email to confirm"
+            value={deleteConfirmation}
+            onChange={(e) => setDeleteConfirmation(e.target.value)}
+            margin="normal"
+            error={deleteConfirmation !== '' && deleteConfirmation !== user?.email}
+            helperText={deleteConfirmation !== '' && deleteConfirmation !== user?.email ? 'Email does not match' : ''}
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+          <Button onClick={() => {
+            setDeleteDialogOpen(false);
+            setDeleteConfirmation('');
+          }}>
             Cancel
           </Button>
-                     <Button
-             variant="contained"
-             color="error"
-             onClick={handleDeleteAccount}
-             disabled={loading}
-             startIcon={<DeleteIcon />}
-           >
-             Delete Account
-           </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteAccount}
+            disabled={loading || deleteConfirmation !== user?.email}
+            startIcon={<DeleteIcon />}
+          >
+            Delete Account
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
