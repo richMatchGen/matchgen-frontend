@@ -33,9 +33,9 @@ export const createClub = async (token, clubData) => {
   }
 };
 
-export const updateClub = async (token, clubData) => {
+export const updateClub = async (token, clubId, clubData) => {
   try {
-    const response = await axios.put(`${API_URL}club/update/`, clubData, {
+    const response = await axios.put(`${API_URL}club/${clubId}/`, clubData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return { success: true, message: response.data.message };
