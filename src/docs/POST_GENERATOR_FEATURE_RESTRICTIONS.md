@@ -33,7 +33,7 @@ This document describes the implementation of feature restrictions with lock ico
 - 🔒 Substitution Posts (requires SemiPro Gen)
 - 🔒 Half Time Posts (requires SemiPro Gen)
 - 🔒 Full Time Posts (requires SemiPro Gen)
-- 🔒 Goal Posts (requires Prem Gen)
+- 🔒 Goal Posts (requires SemiPro Gen)
 - 🔒 Player of the Match Posts (requires Prem Gen)
 
 ### SemiPro Gen Plan (£14.99/month)
@@ -42,9 +42,9 @@ This document describes the implementation of feature restrictions with lock ico
 - ✅ Substitution Posts
 - ✅ Half Time Posts
 - ✅ Full Time Posts
+- ✅ Goal Posts
 
 **Restricted Features:**
-- 🔒 Goal Posts (requires Prem Gen)
 - 🔒 Player of the Match Posts (requires Prem Gen)
 
 ### Prem Gen Plan (£24.99/month)

@@ -146,7 +146,8 @@ export const useFeatureAccess = (featureCode) => {
           'Starting XI Posts',
           'Substitution Posts',
           'Half Time Posts',
-          'Full Time Posts'
+          'Full Time Posts',
+          'Goal Posts'
         ]
       },
       prem: {
