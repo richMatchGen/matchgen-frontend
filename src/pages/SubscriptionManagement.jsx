@@ -735,23 +735,40 @@ const SubscriptionManagement = () => {
         onClose={() => setCancelDialogOpen(false)}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }
+        }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ color: 'white' }}>
           <Box display="flex" alignItems="center" gap={1}>
             <WarningIcon color="warning" />
-            <Typography variant="h6">Cancel Subscription</Typography>
+            <Typography variant="h6" sx={{ color: 'white' }}>Cancel Subscription</Typography>
           </Box>
         </DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" gutterBottom>
+        <DialogContent sx={{ color: 'white' }}>
+          <Typography variant="body1" gutterBottom sx={{ color: 'white' }}>
             Are you sure you want to cancel your subscription?
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+          <Typography variant="body2" sx={{ mt: 2, color: 'rgba(255, 255, 255, 0.8)' }}>
             Your subscription will remain active until the end of your current billing period. 
             You'll continue to have access to all features until then.
           </Typography>
-          <Alert severity="info" sx={{ mt: 2 }}>
-            <Typography variant="body2">
+          <Alert 
+            severity="info" 
+            sx={{ 
+              mt: 2,
+              backgroundColor: 'rgba(33, 150, 243, 0.1)',
+              border: '1px solid rgba(33, 150, 243, 0.3)',
+              '& .MuiAlert-message': {
+                color: 'white'
+              }
+            }}
+          >
+            <Typography variant="body2" sx={{ color: 'white' }}>
               You can reactivate your subscription at any time before the end of your billing period.
             </Typography>
           </Alert>
@@ -759,6 +776,7 @@ const SubscriptionManagement = () => {
         <DialogActions>
           <Button 
             onClick={() => setCancelDialogOpen(false)}
+            sx={{ color: 'white' }}
             disabled={canceling}
           >
             Keep Subscription
