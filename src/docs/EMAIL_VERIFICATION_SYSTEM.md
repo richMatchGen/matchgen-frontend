@@ -120,3 +120,4 @@ The email verification system ensures that users verify their email addresses be
 5. **Analytics**: Track verification rates and drop-offs
 
 
+
