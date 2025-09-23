@@ -310,17 +310,20 @@ const FixturesManagement = () => {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Delete Fixture</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
+        <DialogTitle sx={{ color: 'white' }}>Delete Fixture</DialogTitle>
+        <DialogContent sx={{ color: 'white' }}>
+          <DialogContentText sx={{ color: 'white' }}>
             Are you sure you want to delete the fixture against{' '}
-            <strong>{fixtureToDelete?.opponent}</strong> on{' '}
-            <strong>{fixtureToDelete?.date ? formatDate(fixtureToDelete.date) : 'TBC'}</strong>?
+            <strong style={{ color: 'white' }}>{fixtureToDelete?.opponent}</strong> on{' '}
+            <strong style={{ color: 'white' }}>{fixtureToDelete?.date ? formatDate(fixtureToDelete.date) : 'TBC'}</strong>?
             This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+          <Button 
+            onClick={() => setDeleteDialogOpen(false)}
+            sx={{ color: 'white' }}
+          >
             Cancel
           </Button>
           <Button onClick={confirmDelete} color="error" variant="contained">

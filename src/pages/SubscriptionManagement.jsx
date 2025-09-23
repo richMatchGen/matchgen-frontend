@@ -654,9 +654,9 @@ const SubscriptionManagement = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>
+        <DialogTitle sx={{ color: 'white' }}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">
+            <Typography variant="h6" sx={{ color: 'white' }}>
               {selectedTier && subscriptionInfo?.subscription_tier ? 
                 (isUpgrade(subscriptionInfo.subscription_tier, selectedTier) ? 'Upgrade Subscription' :
                  isDowngrade(subscriptionInfo.subscription_tier, selectedTier) ? 'Downgrade Subscription' :
@@ -665,18 +665,19 @@ const SubscriptionManagement = () => {
             <Button
               icon={<CloseIcon />}
               onClick={() => setUpgradeDialogOpen(false)}
+              sx={{ color: 'white' }}
             >
               <CloseIcon />
             </Button>
           </Box>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ color: 'white' }}>
           {selectedTier && (
             <Box>
-              <Typography variant="h5" color="primary" gutterBottom>
+              <Typography variant="h5" sx={{ color: 'white' }} gutterBottom>
                 {getSubscriptionTierInfo(selectedTier).title}
               </Typography>
-              <Typography variant="h4" color="primary" gutterBottom>
+              <Typography variant="h4" sx={{ color: 'white' }} gutterBottom>
                 £{getSubscriptionTierInfo(selectedTier).price}/month
               </Typography>
               
@@ -684,30 +685,50 @@ const SubscriptionManagement = () => {
               {subscriptionInfo?.subscription_tier && (
                 <>
                   {isUpgrade(subscriptionInfo.subscription_tier, selectedTier) && (
-                    <Alert severity="success" sx={{ mb: 2 }}>
-                      <Typography variant="body2">
-                        <strong>Immediate Upgrade:</strong> You'll be charged a prorated amount and get immediate access to new features.
+                    <Alert 
+                      severity="success" 
+                      sx={{ 
+                        mb: 2,
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        border: '1px solid rgba(76, 175, 80, 0.3)',
+                        '& .MuiAlert-message': {
+                          color: 'white'
+                        }
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ color: 'white' }}>
+                        <strong style={{ color: 'white' }}>Immediate Upgrade:</strong> You'll be charged a prorated amount and get immediate access to new features.
                       </Typography>
                     </Alert>
                   )}
                   
                   {isDowngrade(subscriptionInfo.subscription_tier, selectedTier) && (
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                      <Typography variant="body2">
-                        <strong>Scheduled Downgrade:</strong> The change will take effect at the end of your current billing period. You'll keep current features until then.
+                    <Alert 
+                      severity="info" 
+                      sx={{ 
+                        mb: 2,
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        border: '1px solid rgba(33, 150, 243, 0.3)',
+                        '& .MuiAlert-message': {
+                          color: 'white'
+                        }
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ color: 'white' }}>
+                        <strong style={{ color: 'white' }}>Scheduled Downgrade:</strong> The change will take effect at the end of your current billing period. You'll keep current features until then.
                       </Typography>
                     </Alert>
                   )}
                 </>
               )}
               
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" sx={{ color: 'white' }} gutterBottom>
                 Features You'll {subscriptionInfo?.subscription_tier && isDowngrade(subscriptionInfo.subscription_tier, selectedTier) ? 'Have After Downgrade:' : 'Get:'}
               </Typography>
               {getSubscriptionTierInfo(selectedTier).description.map((feature, index) => (
                 <Box key={index} sx={{ py: 1, display: 'flex', gap: 1.5, alignItems: 'center' }}>
                   <CheckIcon sx={{ width: 20, color: 'primary.main' }} />
-                  <Typography variant="body2">{feature}</Typography>
+                  <Typography variant="body2" sx={{ color: 'white' }}>{feature}</Typography>
                 </Box>
               ))}
             </Box>

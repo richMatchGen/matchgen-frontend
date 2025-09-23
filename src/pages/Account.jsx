@@ -465,8 +465,8 @@ const Account = () => {
 
       {/* Password Change Dialog */}
       <Dialog open={passwordDialogOpen} onClose={() => setPasswordDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Change Password</DialogTitle>
-        <DialogContent>
+        <DialogTitle sx={{ color: 'white' }}>Change Password</DialogTitle>
+        <DialogContent sx={{ color: 'white' }}>
           <Box sx={{ pt: 1 }}>
             <TextField
               fullWidth
@@ -475,9 +475,22 @@ const Account = () => {
               value={passwordForm.current_password}
               onChange={(e) => setPasswordForm(prev => ({ ...prev, current_password: e.target.value }))}
               margin="normal"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
               InputProps={{
                 endAdornment: (
-                  <IconButton onClick={() => togglePasswordVisibility('current')}>
+                  <IconButton 
+                    onClick={() => togglePasswordVisibility('current')}
+                    sx={{ color: 'white' }}
+                  >
                     {showPasswords.current ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </IconButton>
                 )
@@ -491,9 +504,22 @@ const Account = () => {
               value={passwordForm.new_password}
               onChange={(e) => setPasswordForm(prev => ({ ...prev, new_password: e.target.value }))}
               margin="normal"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
               InputProps={{
                 endAdornment: (
-                  <IconButton onClick={() => togglePasswordVisibility('new')}>
+                  <IconButton 
+                    onClick={() => togglePasswordVisibility('new')}
+                    sx={{ color: 'white' }}
+                  >
                     {showPasswords.new ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </IconButton>
                 )
@@ -507,9 +533,22 @@ const Account = () => {
               value={passwordForm.confirm_password}
               onChange={(e) => setPasswordForm(prev => ({ ...prev, confirm_password: e.target.value }))}
               margin="normal"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
               InputProps={{
                 endAdornment: (
-                  <IconButton onClick={() => togglePasswordVisibility('confirm')}>
+                  <IconButton 
+                    onClick={() => togglePasswordVisibility('confirm')}
+                    sx={{ color: 'white' }}
+                  >
                     {showPasswords.confirm ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </IconButton>
                 )
@@ -518,7 +557,10 @@ const Account = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPasswordDialogOpen(false)}>
+          <Button 
+            onClick={() => setPasswordDialogOpen(false)}
+            sx={{ color: 'white' }}
+          >
             Cancel
           </Button>
                      <Button

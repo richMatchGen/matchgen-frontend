@@ -432,14 +432,19 @@ const UserProfile = () => {
 
       {/* Avatar Upload Dialog */}
       <Dialog open={avatarDialogOpen} onClose={() => setAvatarDialogOpen(false)}>
-        <DialogTitle>Update Profile Picture</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary">
+        <DialogTitle sx={{ color: 'white' }}>Update Profile Picture</DialogTitle>
+        <DialogContent sx={{ color: 'white' }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
             Profile picture upload functionality will be implemented in a future update.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAvatarDialogOpen(false)}>Close</Button>
+          <Button 
+            onClick={() => setAvatarDialogOpen(false)}
+            sx={{ color: 'white' }}
+          >
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

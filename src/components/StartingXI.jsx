@@ -545,13 +545,15 @@ export default function StartingXISelection() {
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>
+          <DialogTitle sx={{ color: 'white' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <TrophyIcon color="primary" />
-              Starting XI Graphic
+              <Typography variant="h6" sx={{ color: 'white' }}>
+                Starting XI Graphic
+              </Typography>
             </Box>
           </DialogTitle>
-          <DialogContent>
+          <DialogContent sx={{ color: 'white' }}>
             {imageUrl && (
               <Box sx={{ textAlign: 'center' }}>
                 <img 
@@ -568,7 +570,10 @@ export default function StartingXISelection() {
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setShowPreview(false)}>
+            <Button 
+              onClick={() => setShowPreview(false)}
+              sx={{ color: 'white' }}
+            >
               Close
             </Button>
             {imageUrl && (

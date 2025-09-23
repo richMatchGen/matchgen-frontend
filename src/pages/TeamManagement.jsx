@@ -550,16 +550,28 @@ const TeamManagement = () => {
           }
         }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ color: 'white' }}>
           <Box display="flex" alignItems="center" gap={2}>
             <EmailIcon color="primary" />
-            <Typography variant="h6">Invite Team Member</Typography>
+            <Typography variant="h6" sx={{ color: 'white' }}>Invite Team Member</Typography>
           </Box>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ color: 'white' }}>
           <Box display="flex" flexDirection="column" gap={3} pt={1}>
-            <Alert severity="info" icon={<InfoIcon />}>
-              Send an invitation to join your team. The user will receive an email with instructions to accept the invitation.
+            <Alert 
+              severity="info" 
+              icon={<InfoIcon />}
+              sx={{
+                backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                border: '1px solid rgba(33, 150, 243, 0.3)',
+                '& .MuiAlert-message': {
+                  color: 'white'
+                }
+              }}
+            >
+              <Typography variant="body2" sx={{ color: 'white' }}>
+                Send an invitation to join your team. The user will receive an email with instructions to accept the invitation.
+              </Typography>
             </Alert>
             
             <TextField
@@ -570,24 +582,49 @@ const TeamManagement = () => {
               fullWidth
               required
               placeholder="Enter the email address of the person you want to invite"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
             
             <FormControl fullWidth required>
-              <InputLabel>Role</InputLabel>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Role</InputLabel>
               <Select
                 value={inviteForm.role_id}
                 onChange={(e) => setInviteForm({ ...inviteForm, role_id: e.target.value })}
                 label="Role"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2196f3',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  }
+                }}
               >
                 {teamData.available_roles.map((role) => (
                   <MenuItem key={role.id} value={role.id}>
                     <Box display="flex" alignItems="center" gap={2}>
                       {getRoleIcon(role.name)}
                       <Box>
-                        <Typography variant="body2" fontWeight="medium">
+                        <Typography variant="body2" fontWeight="medium" sx={{ color: 'white' }}>
                           {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                           {role.description}
                         </Typography>
                       </Box>
@@ -605,11 +642,25 @@ const TeamManagement = () => {
               onChange={(e) => setInviteForm({ ...inviteForm, message: e.target.value })}
               fullWidth
               placeholder="Add a personal message to make the invitation more welcoming..."
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setInviteDialogOpen(false)} startIcon={<CloseIcon />}>
+          <Button 
+            onClick={() => setInviteDialogOpen(false)} 
+            startIcon={<CloseIcon />}
+            sx={{ color: 'white' }}
+          >
             Cancel
           </Button>
           <Button 
@@ -637,34 +688,61 @@ const TeamManagement = () => {
           }
         }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ color: 'white' }}>
           <Box display="flex" alignItems="center" gap={2}>
             <EditIcon color="primary" />
-            <Typography variant="h6">Update Role</Typography>
+            <Typography variant="h6" sx={{ color: 'white' }}>Update Role</Typography>
           </Box>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ color: 'white' }}>
           <Box display="flex" flexDirection="column" gap={3} pt={1}>
-            <Alert severity="info" icon={<InfoIcon />}>
-              Change the role for <strong>{selectedMember?.user.email}</strong>. This will affect their permissions and access levels.
+            <Alert 
+              severity="info" 
+              icon={<InfoIcon />}
+              sx={{
+                backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                border: '1px solid rgba(33, 150, 243, 0.3)',
+                '& .MuiAlert-message': {
+                  color: 'white'
+                }
+              }}
+            >
+              <Typography variant="body2" sx={{ color: 'white' }}>
+                Change the role for <strong style={{ color: 'white' }}>{selectedMember?.user.email}</strong>. This will affect their permissions and access levels.
+              </Typography>
             </Alert>
             
             <FormControl fullWidth required>
-              <InputLabel>New Role</InputLabel>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>New Role</InputLabel>
               <Select
                 value={editForm.role_id}
                 onChange={(e) => setEditForm({ ...editForm, role_id: e.target.value })}
                 label="New Role"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2196f3',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  }
+                }}
               >
                 {teamData.available_roles.map((role) => (
                   <MenuItem key={role.id} value={role.id}>
                     <Box display="flex" alignItems="center" gap={2}>
                       {getRoleIcon(role.name)}
                       <Box>
-                        <Typography variant="body2" fontWeight="medium">
+                        <Typography variant="body2" fontWeight="medium" sx={{ color: 'white' }}>
                           {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                           {role.description}
                         </Typography>
                       </Box>
@@ -676,7 +754,11 @@ const TeamManagement = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)} startIcon={<CloseIcon />}>
+          <Button 
+            onClick={() => setEditDialogOpen(false)} 
+            startIcon={<CloseIcon />}
+            sx={{ color: 'white' }}
+          >
             Cancel
           </Button>
           <Button 
@@ -704,19 +786,31 @@ const TeamManagement = () => {
           }
         }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ color: 'white' }}>
           <Box display="flex" alignItems="center" gap={2}>
             <DeleteIcon color="error" />
-            <Typography variant="h6">Remove Team Member</Typography>
+            <Typography variant="h6" sx={{ color: 'white' }}>Remove Team Member</Typography>
           </Box>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ color: 'white' }}>
           <Box display="flex" flexDirection="column" gap={3} pt={1}>
-            <Alert severity="warning" icon={<WarningIcon />}>
-              Are you sure you want to remove <strong>{memberToRemove?.email}</strong> from the team?
+            <Alert 
+              severity="warning" 
+              icon={<WarningIcon />}
+              sx={{
+                backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                border: '1px solid rgba(255, 152, 0, 0.3)',
+                '& .MuiAlert-message': {
+                  color: 'white'
+                }
+              }}
+            >
+              <Typography variant="body2" sx={{ color: 'white' }}>
+                Are you sure you want to remove <strong style={{ color: 'white' }}>{memberToRemove?.email}</strong> from the team?
+              </Typography>
             </Alert>
             
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
               This action will:
             </Typography>
             
@@ -725,25 +819,38 @@ const TeamManagement = () => {
                 <ListItemIcon>
                   <WarningIcon color="warning" fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Remove their access to the club" />
+                <ListItemText 
+                  primary="Remove their access to the club" 
+                  sx={{ '& .MuiListItemText-primary': { color: 'white' } }}
+                />
               </ListItem>
               <ListItem>
                 <ListItemIcon>
                   <WarningIcon color="warning" fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Delete all their club memberships" />
+                <ListItemText 
+                  primary="Delete all their club memberships" 
+                  sx={{ '& .MuiListItemText-primary': { color: 'white' } }}
+                />
               </ListItem>
               <ListItem>
                 <ListItemIcon>
                   <InfoIcon color="info" fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="This action cannot be undone" />
+                <ListItemText 
+                  primary="This action cannot be undone" 
+                  sx={{ '& .MuiListItemText-primary': { color: 'white' } }}
+                />
               </ListItem>
             </List>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRemoveDialogOpen(false)} startIcon={<CloseIcon />}>
+          <Button 
+            onClick={() => setRemoveDialogOpen(false)} 
+            startIcon={<CloseIcon />}
+            sx={{ color: 'white' }}
+          >
             Cancel
           </Button>
           <Button 

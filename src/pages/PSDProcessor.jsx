@@ -372,55 +372,74 @@ const PSDProcessor = () => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>
+        <DialogTitle sx={{ color: 'white' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <InfoIcon color="primary" />
-            {selectedDocument?.title} - Layer Details
+            <Typography variant="h6" sx={{ color: 'white' }}>
+              {selectedDocument?.title} - Layer Details
+            </Typography>
           </Box>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ color: 'white' }}>
           {selectedDocument && (
             <Box>
               <Box sx={{ mb: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                   Document: {selectedDocument.width} × {selectedDocument.height} pixels
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                   Total Layers: {selectedDocument.layers?.length || 0}
                 </Typography>
               </Box>
               
               <Divider sx={{ my: 2 }} />
               
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" sx={{ color: 'white' }} gutterBottom>
                 Layer Information
               </Typography>
               
-              <Alert severity="info" sx={{ mb: 2 }}>
-                <Typography variant="body2">
-                  <strong>Center Point Analysis:</strong> Each layer now includes center coordinates for precise positioning, 
+              <Alert 
+                severity="info" 
+                sx={{ 
+                  mb: 2,
+                  backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                  border: '1px solid rgba(33, 150, 243, 0.3)',
+                  '& .MuiAlert-message': {
+                    color: 'white'
+                  }
+                }}
+              >
+                <Typography variant="body2" sx={{ color: 'white' }}>
+                  <strong style={{ color: 'white' }}>Center Point Analysis:</strong> Each layer now includes center coordinates for precise positioning, 
                   alignment, and design automation. Use center points for rotation anchors, scaling operations, and layout calculations.
                 </Typography>
               </Alert>
               
-              <TableContainer component={Paper} variant="outlined">
+              <TableContainer 
+                component={Paper} 
+                variant="outlined"
+                sx={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                }}
+              >
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Layer Name</TableCell>
-                      <TableCell>Position (X, Y)</TableCell>
-                      <TableCell>Center Point</TableCell>
-                      <TableCell>Size (W × H)</TableCell>
-                      <TableCell>Bounding Box</TableCell>
-                      <TableCell>Visible</TableCell>
-                      <TableCell>Opacity</TableCell>
+                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Layer Name</TableCell>
+                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Position (X, Y)</TableCell>
+                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Center Point</TableCell>
+                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Size (W × H)</TableCell>
+                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Bounding Box</TableCell>
+                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Visible</TableCell>
+                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Opacity</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {selectedDocument.layers?.map((layer, index) => (
                       <TableRow key={index}>
                         <TableCell>
-                          <Typography variant="body2" fontWeight="medium">
+                          <Typography variant="body2" fontWeight="medium" sx={{ color: 'white' }}>
                             {layer.name}
                           </Typography>
                         </TableCell>
@@ -447,7 +466,7 @@ const PSDProcessor = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" fontFamily="monospace">
+                          <Typography variant="body2" fontFamily="monospace" sx={{ color: 'white' }}>
                             {layer.bounding_box}
                           </Typography>
                         </TableCell>
@@ -459,7 +478,7 @@ const PSDProcessor = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2">
+                          <Typography variant="body2" sx={{ color: 'white' }}>
                             {Math.round(layer.opacity)}%
                           </Typography>
                         </TableCell>
@@ -472,7 +491,12 @@ const PSDProcessor = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setViewDialogOpen(false)}>Close</Button>
+          <Button 
+            onClick={() => setViewDialogOpen(false)}
+            sx={{ color: 'white' }}
+          >
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

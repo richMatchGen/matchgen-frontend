@@ -557,17 +557,34 @@ const TextElementManagement = () => {
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {editingElement ? 'Edit Element' : 'Add Element'}
+        <DialogTitle sx={{ color: 'white' }}>
+          <Typography variant="h6" sx={{ color: 'white' }}>
+            {editingElement ? 'Edit Element' : 'Add Element'}
+          </Typography>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ color: 'white' }}>
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
             <FormControl fullWidth>
-              <InputLabel>Graphic Pack</InputLabel>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Graphic Pack</InputLabel>
               <Select
                 value={formData.graphic_pack}
                 onChange={(e) => setFormData({ ...formData, graphic_pack: e.target.value })}
                 label="Graphic Pack"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2196f3',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  }
+                }}
               >
                 {(() => {
                   console.log('Rendering dropdown with graphicPacks:', graphicPacks);
@@ -591,11 +608,26 @@ const TextElementManagement = () => {
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel>Element Type</InputLabel>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Element Type</InputLabel>
               <Select
                 value={formData.element_type}
                 onChange={(e) => setFormData({ ...formData, element_type: e.target.value })}
                 label="Element Type"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2196f3',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  }
+                }}
               >
                 <MenuItem value="text">Text</MenuItem>
                 <MenuItem value="image">Image</MenuItem>
@@ -603,11 +635,26 @@ const TextElementManagement = () => {
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel>Content Type</InputLabel>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Content Type</InputLabel>
               <Select
                 value={formData.content_type}
                 onChange={(e) => setFormData({ ...formData, content_type: e.target.value })}
                 label="Content Type"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2196f3',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  }
+                }}
               >
                 {contentTypes.map((type) => (
                   <MenuItem key={type.value} value={type.value}>
@@ -618,11 +665,26 @@ const TextElementManagement = () => {
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel>Element Name</InputLabel>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Element Name</InputLabel>
               <Select
                 value={formData.element_name}
                 onChange={(e) => setFormData({ ...formData, element_name: e.target.value })}
                 label="Element Name"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2196f3',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  }
+                }}
               >
                 {elementNames.map((name) => (
                   <MenuItem key={name.value} value={name.value}>
@@ -637,6 +699,16 @@ const TextElementManagement = () => {
               value={formData.font_family}
               onChange={(e) => setFormData({ ...formData, font_family: e.target.value })}
               fullWidth
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
 
             <TextField
@@ -645,6 +717,16 @@ const TextElementManagement = () => {
               value={formData.position_x}
               onChange={(e) => setFormData({ ...formData, position_x: parseInt(e.target.value) || 0 })}
               fullWidth
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
 
             <TextField
@@ -653,6 +735,16 @@ const TextElementManagement = () => {
               value={formData.position_y}
               onChange={(e) => setFormData({ ...formData, position_y: parseInt(e.target.value) || 0 })}
               fullWidth
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
 
             {/* Home/Away positioning fields */}
@@ -663,6 +755,16 @@ const TextElementManagement = () => {
               onChange={(e) => setFormData({ ...formData, home_position_x: parseInt(e.target.value) || 0 })}
               fullWidth
               helperText="X position for home fixtures"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
 
             <TextField
@@ -672,6 +774,16 @@ const TextElementManagement = () => {
               onChange={(e) => setFormData({ ...formData, home_position_y: parseInt(e.target.value) || 0 })}
               fullWidth
               helperText="Y position for home fixtures"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
 
             <TextField
@@ -681,6 +793,16 @@ const TextElementManagement = () => {
               onChange={(e) => setFormData({ ...formData, away_position_x: parseInt(e.target.value) || 0 })}
               fullWidth
               helperText="X position for away fixtures"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
 
             <TextField
@@ -690,6 +812,16 @@ const TextElementManagement = () => {
               onChange={(e) => setFormData({ ...formData, away_position_y: parseInt(e.target.value) || 0 })}
               fullWidth
               helperText="Y position for away fixtures"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
 
             <TextField
@@ -698,6 +830,16 @@ const TextElementManagement = () => {
               value={formData.font_size}
               onChange={(e) => setFormData({ ...formData, font_size: parseInt(e.target.value) || 12 })}
               fullWidth
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
 
             <TextField
@@ -706,14 +848,39 @@ const TextElementManagement = () => {
               value={formData.font_color}
               onChange={(e) => setFormData({ ...formData, font_color: e.target.value })}
               fullWidth
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
             />
 
             <FormControl fullWidth>
-              <InputLabel>Alignment</InputLabel>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Alignment</InputLabel>
               <Select
                 value={formData.alignment}
                 onChange={(e) => setFormData({ ...formData, alignment: e.target.value })}
                 label="Alignment"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2196f3',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  }
+                }}
               >
                 <MenuItem value="left">Left</MenuItem>
                 <MenuItem value="center">Center</MenuItem>
@@ -722,11 +889,26 @@ const TextElementManagement = () => {
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel>Font Weight</InputLabel>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Font Weight</InputLabel>
               <Select
                 value={formData.font_weight}
                 onChange={(e) => setFormData({ ...formData, font_weight: e.target.value })}
                 label="Font Weight"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2196f3',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  }
+                }}
               >
                 <MenuItem value="normal">Normal</MenuItem>
                 <MenuItem value="bold">Bold</MenuItem>
@@ -743,6 +925,16 @@ const TextElementManagement = () => {
                   onChange={(e) => setFormData({ ...formData, image_width: parseInt(e.target.value) || 100 })}
                   fullWidth
                   helperText="Width in pixels"
+                  sx={{
+                    '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                      '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                      '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                    },
+                    '& .MuiInputBase-input': { color: 'white' },
+                    '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+                  }}
                 />
 
                 <TextField
@@ -752,14 +944,39 @@ const TextElementManagement = () => {
                   onChange={(e) => setFormData({ ...formData, image_height: parseInt(e.target.value) || 100 })}
                   fullWidth
                   helperText="Height in pixels"
+                  sx={{
+                    '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                      '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                      '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                    },
+                    '& .MuiInputBase-input': { color: 'white' },
+                    '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+                  }}
                 />
 
                 <FormControl fullWidth>
-                  <InputLabel>Maintain Aspect Ratio</InputLabel>
+                  <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Maintain Aspect Ratio</InputLabel>
                   <Select
                     value={formData.maintain_aspect_ratio}
                     onChange={(e) => setFormData({ ...formData, maintain_aspect_ratio: e.target.value })}
                     label="Maintain Aspect Ratio"
+                    sx={{
+                      color: 'white',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#2196f3',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        color: 'white',
+                      }
+                    }}
                   >
                     <MenuItem value={true}>Yes</MenuItem>
                     <MenuItem value={false}>No</MenuItem>
@@ -770,7 +987,11 @@ const TextElementManagement = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} startIcon={<CancelIcon />}>
+          <Button 
+            onClick={handleCloseDialog} 
+            startIcon={<CancelIcon />}
+            sx={{ color: 'white' }}
+          >
             Cancel
           </Button>
           <Button 
