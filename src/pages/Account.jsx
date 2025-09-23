@@ -533,18 +533,30 @@ const Account = () => {
       </Dialog>
 
       {/* Delete Account Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog 
+        open={deleteDialogOpen} 
+        onClose={() => setDeleteDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }
+        }}
+      >
         <DialogTitle sx={{ color: '#ff6b6b' }}>Delete Account</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" paragraph>
+        <DialogContent sx={{ color: 'white' }}>
+          <Typography variant="body1" paragraph sx={{ color: 'white' }}>
             Are you sure you want to delete your account? This action cannot be undone.
           </Typography>
-          <Typography variant="body2" color="text.secondary" paragraph>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)', paragraph: true }}>
             All your data, including club information, posts, and settings will be permanently deleted.
           </Typography>
           
-          <Typography variant="body2" color="text.secondary" paragraph>
-            To confirm deletion, please type your email address: <strong>{user?.email}</strong>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)', paragraph: true }}>
+            To confirm deletion, please type your email address: <strong style={{ color: 'white' }}>{user?.email}</strong>
           </Typography>
           
           <TextField
@@ -555,13 +567,26 @@ const Account = () => {
             margin="normal"
             error={deleteConfirmation !== '' && deleteConfirmation !== user?.email}
             helperText={deleteConfirmation !== '' && deleteConfirmation !== user?.email ? 'Email does not match' : ''}
+            sx={{
+              '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                '&.Mui-focused fieldset': { borderColor: '#ff6b6b' }
+              },
+              '& .MuiInputBase-input': { color: 'white' },
+              '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+            }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => {
-            setDeleteDialogOpen(false);
-            setDeleteConfirmation('');
-          }}>
+          <Button 
+            onClick={() => {
+              setDeleteDialogOpen(false);
+              setDeleteConfirmation('');
+            }}
+            sx={{ color: 'white' }}
+          >
             Cancel
           </Button>
           <Button

@@ -537,7 +537,19 @@ const TeamManagement = () => {
       </Card>
 
       {/* Invite Dialog */}
-      <Dialog open={inviteDialogOpen} onClose={() => setInviteDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog 
+        open={inviteDialogOpen} 
+        onClose={() => setInviteDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }
+        }}
+      >
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={2}>
             <EmailIcon color="primary" />
@@ -612,7 +624,19 @@ const TeamManagement = () => {
       </Dialog>
 
       {/* Edit Role Dialog */}
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog 
+        open={editDialogOpen} 
+        onClose={() => setEditDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }
+        }}
+      >
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={2}>
             <EditIcon color="primary" />
@@ -667,7 +691,19 @@ const TeamManagement = () => {
       </Dialog>
 
       {/* Remove Member Confirmation Dialog */}
-      <Dialog open={removeDialogOpen} onClose={() => setRemoveDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog 
+        open={removeDialogOpen} 
+        onClose={() => setRemoveDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }
+        }}
+      >
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={2}>
             <DeleteIcon color="error" />

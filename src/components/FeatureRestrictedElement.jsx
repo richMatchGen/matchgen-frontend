@@ -325,33 +325,50 @@ const FeatureRestrictedElement = ({
           onClose={() => setUpgradeDialogOpen(false)}
           maxWidth="md"
           fullWidth
+          PaperProps={{
+            sx: {
+              backgroundColor: 'rgba(0, 0, 0, 0.9)',
+              color: 'white',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }
+          }}
         >
-          <DialogTitle>
+          <DialogTitle sx={{ color: 'white' }}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="h6">{upgradeDialogTitle}</Typography>
+              <Typography variant="h6" sx={{ color: 'white' }}>{upgradeDialogTitle}</Typography>
               <Button
                 icon={<CloseIcon />}
                 onClick={() => setUpgradeDialogOpen(false)}
+                sx={{ color: 'white' }}
               >
                 <CloseIcon />
               </Button>
             </Box>
           </DialogTitle>
-          <DialogContent>
+          <DialogContent sx={{ color: 'white' }}>
             <Box display="flex" flexDirection="column" gap={3}>
               {/* Feature Description */}
-              <Alert severity="info">
-                <Typography variant="body2">
+              <Alert 
+                severity="info"
+                sx={{
+                  backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                  border: '1px solid rgba(33, 150, 243, 0.3)',
+                  '& .MuiAlert-message': {
+                    color: 'white'
+                  }
+                }}
+              >
+                <Typography variant="body2" sx={{ color: 'white' }}>
                   <strong>{featureInfo?.name || 'This feature'}</strong>: {featureInfo?.description || upgradeDialogDescription}
                 </Typography>
               </Alert>
 
               {/* Current Plan */}
               <Box>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom sx={{ color: 'white' }}>
                   Current Plan: {currentTierInfo.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)', gutterBottom: true }}>
                   {currentTierInfo.price}/{currentTierInfo.period}
                 </Typography>
                 <List dense>
@@ -360,19 +377,19 @@ const FeatureRestrictedElement = ({
                       <ListItemIcon>
                         <CheckIcon color="success" />
                       </ListItemIcon>
-                      <ListItemText primary={feature} />
+                      <ListItemText primary={feature} sx={{ color: 'white' }} />
                     </ListItem>
                   ))}
                 </List>
               </Box>
 
-              <Divider />
+              <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.2)' }} />
 
               {/* Next Tier */}
               {nextTierInfo && (
                 <Box>
                   <Box display="flex" alignItems="center" gap={1} mb={2}>
-                    <Typography variant="h6">
+                    <Typography variant="h6" sx={{ color: 'white' }}>
                       Recommended: {nextTierInfo.name}
                     </Typography>
                     <Chip 
@@ -382,7 +399,7 @@ const FeatureRestrictedElement = ({
                       size="small" 
                     />
                   </Box>
-                  <Typography variant="h5" color="primary" gutterBottom>
+                  <Typography variant="h5" sx={{ color: '#2196f3', gutterBottom: true }}>
                     {nextTierInfo.price}/{nextTierInfo.period}
                   </Typography>
                   <List dense>
@@ -391,7 +408,7 @@ const FeatureRestrictedElement = ({
                         <ListItemIcon>
                           <CheckIcon color="success" />
                         </ListItemIcon>
-                        <ListItemText primary={feature} />
+                        <ListItemText primary={feature} sx={{ color: 'white' }} />
                       </ListItem>
                     ))}
                   </List>
@@ -400,7 +417,10 @@ const FeatureRestrictedElement = ({
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setUpgradeDialogOpen(false)}>
+            <Button 
+              onClick={() => setUpgradeDialogOpen(false)}
+              sx={{ color: 'white' }}
+            >
               Cancel
             </Button>
             <Button 
