@@ -270,7 +270,7 @@ const ClubOverview = () => {
       setLogoFile(file);
       setLogoPreview(URL.createObjectURL(file));
       
-      setError("");
+      setSaveError("");
       setSnackbar({
         open: true,
         message: "Club logo selected successfully!",
@@ -315,7 +315,7 @@ const ClubOverview = () => {
 
   // Enhanced form submission
   const handleSave = useCallback(async () => {
-    setError("");
+    setSaveError("");
     setSuccess("");
     
     if (!validateForm()) {
