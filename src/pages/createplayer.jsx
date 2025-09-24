@@ -177,9 +177,9 @@ const CreatePlayer = () => {
   const [players, setPlayers] = useState([]);
   const [playersLoading, setPlayersLoading] = useState(false);
 
-  // Fetch user's club on component mount
+  // Fetch user's club on component mount with retry logic
   useEffect(() => {
-    const fetchUserClub = async () => {
+    const fetchUserClub = async (retryCount = 0) => {
       try {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
@@ -199,14 +199,23 @@ const CreatePlayer = () => {
         }
       } catch (err) {
         console.warn("Could not fetch user club:", err);
+        
+        // Handle 429 rate limiting with exponential backoff
+        if (err.response?.status === 429 && retryCount < 3) {
+          const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+          console.log(`Rate limited, retrying in ${delay}ms...`);
+          setTimeout(() => {
+            fetchUserClub(retryCount + 1);
+          }, delay);
+        }
       }
     };
 
     fetchUserClub();
   }, []);
 
-  // Fetch players function
-  const fetchPlayers = useCallback(async () => {
+  // Fetch players function with retry logic
+  const fetchPlayers = useCallback(async (retryCount = 0) => {
     setPlayersLoading(true);
     try {
       const token = localStorage.getItem("accessToken");
@@ -235,6 +244,17 @@ const CreatePlayer = () => {
       console.log("Fetched players:", playersData);
     } catch (err) {
       console.error("Error fetching players:", err);
+      
+      // Handle 429 rate limiting with exponential backoff
+      if (err.response?.status === 429 && retryCount < 3) {
+        const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+        console.log(`Rate limited, retrying in ${delay}ms...`);
+        setTimeout(() => {
+          fetchPlayers(retryCount + 1);
+        }, delay);
+        return; // Don't set loading to false yet
+      }
+      
       setPlayers([]);
     } finally {
       setPlayersLoading(false);
@@ -244,10 +264,10 @@ const CreatePlayer = () => {
   // Handle tab change
   const handleTabChange = useCallback((event, newValue) => {
     setActiveTab(newValue);
-    if (newValue === 1) {
+    if (newValue === 1 && players.length === 0) {
       fetchPlayers();
     }
-  }, [fetchPlayers]);
+  }, [fetchPlayers, players.length]);
 
   // Memoized values for performance
   const isFormValid = useMemo(() => {
