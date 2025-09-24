@@ -443,26 +443,70 @@ const CreatePlayer = () => {
         playerData.player_pic = playerPicUrl;
         setUploadProgress(50);
       } else if (playerPicFile) {
-        // For now, we'll skip file upload since endpoint might not be available
-        setUploadProgress(50);
-        setSnackbar({
-          open: true,
-          message: "Player photo will be added later (upload endpoint not available)",
-          severity: "info"
-        });
+        // Upload player photo to Cloudinary first
+        setUploadProgress(25);
+        try {
+          const photoFormData = new FormData();
+          photoFormData.append('photo', playerPicFile);
+          
+          const photoResponse = await axios.post(
+            'https://matchgen-backend-production.up.railway.app/api/content/players/upload-photo/',
+            photoFormData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+          
+          if (photoResponse.data.photo_url) {
+            playerData.player_pic = photoResponse.data.photo_url;
+            setUploadProgress(50);
+          }
+        } catch (photoError) {
+          console.error('Player photo upload failed:', photoError);
+          setSnackbar({
+            open: true,
+            message: "Player photo upload failed, but other details will be saved",
+            severity: "warning"
+          });
+        }
       }
 
       if (useFormattedPicUrl && formattedPicUrl) {
         playerData.formatted_pic = formattedPicUrl;
         setUploadProgress(100);
       } else if (formattedPicFile) {
-        // For now, we'll skip file upload since endpoint might not be available
-        setUploadProgress(100);
-        setSnackbar({
-          open: true,
-          message: "Formatted photo will be added later (upload endpoint not available)",
-          severity: "info"
-        });
+        // Upload formatted photo to Cloudinary first
+        setUploadProgress(75);
+        try {
+          const formattedPhotoFormData = new FormData();
+          formattedPhotoFormData.append('photo', formattedPicFile);
+          
+          const formattedPhotoResponse = await axios.post(
+            'https://matchgen-backend-production.up.railway.app/api/content/players/upload-photo/',
+            formattedPhotoFormData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+          
+          if (formattedPhotoResponse.data.photo_url) {
+            playerData.formatted_pic = formattedPhotoResponse.data.photo_url;
+            setUploadProgress(100);
+          }
+        } catch (formattedPhotoError) {
+          console.error('Formatted photo upload failed:', formattedPhotoError);
+          setSnackbar({
+            open: true,
+            message: "Formatted photo upload failed, but other details will be saved",
+            severity: "warning"
+          });
+        }
       }
 
       // Remove null/empty values to avoid validation issues
