@@ -17,6 +17,10 @@ import {
   IconButton,
   Breadcrumbs,
   Link,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -24,6 +28,8 @@ import {
   CheckCircle as CheckCircleIcon,
   Palette as PaletteIcon,
   Home as HomeIcon,
+  Close as CloseIcon,
+  ZoomIn as ZoomInIcon,
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -84,7 +90,7 @@ const TemplatePreview = ({ template, onSelect, onPreview }) => {
           >
             Preview
           </Button>
-          <Button
+          {/* <Button
             size="small"
             variant="contained"
             onClick={(e) => {
@@ -93,7 +99,7 @@ const TemplatePreview = ({ template, onSelect, onPreview }) => {
             }}
           >
             Select
-          </Button>
+          </Button> */}
         </Box>
       </CardContent>
     </Card>
@@ -110,6 +116,8 @@ export default function TemplateDetails() {
   const [error, setError] = useState(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState(null);
 
   useEffect(() => {
     if (packId) {
@@ -164,8 +172,13 @@ export default function TemplateDetails() {
   };
 
   const handlePreviewTemplate = (template) => {
-    // Handle template preview logic here
-    console.log('Preview template:', template);
+    setPreviewTemplate(template);
+    setPreviewModalOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setPreviewModalOpen(false);
+    setPreviewTemplate(null);
   };
 
   const handleSelectPack = async () => {
@@ -337,6 +350,96 @@ export default function TemplateDetails() {
             No templates found for this pack.
           </Alert>
         )}
+
+        {/* Template Preview Modal */}
+        <Dialog
+          open={previewModalOpen}
+          onClose={handleClosePreview}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            sx: {
+              backgroundColor: 'background.paper',
+              borderRadius: 2,
+            },
+          }}
+        >
+          <DialogTitle sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            pb: 2
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <ZoomInIcon color="primary" />
+              <Typography variant="h6" component="div">
+                {previewTemplate?.content_type?.replace(/([A-Z])/g, ' $1').trim()}
+              </Typography>
+            </Box>
+            <IconButton onClick={handleClosePreview} size="small">
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+
+          <DialogContent sx={{ p: 0 }}>
+            {previewTemplate && (
+              <Box sx={{ textAlign: 'center', p: 2 }}>
+                <img
+                  src={previewTemplate.image_url}
+                  alt={previewTemplate.content_type}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '70vh',
+                    objectFit: 'contain',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                  }}
+                />
+                <Box sx={{ mt: 2 }}>
+                  <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
+                    <Chip
+                      label={previewTemplate.sport || 'All Sports'}
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                    />
+                    <Chip
+                      label={previewTemplate.content_type}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    />
+                  </Stack>
+                </Box>
+              </Box>
+            )}
+          </DialogContent>
+
+          <DialogActions sx={{ 
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            p: 2,
+            gap: 1
+          }}>
+            <Button onClick={handleClosePreview} color="inherit">
+              Close
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                if (previewTemplate) {
+                  handleSelectTemplate(previewTemplate);
+                }
+                handleClosePreview();
+              }}
+              startIcon={<CheckCircleIcon />}
+            >
+              Select This Template
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {/* Snackbar */}
         {snackbar.open && (
