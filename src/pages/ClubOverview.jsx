@@ -352,7 +352,7 @@ const ClubOverview = () => {
         clubData.logo = logoUrl;
         setUploadProgress(50);
       } else if (logoFile) {
-        // Upload logo file first
+        // Upload logo file to Cloudinary first
         setUploadProgress(25);
         try {
           const logoFormData = new FormData();
