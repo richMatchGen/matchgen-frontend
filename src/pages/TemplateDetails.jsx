@@ -120,15 +120,30 @@ export default function TemplateDetails() {
   const fetchTemplates = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setError('Authentication required. Please log in again.');
+        return;
+      }
+
       const response = await axios.get(
-        `https://matchgen-backend-production.up.railway.app/api/graphicpack/templates/${packId}/`
+        `https://matchgen-backend-production.up.railway.app/api/graphicpack/templates/${packId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       
       setPack(response.data.pack);
       setTemplates(response.data.templates || []);
     } catch (error) {
       console.error('Error fetching templates:', error);
-      setError('Failed to load templates. Please try again.');
+      if (error.response?.status === 401) {
+        setError('Authentication failed. Please log in again.');
+      } else {
+        setError('Failed to load templates. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
