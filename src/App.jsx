@@ -28,6 +28,7 @@ const Results = lazy(() => import("./pages/results"));
 const ClubOverview = lazy(() => import("./pages/ClubOverview"));
 const ChoosePackPage = lazy(() => import("./pages/ChoosePackage"));
 const EnhancedTemplateSelection = lazy(() => import("./pages/EnhancedTemplateSelection"));
+const TemplateDetails = lazy(() => import("./pages/TemplateDetails"));
 const SocialMediaPostGenerator = lazy(() => import("./components/MatchdayPostGenerator"));
 const TextElementManagement = lazy(() => import("./pages/TextElementManagement"));
 const FixturesManagement = lazy(() => import("./pages/FixturesManagement"));
@@ -118,6 +119,7 @@ function App() {
           <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
 
           <Route path="/gen/templates" element={<PrivateRoute><EnhancedTemplateSelection/></PrivateRoute>} />
+          <Route path="/gen/templates/:packId" element={<PrivateRoute><TemplateDetails/></PrivateRoute>} />
           
           {/* PSD Processor Routes */}
           <Route path="/psd-processor" element={<PrivateRoute><PSDProcessor /></PrivateRoute>} />

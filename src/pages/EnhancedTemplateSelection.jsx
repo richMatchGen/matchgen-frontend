@@ -9,36 +9,17 @@ import {
   CardContent,
   Button,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
   Alert,
   CircularProgress,
-  Tabs,
-  Tab,
-  Badge,
   Stack,
-  Divider,
-  Paper,
-  Avatar,
-  Tooltip,
   Zoom,
   Fade,
-  Slide,
 } from '@mui/material';
 import {
-  Close as CloseIcon,
-  Preview as PreviewIcon,
   CheckCircle as CheckCircleIcon,
-  SportsSoccer as SportsIcon,
   Palette as PaletteIcon,
-  Star as StarIcon,
   Info as InfoIcon,
   ArrowBack as ArrowBackIcon,
-  Fullscreen as FullscreenIcon,
-  Download as DownloadIcon,
 } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
 import axios from 'axios';
@@ -240,156 +221,6 @@ const TemplatePackCard = ({ pack, isSelected, onSelect, onViewDetails }) => {
   );
 };
 
-// Template Details Dialog
-const TemplateDetailsDialog = ({ open, onClose, pack, onSelect }) => {
-  const [selectedTab, setSelectedTab] = useState(0);
-  const [templates, setTemplates] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (open && pack) {
-      fetchTemplates();
-    }
-  }, [open, pack]);
-
-  const fetchTemplates = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        `https://matchgen-backend-production.up.railway.app/api/graphicpack/templates/${pack.id}/`
-      );
-      setTemplates(response.data.templates || []);
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-      setTemplates([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setSelectedTab(newValue);
-  };
-
-  const contentTypes = [...new Set(templates.map(t => t.content_type))];
-
-  return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="lg"
-      fullWidth
-      PaperProps={{
-        sx: {
-          backgroundColor: '#1a1a1a',
-          color: 'white',
-          borderRadius: 2,
-        },
-      }}
-    >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        borderBottom: '1px solid #333',
-        pb: 2
-      }}>
-        <Box>
-          <Typography variant="h5" component="div" color="white">
-            {pack?.name}
-          </Typography>
-          <Typography variant="body2" color="rgba(255,255,255,0.7)">
-            {pack?.description}
-          </Typography>
-        </Box>
-        <IconButton onClick={onClose} sx={{ color: 'white' }}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-
-      <DialogContent sx={{ p: 0 }}>
-        <Box sx={{ borderBottom: 1, borderColor: '#333' }}>
-          <Tabs
-            value={selectedTab}
-            onChange={handleTabChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              '& .MuiTab-root': {
-                color: 'rgba(255,255,255,0.7)',
-                '&.Mui-selected': {
-                  color: 'white',
-                },
-              },
-              '& .MuiTabs-indicator': {
-                backgroundColor: '#1976d2',
-              },
-            }}
-          >
-            <Tab label="All Templates" />
-            {contentTypes.map((type) => (
-              <Tab
-                key={type}
-                label={type.replace(/([A-Z])/g, ' $1').trim()}
-              />
-            ))}
-          </Tabs>
-        </Box>
-
-        <Box sx={{ p: 3 }}>
-          {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Grid container spacing={2}>
-              {templates
-                .filter(template => 
-                  selectedTab === 0 || template.content_type === contentTypes[selectedTab - 1]
-                )
-                .map((template) => (
-                  <Grid item xs={12} sm={6} md={4} key={template.id}>
-                    <TemplatePreview
-                      template={template}
-                      isSelected={false}
-                      onSelect={() => {
-                        onSelect(template);
-                        onClose();
-                      }}
-                      onPreview={() => {
-                        // Handle preview logic
-                        console.log('Preview template:', template);
-                      }}
-                    />
-                  </Grid>
-                ))}
-            </Grid>
-          )}
-        </Box>
-      </DialogContent>
-
-      <DialogActions sx={{ 
-        borderTop: '1px solid #333',
-        p: 2,
-        gap: 1
-      }}>
-        <Button onClick={onClose} color="inherit">
-          Close
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => {
-            onSelect(pack.id);
-            onClose();
-          }}
-          startIcon={<CheckCircleIcon />}
-        >
-          Select This Pack
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
 
 // Main Enhanced Template Selection Component
 export default function EnhancedTemplateSelection() {
@@ -398,8 +229,6 @@ export default function EnhancedTemplateSelection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPackId, setSelectedPackId] = useState(null);
-  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
-  const [selectedPack, setSelectedPack] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
 
   // Sample packs for demonstration
@@ -519,13 +348,7 @@ export default function EnhancedTemplateSelection() {
   };
 
   const handleViewDetails = (pack) => {
-    setSelectedPack(pack);
-    setDetailsDialogOpen(true);
-  };
-
-  const handleCloseDetails = () => {
-    setDetailsDialogOpen(false);
-    setSelectedPack(null);
+    navigate(`/gen/templates/${pack.id}`);
   };
 
   if (loading) {
@@ -535,11 +358,11 @@ export default function EnhancedTemplateSelection() {
         justifyContent="center" 
         alignItems="center" 
         minHeight="100vh"
-        sx={{ backgroundColor: '#0a0a0a' }}
+        sx={{ backgroundColor: 'background.default' }}
       >
         <Box textAlign="center">
-          <CircularProgress size={60} sx={{ color: '#1976d2', mb: 2 }} />
-          <Typography variant="h6" color="white">
+          <CircularProgress size={60} sx={{ mb: 2 }} />
+          <Typography variant="h6" color="text.primary">
             Loading Template Packs...
           </Typography>
         </Box>
@@ -550,8 +373,7 @@ export default function EnhancedTemplateSelection() {
   return (
     <Box sx={{ 
       minHeight: '100vh', 
-      backgroundColor: '#0a0a0a',
-      backgroundImage: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+      backgroundColor: 'background.default',
     }}>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header */}
@@ -560,20 +382,16 @@ export default function EnhancedTemplateSelection() {
             startIcon={<ArrowBackIcon />}
             onClick={() => navigate('/dashboard')}
             sx={{ 
-              color: 'white', 
               mb: 2,
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.1)',
-              }
             }}
           >
             Back to Dashboard
           </Button>
           
-          <Typography variant="h3" component="h1" color="white" fontWeight="bold" gutterBottom>
+          <Typography variant="h3" component="h1" color="text.primary" fontWeight="bold" gutterBottom>
             Choose Your Template Pack
           </Typography>
-          <Typography variant="h6" color="rgba(255,255,255,0.7)" sx={{ mb: 3 }}>
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
             Select a graphic template pack that matches your club's style and personality
           </Typography>
           
@@ -598,13 +416,6 @@ export default function EnhancedTemplateSelection() {
           ))}
         </Grid>
 
-        {/* Template Details Dialog */}
-        <TemplateDetailsDialog
-          open={detailsDialogOpen}
-          onClose={handleCloseDetails}
-          pack={selectedPack}
-          onSelect={handleSelectPack}
-        />
 
         {/* Snackbar */}
         {snackbar.open && (
