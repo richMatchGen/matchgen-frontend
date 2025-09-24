@@ -24,6 +24,10 @@ import {
 import { alpha } from '@mui/material/styles';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import SideMenu from '../components/SideMenu';
+import AppNavbar from '../components/AppNavBar';
+import AppTheme from '../themes/AppTheme';
+import { CssBaseline } from '@mui/material';
 
 // Enhanced Template Preview Component
 const TemplatePreview = ({ template, isSelected, onSelect, onPreview }) => {
@@ -371,11 +375,23 @@ export default function EnhancedTemplateSelection() {
   }
 
   return (
-    <Box sx={{ 
-      minHeight: '100vh', 
-      backgroundColor: 'background.default',
-    }}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+    <AppTheme>
+      <CssBaseline enableColorScheme />
+      <Box sx={{ display: 'flex' }}>
+        <SideMenu />
+        <AppNavbar />
+        {/* Main content */}
+        <Box
+          component="main"
+          sx={(theme) => ({
+            flexGrow: 1,
+            backgroundColor: theme.vars
+              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+              : alpha(theme.palette.background.default, 1),
+            overflow: 'auto',
+          })}
+        >
+          <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header */}
         <Box sx={{ mb: 4 }}>
           <Button
@@ -432,7 +448,9 @@ export default function EnhancedTemplateSelection() {
             {snackbar.message}
           </Alert>
         )}
-      </Container>
-    </Box>
+          </Container>
+        </Box>
+      </Box>
+    </AppTheme>
   );
 }

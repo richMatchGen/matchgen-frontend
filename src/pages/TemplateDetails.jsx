@@ -33,6 +33,11 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import SideMenu from '../components/SideMenu';
+import AppNavbar from '../components/AppNavBar';
+import AppTheme from '../themes/AppTheme';
+import { CssBaseline } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 // Template Preview Component
 const TemplatePreview = ({ template, onSelect, onPreview }) => {
@@ -252,8 +257,23 @@ export default function TemplateDetails() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+    <AppTheme>
+      <CssBaseline enableColorScheme />
+      <Box sx={{ display: 'flex' }}>
+        <SideMenu />
+        <AppNavbar />
+        {/* Main content */}
+        <Box
+          component="main"
+          sx={(theme) => ({
+            flexGrow: 1,
+            backgroundColor: theme.vars
+              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+              : alpha(theme.palette.background.default, 1),
+            overflow: 'auto',
+          })}
+        >
+          <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Breadcrumbs */}
         <Breadcrumbs sx={{ mb: 3 }}>
           <Link
@@ -456,7 +476,9 @@ export default function TemplateDetails() {
             {snackbar.message}
           </Alert>
         )}
-      </Container>
-    </Box>
+          </Container>
+        </Box>
+      </Box>
+    </AppTheme>
   );
 }
