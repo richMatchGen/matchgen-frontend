@@ -344,6 +344,7 @@ const ClubOverview = () => {
         founded_year: formData.founded_year ? parseInt(formData.founded_year) : null,
         primary_color: formData.primary_color.trim() || null,
         secondary_color: formData.secondary_color.trim() || null,
+        logo: formData.logo || null,
       };
 
       // Handle logo with progress tracking
@@ -351,19 +352,44 @@ const ClubOverview = () => {
         clubData.logo = logoUrl;
         setUploadProgress(50);
       } else if (logoFile) {
-        // For now, we'll skip file upload since endpoint might not be available
-        setUploadProgress(50);
-        setSnackbar({
-          open: true,
-          message: "Club logo will be updated later (upload endpoint not available)",
-          severity: "info"
-        });
+        // Upload logo file first
+        setUploadProgress(25);
+        try {
+          const logoFormData = new FormData();
+          logoFormData.append('logo', logoFile);
+          
+          const logoResponse = await axios.post(
+            'https://matchgen-backend-production.up.railway.app/api/users/club/upload-logo/',
+            logoFormData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+          
+          if (logoResponse.data.logo_url) {
+            clubData.logo = logoResponse.data.logo_url;
+            setUploadProgress(50);
+          }
+        } catch (logoError) {
+          console.error('Logo upload failed:', logoError);
+          setSnackbar({
+            open: true,
+            message: "Logo upload failed, but other details will be saved",
+            severity: "warning"
+          });
+        }
       }
 
-      // Remove null/empty values to avoid validation issues
+      // Remove null/empty values to avoid validation issues, but keep required fields
       Object.keys(clubData).forEach(key => {
         if (clubData[key] === null || clubData[key] === "") {
-          delete clubData[key];
+          // Don't delete required fields like name and sport
+          if (key !== 'name' && key !== 'sport') {
+            delete clubData[key];
+          }
         }
       });
 
