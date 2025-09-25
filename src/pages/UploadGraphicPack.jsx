@@ -168,7 +168,7 @@ const UploadGraphicPack = () => {
       formData.append('primary_color', packPrimaryColor);
       formData.append('category', packCategory);
       formData.append('tier', packTier);
-      formData.append('club_id', packClub || '');
+      formData.append('assigned_club_id', packClub || '');
       formData.append('is_active', packActive);
 
       const response = await apiClient.post('graphicpack/packs/create/', formData, {
@@ -311,7 +311,7 @@ const UploadGraphicPack = () => {
         primary_color: selectedPack.primary_color,
         category: selectedPack.category,
         tier: selectedPack.tier,
-        club_id: selectedPack.club_id || null,
+        assigned_club_id: selectedPack.assigned_club_id || null,
         is_active: selectedPack.is_active
       };
 
@@ -896,8 +896,8 @@ const UploadGraphicPack = () => {
                   <FormControl fullWidth>
                     <InputLabel>Club</InputLabel>
                     <Select
-                      value={selectedPack.club_id || ''}
-                      onChange={(e) => setSelectedPack({...selectedPack, club_id: e.target.value})}
+                      value={selectedPack.assigned_club_id || ''}
+                      onChange={(e) => setSelectedPack({...selectedPack, assigned_club_id: e.target.value})}
                       label="Club"
                     >
                       <MenuItem value="">Available to all clubs</MenuItem>
