@@ -413,6 +413,9 @@ export default function TemplateDetails() {
                     maxWidth: '100%',
                     maxHeight: '70vh',
                     objectFit: 'contain',
+                    backgroundPosition: 'top',
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat',
                     borderRadius: '8px',
                     boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                   }}

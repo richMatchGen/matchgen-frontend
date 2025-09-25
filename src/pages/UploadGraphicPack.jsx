@@ -117,8 +117,8 @@ const UploadGraphicPack = () => {
 
   // Helper function to convert hex color to color name
   const getColorNameFromHex = (hexColor) => {
-    if (!hexColor) return 'black';
-    const color = colorOptions.find(c => c.hex.toLowerCase() === hexColor.toLowerCase());
+    if (!hexColor || !colorOptions || !Array.isArray(colorOptions)) return 'black';
+    const color = colorOptions.find(c => c && c.hex && c.hex.toLowerCase() === hexColor.toLowerCase());
     return color ? color.value : 'black';
   };
 
@@ -138,11 +138,12 @@ const UploadGraphicPack = () => {
       });
       
       // Handle both paginated and direct array responses
-      const packs = response.data.results || response.data || [];
-      setGraphicPacks(packs);
+      const packs = response.data?.results || response.data || [];
+      setGraphicPacks(Array.isArray(packs) ? packs : []);
     } catch (err) {
       setError('Failed to fetch graphic packs');
       console.error('Error fetching graphic packs:', err);
+      setGraphicPacks([]); // Ensure it's always an array
     } finally {
       setLoading(false);
     }
@@ -153,9 +154,11 @@ const UploadGraphicPack = () => {
       const response = await apiClient.get('users/clubs/', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setClubs(response.data || []);
+      const clubs = response.data || [];
+      setClubs(Array.isArray(clubs) ? clubs : []);
     } catch (err) {
       console.error('Error fetching clubs:', err);
+      setClubs([]); // Ensure it's always an array
     }
   };
 
@@ -164,9 +167,11 @@ const UploadGraphicPack = () => {
       const response = await apiClient.get(`graphicpack/packs/${packId}/templates/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setTemplates(response.data || []);
+      const templates = response.data?.templates || response.data || [];
+      setTemplates(Array.isArray(templates) ? templates : []);
     } catch (err) {
       console.error('Error fetching templates:', err);
+      setTemplates([]); // Ensure it's always an array
     }
   };
 
