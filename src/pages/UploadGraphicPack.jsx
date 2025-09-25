@@ -483,11 +483,11 @@ const UploadGraphicPack = () => {
               <Button
                 variant="contained"
                 onClick={handleUpload}
-                disabled={!selectedFile || !packName.trim() || uploading}
+                disabled={!packName.trim() || uploading}
                 startIcon={uploading ? <CircularProgress size={20} /> : <UploadIcon />}
                 fullWidth
               >
-                {uploading ? 'Uploading...' : 'Upload Pack'}
+                {uploading ? 'Creating...' : 'Create Pack'}
               </Button>
             </Grid>
           </Grid>
