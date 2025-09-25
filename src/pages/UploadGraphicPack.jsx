@@ -512,7 +512,7 @@ const UploadGraphicPack = () => {
                   label="Club (Optional)"
                 >
                   <MenuItem value="">Available to all clubs</MenuItem>
-                  {clubs.map((club) => (
+                  {clubs && clubs.length > 0 && clubs.map((club) => (
                     <MenuItem key={club.id} value={club.id}>
                       {club.name}
                     </MenuItem>
@@ -602,7 +602,7 @@ const UploadGraphicPack = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Name</TableCell>
-                    <TableCell>Category</TableCell>
+                    <TableCell>Sport</TableCell>
                     <TableCell>Tier</TableCell>
                     <TableCell>Club</TableCell>
                     <TableCell>Status</TableCell>
@@ -611,7 +611,7 @@ const UploadGraphicPack = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {graphicPacks.map((pack) => (
+                  {graphicPacks && graphicPacks.length > 0 ? graphicPacks.map((pack) => (
                     <TableRow key={pack.id}>
                       <TableCell>
                         <Typography variant="body1" fontWeight="medium">
@@ -623,7 +623,7 @@ const UploadGraphicPack = () => {
                       </TableCell>
                       <TableCell>
                         <Chip 
-                          label={pack.category} 
+                          label={pack.sport || 'N/A'} 
                           size="small" 
                           variant="outlined" 
                         />
@@ -683,7 +683,15 @@ const UploadGraphicPack = () => {
                         </IconButton>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )) : (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">
+                        <Typography variant="body2" color="text.secondary">
+                          No graphic packs found
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -824,7 +832,7 @@ const UploadGraphicPack = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {templates.map((template) => (
+                      {templates && templates.length > 0 ? templates.map((template) => (
                         <TableRow key={template.id}>
                           <TableCell>
                             <Chip 
@@ -853,7 +861,15 @@ const UploadGraphicPack = () => {
                             </IconButton>
                           </TableCell>
                         </TableRow>
-                      ))}
+                      )) : (
+                        <TableRow>
+                          <TableCell colSpan={4} align="center">
+                            <Typography variant="body2" color="text.secondary">
+                              No templates found
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -1006,7 +1022,7 @@ const UploadGraphicPack = () => {
                       }}
                     >
                       <MenuItem value="">Available to all clubs</MenuItem>
-                      {clubs.map((club) => (
+                      {clubs && clubs.length > 0 && clubs.map((club) => (
                         <MenuItem key={club.id} value={club.id}>
                           {club.name}
                         </MenuItem>
