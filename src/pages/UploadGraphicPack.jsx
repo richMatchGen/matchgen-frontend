@@ -48,7 +48,6 @@ const UploadGraphicPack = () => {
   const [packName, setPackName] = useState('');
   const [packDescription, setPackDescription] = useState('');
   const [packPrimaryColor, setPackPrimaryColor] = useState('black');
-  const [packCategory, setPackCategory] = useState('');
   const [packSport, setPackSport] = useState('');
   const [packTier, setPackTier] = useState('');
   const [packClub, setPackClub] = useState('');
@@ -67,17 +66,6 @@ const UploadGraphicPack = () => {
   const [selectedTemplateFile, setSelectedTemplateFile] = useState(null);
   const [templateContentType, setTemplateContentType] = useState('');
 
-  const categories = [
-    { value: 'football', label: 'Football' },
-    { value: 'basketball', label: 'Basketball' },
-    { value: 'soccer', label: 'Soccer' },
-    { value: 'tennis', label: 'Tennis' },
-    { value: 'rugby', label: 'Rugby' },
-    { value: 'cricket', label: 'Cricket' },
-    { value: 'hockey', label: 'Hockey' },
-    { value: 'baseball', label: 'Baseball' },
-    { value: 'general', label: 'General Sports' }
-  ];
 
   const sports = [
     { value: 'football', label: 'Football' },
@@ -108,18 +96,31 @@ const UploadGraphicPack = () => {
 
   const colorOptions = [
     { value: 'black', label: 'Black', hex: '#000000' },
+    { value: 'grey', label: 'Grey', hex: '#808080' },
     { value: 'white', label: 'White', hex: '#FFFFFF' },
     { value: 'red', label: 'Red', hex: '#FF0000' },
     { value: 'blue', label: 'Blue', hex: '#0000FF' },
+    { value: 'navy', label: 'Navy', hex: '#000080' },
+    { value: 'royalBlue', label: 'Royal Blue', hex: '#0d00e9' },
+    { value: 'skyBlue', label: 'Sky Blue', hex: '#99ccff' },
     { value: 'green', label: 'Green', hex: '#00FF00' },
+    { value: 'lime', label: 'Lime', hex: '#00FF00' },
     { value: 'yellow', label: 'Yellow', hex: '#FFFF00' },
     { value: 'orange', label: 'Orange', hex: '#FFA500' },
-    { value: 'purple', label: 'Purple', hex: '#800080' },
+    { value: 'gold', label: 'Gold', hex: '#FFD700' },
+    { value: 'purple', label: 'Purple', hex: '#800080' },  
     { value: 'pink', label: 'Pink', hex: '#FFC0CB' },
-    { value: 'brown', label: 'Brown', hex: '#A52A2A' },
-    { value: 'gray', label: 'Gray', hex: '#808080' },
-    { value: 'navy', label: 'Navy', hex: '#000080' }
+    { value: 'maroon', label: 'Maroon', hex: '#A52A2A' },
+    { value: 'Claret', label: 'Claret', hex: '#7c2c3b' },
+
   ];
+
+  // Helper function to convert hex color to color name
+  const getColorNameFromHex = (hexColor) => {
+    if (!hexColor) return 'black';
+    const color = colorOptions.find(c => c.hex.toLowerCase() === hexColor.toLowerCase());
+    return color ? color.value : 'black';
+  };
 
   useEffect(() => {
     if (!token) {
@@ -185,7 +186,6 @@ const UploadGraphicPack = () => {
         name: packName,
         description: packDescription,
         primary_color: selectedColor ? selectedColor.hex : '#000000',
-        category: packCategory,
         sport: packSport,
         tier: packTier,
         assigned_club_id: packClub || null,
@@ -203,10 +203,11 @@ const UploadGraphicPack = () => {
       setSuccess('Graphic pack created successfully!');
       setPackName('');
       setPackDescription('');
-      setPackPrimaryColor('#000000');
-      setPackCategory('');
+      setPackPrimaryColor('black');
+      setPackSport('');
       setPackTier('');
       setPackClub('');
+      setPackPreviewImageUrl('');
       setPackActive(true);
       setSelectedPreviewImage(null);
       fetchGraphicPacks();
@@ -326,13 +327,15 @@ const UploadGraphicPack = () => {
   const handleUpdatePack = async () => {
     try {
       setUploading(true);
+      const selectedColor = colorOptions.find(color => color.value === selectedPack.primary_color);
       const updateData = {
         name: selectedPack.name,
         description: selectedPack.description,
-        primary_color: selectedPack.primary_color,
-        category: selectedPack.category,
+        primary_color: selectedColor ? selectedColor.hex : '#000000',
+        sport: selectedPack.sport,
         tier: selectedPack.tier,
         assigned_club_id: selectedPack.assigned_club_id || null,
+        preview_image_url: selectedPack.preview_image_url,
         is_active: selectedPack.is_active
       };
 
@@ -463,22 +466,6 @@ const UploadGraphicPack = () => {
                         />
                         {color.label}
                       </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <FormControl fullWidth>
-                <InputLabel>Category</InputLabel>
-                <Select
-                  value={packCategory}
-                  onChange={(e) => setPackCategory(e.target.value)}
-                  label="Category"
-                >
-                  {categories.map((category) => (
-                    <MenuItem key={category.value} value={category.value}>
-                      {category.label}
                     </MenuItem>
                   ))}
                 </Select>
@@ -736,10 +723,10 @@ const UploadGraphicPack = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="subtitle2" sx={{ color: 'white' }}>
-                    Category
+                    Sport
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 2, color: 'white' }}>
-                    {selectedPack.category}
+                    {selectedPack.sport || 'N/A'}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -933,20 +920,20 @@ const UploadGraphicPack = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel sx={{ color: 'white' }}>Category</InputLabel>
+                    <InputLabel sx={{ color: 'white' }}>Sport</InputLabel>
                     <Select
-                      value={selectedPack.category}
-                      onChange={(e) => setSelectedPack({...selectedPack, category: e.target.value})}
-                      label="Category"
+                      value={selectedPack.sport || ''}
+                      onChange={(e) => setSelectedPack({...selectedPack, sport: e.target.value})}
+                      label="Sport"
                       sx={{
                         color: 'white',
                         '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
                         '& .MuiSvgIcon-root': { color: 'white' }
                       }}
                     >
-                      {categories.map((category) => (
-                        <MenuItem key={category.value} value={category.value}>
-                          {category.label}
+                      {sports.map((sport) => (
+                        <MenuItem key={sport.value} value={sport.value}>
+                          {sport.label}
                         </MenuItem>
                       ))}
                     </Select>
@@ -956,7 +943,7 @@ const UploadGraphicPack = () => {
                   <FormControl fullWidth>
                     <InputLabel sx={{ color: 'white' }}>Primary Color</InputLabel>
                     <Select
-                      value={selectedPack.primary_color || 'black'}
+                      value={getColorNameFromHex(selectedPack.primary_color) || 'black'}
                       onChange={(e) => setSelectedPack({...selectedPack, primary_color: e.target.value})}
                       label="Primary Color"
                       sx={{
@@ -1026,6 +1013,20 @@ const UploadGraphicPack = () => {
                       ))}
                     </Select>
                   </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Preview Image URL (Optional)"
+                    value={selectedPack.preview_image_url || ''}
+                    onChange={(e) => setSelectedPack({...selectedPack, preview_image_url: e.target.value})}
+                    sx={{
+                      '& .MuiInputLabel-root': { color: 'white' },
+                      '& .MuiOutlinedInput-root': { color: 'white' },
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' }
+                    }}
+                    placeholder="https://example.com/image.jpg"
+                  />
                 </Grid>
                 <Grid item xs={12}>
                   <FormControlLabel
