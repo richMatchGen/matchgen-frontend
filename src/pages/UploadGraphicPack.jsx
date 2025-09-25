@@ -45,6 +45,7 @@ const UploadGraphicPack = () => {
   const token = auth.token;
   const [graphicPacks, setGraphicPacks] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedPreviewImage, setSelectedPreviewImage] = useState(null);
   const [packName, setPackName] = useState('');
   const [packDescription, setPackDescription] = useState('');
   const [packPrimaryColor, setPackPrimaryColor] = useState('#000000');
@@ -152,8 +153,8 @@ const UploadGraphicPack = () => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !packName.trim()) {
-      setError('Please select a file and enter a pack name');
+    if (!packName.trim()) {
+      setError('Please enter a pack name');
       return;
     }
 
@@ -162,7 +163,12 @@ const UploadGraphicPack = () => {
       setError('');
       
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      
+      // Only append file if one is selected
+      if (selectedFile) {
+        formData.append('file', selectedFile);
+      }
+      
       formData.append('name', packName);
       formData.append('description', packDescription);
       formData.append('primary_color', packPrimaryColor);
@@ -178,7 +184,7 @@ const UploadGraphicPack = () => {
         }
       });
 
-      setSuccess('Graphic pack uploaded successfully!');
+      setSuccess('Graphic pack created successfully!');
       setPackName('');
       setPackDescription('');
       setPackPrimaryColor('#000000');
@@ -187,10 +193,11 @@ const UploadGraphicPack = () => {
       setPackClub('');
       setPackActive(true);
       setSelectedFile(null);
+      setSelectedPreviewImage(null);
       document.getElementById('file-input').value = '';
       fetchGraphicPacks();
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to upload graphic pack');
+      setError(err.response?.data?.error || 'Failed to create graphic pack');
       console.error('Upload error:', err);
     } finally {
       setUploading(false);
@@ -395,7 +402,7 @@ const UploadGraphicPack = () => {
                   startIcon={<UploadIcon />}
                   disabled={uploading}
                 >
-                  Select Pack File
+                  Select Pack File (Optional)
                 </Button>
               </label>
               {selectedFile && (
@@ -403,6 +410,23 @@ const UploadGraphicPack = () => {
                   Selected: {selectedFile.name}
                 </Typography>
               )}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Preview Image (Optional)</InputLabel>
+                <Select
+                  value={selectedPreviewImage || ''}
+                  onChange={(e) => setSelectedPreviewImage(e.target.value)}
+                  label="Preview Image (Optional)"
+                >
+                  <MenuItem value="">No preview image</MenuItem>
+                  {templates.map((template) => (
+                    <MenuItem key={template.id} value={template.id}>
+                      {template.content_type} - {template.file_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -652,9 +676,15 @@ const UploadGraphicPack = () => {
         onClose={() => setViewDialogOpen(false)}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: '#1a1a1a',
+            color: 'white'
+          }
+        }}
       >
         <DialogTitle>
-          <Typography variant="h6">
+          <Typography variant="h6" sx={{ color: 'white' }}>
             {selectedPack?.name} - Details
           </Typography>
         </DialogTitle>
@@ -823,9 +853,15 @@ const UploadGraphicPack = () => {
         onClose={() => setEditDialogOpen(false)}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: '#1a1a1a',
+            color: 'white'
+          }
+        }}
       >
         <DialogTitle>
-          <Typography variant="h6">
+          <Typography variant="h6" sx={{ color: 'white' }}>
             Edit Graphic Pack
           </Typography>
         </DialogTitle>
@@ -945,9 +981,15 @@ const UploadGraphicPack = () => {
         onClose={() => setTemplateUploadOpen(false)}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: '#1a1a1a',
+            color: 'white'
+          }
+        }}
       >
         <DialogTitle>
-          <Typography variant="h6">
+          <Typography variant="h6" sx={{ color: 'white' }}>
             Upload Template to {selectedPack?.name}
           </Typography>
         </DialogTitle>
