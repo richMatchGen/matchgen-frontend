@@ -49,8 +49,10 @@ const UploadGraphicPack = () => {
   const [packDescription, setPackDescription] = useState('');
   const [packPrimaryColor, setPackPrimaryColor] = useState('black');
   const [packCategory, setPackCategory] = useState('');
+  const [packSport, setPackSport] = useState('');
   const [packTier, setPackTier] = useState('');
   const [packClub, setPackClub] = useState('');
+  const [packPreviewImageUrl, setPackPreviewImageUrl] = useState('');
   const [packActive, setPackActive] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -66,6 +68,18 @@ const UploadGraphicPack = () => {
   const [templateContentType, setTemplateContentType] = useState('');
 
   const categories = [
+    { value: 'football', label: 'Football' },
+    { value: 'basketball', label: 'Basketball' },
+    { value: 'soccer', label: 'Soccer' },
+    { value: 'tennis', label: 'Tennis' },
+    { value: 'rugby', label: 'Rugby' },
+    { value: 'cricket', label: 'Cricket' },
+    { value: 'hockey', label: 'Hockey' },
+    { value: 'baseball', label: 'Baseball' },
+    { value: 'general', label: 'General Sports' }
+  ];
+
+  const sports = [
     { value: 'football', label: 'Football' },
     { value: 'basketball', label: 'Basketball' },
     { value: 'soccer', label: 'Soccer' },
@@ -172,8 +186,10 @@ const UploadGraphicPack = () => {
         description: packDescription,
         primary_color: selectedColor ? selectedColor.hex : '#000000',
         category: packCategory,
+        sport: packSport,
         tier: packTier,
         assigned_club_id: packClub || null,
+        preview_image_url: packPreviewImageUrl,
         is_active: packActive
       };
 
@@ -470,6 +486,22 @@ const UploadGraphicPack = () => {
             </Grid>
             <Grid item xs={12} sm={3}>
               <FormControl fullWidth>
+                <InputLabel>Sport</InputLabel>
+                <Select
+                  value={packSport}
+                  onChange={(e) => setPackSport(e.target.value)}
+                  label="Sport"
+                >
+                  {sports.map((sport) => (
+                    <MenuItem key={sport.value} value={sport.value}>
+                      {sport.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <FormControl fullWidth>
                 <InputLabel>Tier</InputLabel>
                 <Select
                   value={packTier}
@@ -500,6 +532,16 @@ const UploadGraphicPack = () => {
                   ))}
                 </Select>
               </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Preview Image URL (Optional)"
+                value={packPreviewImageUrl}
+                onChange={(e) => setPackPreviewImageUrl(e.target.value)}
+                disabled={uploading}
+                placeholder="https://example.com/image.jpg"
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControlLabel
@@ -859,7 +901,7 @@ const UploadGraphicPack = () => {
         </DialogTitle>
         <DialogContent>
           {selectedPack && (
-            <Box sx={{ pt: 1 }}>
+            <Box sx={{ pt: 1, color: 'white' }}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
@@ -867,6 +909,11 @@ const UploadGraphicPack = () => {
                     label="Pack Name"
                     value={selectedPack.name}
                     onChange={(e) => setSelectedPack({...selectedPack, name: e.target.value})}
+                    sx={{
+                      '& .MuiInputLabel-root': { color: 'white' },
+                      '& .MuiOutlinedInput-root': { color: 'white' },
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -877,15 +924,25 @@ const UploadGraphicPack = () => {
                     onChange={(e) => setSelectedPack({...selectedPack, description: e.target.value})}
                     multiline
                     rows={3}
+                    sx={{
+                      '& .MuiInputLabel-root': { color: 'white' },
+                      '& .MuiOutlinedInput-root': { color: 'white' },
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel>Category</InputLabel>
+                    <InputLabel sx={{ color: 'white' }}>Category</InputLabel>
                     <Select
                       value={selectedPack.category}
                       onChange={(e) => setSelectedPack({...selectedPack, category: e.target.value})}
                       label="Category"
+                      sx={{
+                        color: 'white',
+                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                        '& .MuiSvgIcon-root': { color: 'white' }
+                      }}
                     >
                       {categories.map((category) => (
                         <MenuItem key={category.value} value={category.value}>
@@ -897,11 +954,16 @@ const UploadGraphicPack = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel>Primary Color</InputLabel>
+                    <InputLabel sx={{ color: 'white' }}>Primary Color</InputLabel>
                     <Select
                       value={selectedPack.primary_color || 'black'}
                       onChange={(e) => setSelectedPack({...selectedPack, primary_color: e.target.value})}
                       label="Primary Color"
+                      sx={{
+                        color: 'white',
+                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                        '& .MuiSvgIcon-root': { color: 'white' }
+                      }}
                     >
                       {colorOptions.map((color) => (
                         <MenuItem key={color.value} value={color.value}>
@@ -924,11 +986,16 @@ const UploadGraphicPack = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel>Tier</InputLabel>
+                    <InputLabel sx={{ color: 'white' }}>Tier</InputLabel>
                     <Select
                       value={selectedPack.tier || ''}
                       onChange={(e) => setSelectedPack({...selectedPack, tier: e.target.value})}
                       label="Tier"
+                      sx={{
+                        color: 'white',
+                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                        '& .MuiSvgIcon-root': { color: 'white' }
+                      }}
                     >
                       {tiers.map((tier) => (
                         <MenuItem key={tier.value} value={tier.value}>
@@ -940,11 +1007,16 @@ const UploadGraphicPack = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel>Club</InputLabel>
+                    <InputLabel sx={{ color: 'white' }}>Club</InputLabel>
                     <Select
                       value={selectedPack.assigned_club_id || ''}
                       onChange={(e) => setSelectedPack({...selectedPack, assigned_club_id: e.target.value})}
                       label="Club"
+                      sx={{
+                        color: 'white',
+                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                        '& .MuiSvgIcon-root': { color: 'white' }
+                      }}
                     >
                       <MenuItem value="">Available to all clubs</MenuItem>
                       {clubs.map((club) => (
