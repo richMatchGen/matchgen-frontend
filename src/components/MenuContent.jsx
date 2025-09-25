@@ -18,9 +18,14 @@ import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
 import PaymentIcon from '@mui/icons-material/Payment';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
+import ImageIcon from '@mui/icons-material/Image';
+import UploadIcon from '@mui/icons-material/Upload';
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
 import Box from '@mui/material/Box';
+import useAuth from '../hooks/useAuth';
 
 const MenuSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1, 0),
@@ -76,8 +81,15 @@ const secondaryListItems = [
   { text: 'Feedback', icon: <HelpRoundedIcon />, link: '/feedback' },
 ];
 
+const adminListItems = [
+  { text: 'Text Element Management', icon: <TextFieldsIcon />, link: '/text-elements' },
+  { text: 'PSD Processor', icon: <ImageIcon />, link: '/psd-processor' },
+  { text: 'Upload Graphic Pack', icon: <UploadIcon />, link: '/upload-graphic-pack' },
+];
+
 export default function MenuContent() {
   const location = useLocation();
+  const { user } = useAuth();
 
   const isActive = (link) => {
     if (link === '/dashboard') {
@@ -106,6 +118,27 @@ export default function MenuContent() {
           ))}
         </List>
       </MenuSection>
+
+      {/* Admin Navigation - Only show for staff users */}
+      {user?.is_staff && (
+        <MenuSection>
+          <SectionTitle>Admin</SectionTitle>
+          <List dense disablePadding>
+            {adminListItems.map((item, index) => (
+              <ListItem key={index} disablePadding sx={{ display: 'block' }}>
+                <StyledListItemButton 
+                  component={Link} 
+                  to={item.link} 
+                  selected={isActive(item.link)}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </StyledListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </MenuSection>
+      )}
 
       {/* Secondary Navigation */}
       <MenuSection>

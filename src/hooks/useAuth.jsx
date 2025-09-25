@@ -6,6 +6,7 @@ const useAuth = () => {
     token: localStorage.getItem("accessToken"),
     refresh: localStorage.getItem("refreshToken"),
   });
+  const [user, setUser] = useState(null);
 
   // Refresh token every 4 minutes
   useEffect(() => {
@@ -30,20 +31,43 @@ const useAuth = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const login = useCallback(({ access, refresh }) => {
+  const login = useCallback(({ access, refresh, user: userData }) => {
     localStorage.setItem("accessToken", access);
     localStorage.setItem("refreshToken", refresh);
     setAuth({ token: access, refresh });
+    if (userData) {
+      setUser(userData);
+    }
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     setAuth({ token: null, refresh: null });
+    setUser(null);
     window.location.href = "/login";
   }, []);
 
-  return { auth, login, logout };
+  // Fetch user data when token is available
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (auth.token && !user) {
+        try {
+          const response = await axios.get(
+            "https://matchgen-backend-production.up.railway.app/api/users/me/",
+            { headers: { Authorization: `Bearer ${auth.token}` } }
+          );
+          setUser(response.data);
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [auth.token, user]);
+
+  return { auth, user, login, logout };
 };
 
 export default useAuth;

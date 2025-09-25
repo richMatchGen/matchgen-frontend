@@ -39,6 +39,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const Account = lazy(() => import("./pages/Account"));
 const PSDProcessor = lazy(() => import("./pages/PSDProcessor"));
+const UploadGraphicPack = lazy(() => import("./pages/UploadGraphicPack"));
 
 
 function App() {
@@ -123,6 +124,9 @@ function App() {
           
           {/* PSD Processor Routes */}
           <Route path="/psd-processor" element={<PrivateRoute><PSDProcessor /></PrivateRoute>} />
+          
+          {/* Admin Routes */}
+          <Route path="/upload-graphic-pack" element={<PrivateRoute><UploadGraphicPack /></PrivateRoute>} />
         </Routes>
       </Suspense>
       </Box>
