@@ -44,7 +44,6 @@ const UploadGraphicPack = () => {
   const { auth, user } = useAuth();
   const token = auth.token;
   const [graphicPacks, setGraphicPacks] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
   const [selectedPreviewImage, setSelectedPreviewImage] = useState(null);
   const [packName, setPackName] = useState('');
   const [packDescription, setPackDescription] = useState('');
@@ -141,16 +140,6 @@ const UploadGraphicPack = () => {
     }
   };
 
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setError('');
-    } else {
-      setError('Please select a valid file');
-      setSelectedFile(null);
-    }
-  };
 
   const handleUpload = async () => {
     if (!packName.trim()) {
@@ -162,25 +151,20 @@ const UploadGraphicPack = () => {
       setUploading(true);
       setError('');
       
-      const formData = new FormData();
-      
-      // Only append file if one is selected
-      if (selectedFile) {
-        formData.append('file', selectedFile);
-      }
-      
-      formData.append('name', packName);
-      formData.append('description', packDescription);
-      formData.append('primary_color', packPrimaryColor);
-      formData.append('category', packCategory);
-      formData.append('tier', packTier);
-      formData.append('assigned_club_id', packClub || '');
-      formData.append('is_active', packActive);
+      const data = {
+        name: packName,
+        description: packDescription,
+        primary_color: packPrimaryColor,
+        category: packCategory,
+        tier: packTier,
+        assigned_club_id: packClub || null,
+        is_active: packActive
+      };
 
-      const response = await apiClient.post('graphicpack/packs/create/', formData, {
+      const response = await apiClient.post('graphicpack/packs/create/', data, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
 
@@ -192,9 +176,7 @@ const UploadGraphicPack = () => {
       setPackTier('');
       setPackClub('');
       setPackActive(true);
-      setSelectedFile(null);
       setSelectedPreviewImage(null);
-      document.getElementById('file-input').value = '';
       fetchGraphicPacks();
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to create graphic pack');
@@ -387,30 +369,6 @@ const UploadGraphicPack = () => {
             Upload a new graphic pack with templates and assets for social media posts.
           </Typography>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6}>
-              <input
-                id="file-input"
-                type="file"
-                accept=".zip,.rar,.7z"
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
-              />
-              <label htmlFor="file-input">
-                <Button
-                  variant="outlined"
-                  component="span"
-                  startIcon={<UploadIcon />}
-                  disabled={uploading}
-                >
-                  Select Pack File (Optional)
-                </Button>
-              </label>
-              {selectedFile && (
-                <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                  Selected: {selectedFile.name}
-                </Typography>
-              )}
-            </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
                 <InputLabel>Preview Image (Optional)</InputLabel>
