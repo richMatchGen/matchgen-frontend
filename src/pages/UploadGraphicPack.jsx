@@ -47,8 +47,10 @@ const UploadGraphicPack = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [packName, setPackName] = useState('');
   const [packDescription, setPackDescription] = useState('');
+  const [packPrimaryColor, setPackPrimaryColor] = useState('#000000');
   const [packCategory, setPackCategory] = useState('');
-  const [packPrice, setPackPrice] = useState(0);
+  const [packTier, setPackTier] = useState('');
+  const [packClub, setPackClub] = useState('');
   const [packActive, setPackActive] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -57,6 +59,11 @@ const UploadGraphicPack = () => {
   const [selectedPack, setSelectedPack] = useState(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [templateUploadOpen, setTemplateUploadOpen] = useState(false);
+  const [clubs, setClubs] = useState([]);
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplateFile, setSelectedTemplateFile] = useState(null);
+  const [templateContentType, setTemplateContentType] = useState('');
 
   const categories = [
     { value: 'football', label: 'Football' },
@@ -70,11 +77,27 @@ const UploadGraphicPack = () => {
     { value: 'general', label: 'General Sports' }
   ];
 
+  const tiers = [
+    { value: 'basic', label: 'Basic' },
+    { value: 'semipro', label: 'SemiPro' },
+    { value: 'pro', label: 'Pro' }
+  ];
+
+  const contentTypes = [
+    { value: 'matchday', label: 'Matchday' },
+    { value: 'startingXI', label: 'Starting XI' },
+    { value: 'halftime', label: 'Half Time' },
+    { value: 'fulltime', label: 'Full Time' },
+    { value: 'sub', label: 'Substitution' },
+    { value: 'upcomingfixture', label: 'Upcoming Fixture' }
+  ];
+
   useEffect(() => {
     if (!token) {
       return;
     }
     fetchGraphicPacks();
+    fetchClubs();
   }, [token]);
 
   const fetchGraphicPacks = async () => {
@@ -92,6 +115,28 @@ const UploadGraphicPack = () => {
       console.error('Error fetching graphic packs:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchClubs = async () => {
+    try {
+      const response = await apiClient.get('users/clubs/', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setClubs(response.data || []);
+    } catch (err) {
+      console.error('Error fetching clubs:', err);
+    }
+  };
+
+  const fetchTemplates = async (packId) => {
+    try {
+      const response = await apiClient.get(`graphicpack/packs/${packId}/templates/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTemplates(response.data || []);
+    } catch (err) {
+      console.error('Error fetching templates:', err);
     }
   };
 
@@ -120,8 +165,10 @@ const UploadGraphicPack = () => {
       formData.append('file', selectedFile);
       formData.append('name', packName);
       formData.append('description', packDescription);
+      formData.append('primary_color', packPrimaryColor);
       formData.append('category', packCategory);
-      formData.append('price', packPrice);
+      formData.append('tier', packTier);
+      formData.append('club_id', packClub || '');
       formData.append('is_active', packActive);
 
       const response = await apiClient.post('graphicpack/packs/create/', formData, {
@@ -134,8 +181,10 @@ const UploadGraphicPack = () => {
       setSuccess('Graphic pack uploaded successfully!');
       setPackName('');
       setPackDescription('');
+      setPackPrimaryColor('#000000');
       setPackCategory('');
-      setPackPrice(0);
+      setPackTier('');
+      setPackClub('');
       setPackActive(true);
       setSelectedFile(null);
       document.getElementById('file-input').value = '';
@@ -149,7 +198,7 @@ const UploadGraphicPack = () => {
   };
 
   const handleDelete = async (packId) => {
-    if (window.confirm('Are you sure you want to delete this graphic pack?')) {
+    if (window.confirm('Are you sure you want to delete this graphic pack and all its templates?')) {
       try {
         await apiClient.delete(`graphicpack/packs/${packId}/delete/`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -163,6 +212,69 @@ const UploadGraphicPack = () => {
     }
   };
 
+  const handleDeleteTemplate = async (templateId) => {
+    if (window.confirm('Are you sure you want to delete this template?')) {
+      try {
+        await apiClient.delete(`graphicpack/templates/${templateId}/delete/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSuccess('Template deleted successfully');
+        if (selectedPack) {
+          fetchTemplates(selectedPack.id);
+        }
+      } catch (err) {
+        setError('Failed to delete template');
+        console.error('Delete template error:', err);
+      }
+    }
+  };
+
+  const handleTemplateFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedTemplateFile(file);
+      setError('');
+    } else {
+      setError('Please select a valid image file');
+      setSelectedTemplateFile(null);
+    }
+  };
+
+  const handleTemplateUpload = async () => {
+    if (!selectedTemplateFile || !templateContentType || !selectedPack) {
+      setError('Please select a file, content type, and graphic pack');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setError('');
+      
+      const formData = new FormData();
+      formData.append('file', selectedTemplateFile);
+      formData.append('content_type', templateContentType);
+      formData.append('graphic_pack_id', selectedPack.id);
+
+      const response = await apiClient.post('graphicpack/templates/create/', formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      setSuccess('Template uploaded successfully!');
+      setSelectedTemplateFile(null);
+      setTemplateContentType('');
+      document.getElementById('template-file-input').value = '';
+      fetchTemplates(selectedPack.id);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to upload template');
+      console.error('Template upload error:', err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleViewPack = async (packId) => {
     try {
       const response = await apiClient.get(`graphicpack/packs/${packId}/`, {
@@ -170,6 +282,7 @@ const UploadGraphicPack = () => {
       });
       setSelectedPack(response.data);
       setViewDialogOpen(true);
+      fetchTemplates(packId);
     } catch (err) {
       setError('Failed to fetch pack details');
       console.error('View error:', err);
@@ -195,8 +308,10 @@ const UploadGraphicPack = () => {
       const updateData = {
         name: selectedPack.name,
         description: selectedPack.description,
+        primary_color: selectedPack.primary_color,
         category: selectedPack.category,
-        price: selectedPack.price,
+        tier: selectedPack.tier,
+        club_id: selectedPack.club_id || null,
         is_active: selectedPack.is_active
       };
 
@@ -312,6 +427,16 @@ const UploadGraphicPack = () => {
               />
             </Grid>
             <Grid item xs={12} sm={3}>
+              <TextField
+                fullWidth
+                label="Primary Color"
+                type="color"
+                value={packPrimaryColor}
+                onChange={(e) => setPackPrimaryColor(e.target.value)}
+                disabled={uploading}
+              />
+            </Grid>
+            <Grid item xs={12} sm={3}>
               <FormControl fullWidth>
                 <InputLabel>Category</InputLabel>
                 <Select
@@ -328,16 +453,37 @@ const UploadGraphicPack = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={3}>
-              <TextField
-                fullWidth
-                label="Price"
-                type="number"
-                value={packPrice}
-                onChange={(e) => setPackPrice(parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-                disabled={uploading}
-                inputProps={{ step: 0.01, min: 0 }}
-              />
+              <FormControl fullWidth>
+                <InputLabel>Tier</InputLabel>
+                <Select
+                  value={packTier}
+                  onChange={(e) => setPackTier(e.target.value)}
+                  label="Tier"
+                >
+                  {tiers.map((tier) => (
+                    <MenuItem key={tier.value} value={tier.value}>
+                      {tier.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <FormControl fullWidth>
+                <InputLabel>Club (Optional)</InputLabel>
+                <Select
+                  value={packClub}
+                  onChange={(e) => setPackClub(e.target.value)}
+                  label="Club (Optional)"
+                >
+                  <MenuItem value="">Available to all clubs</MenuItem>
+                  {clubs.map((club) => (
+                    <MenuItem key={club.id} value={club.id}>
+                      {club.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControlLabel
@@ -412,7 +558,8 @@ const UploadGraphicPack = () => {
                   <TableRow>
                     <TableCell>Name</TableCell>
                     <TableCell>Category</TableCell>
-                    <TableCell>Price</TableCell>
+                    <TableCell>Tier</TableCell>
+                    <TableCell>Club</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Created</TableCell>
                     <TableCell>Actions</TableCell>
@@ -437,8 +584,16 @@ const UploadGraphicPack = () => {
                         />
                       </TableCell>
                       <TableCell>
+                        <Chip 
+                          label={pack.tier || 'N/A'} 
+                          size="small" 
+                          color="primary"
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell>
                         <Typography variant="body2">
-                          ${pack.price?.toFixed(2) || '0.00'}
+                          {pack.club_name || 'All Clubs'}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -456,6 +611,16 @@ const UploadGraphicPack = () => {
                           title="View Details"
                         >
                           <ViewIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => {
+                            setSelectedPack(pack);
+                            setTemplateUploadOpen(true);
+                          }}
+                          color="info"
+                          title="Upload Templates"
+                        >
+                          <AddIcon />
                         </IconButton>
                         <IconButton
                           onClick={() => handleEditPack(pack.id)}
@@ -515,10 +680,37 @@ const UploadGraphicPack = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="subtitle2" color="text.secondary">
-                    Price
+                    Primary Color
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <Box
+                      sx={{
+                        width: 20,
+                        height: 20,
+                        backgroundColor: selectedPack.primary_color || '#000000',
+                        border: '1px solid #ccc',
+                        borderRadius: 1
+                      }}
+                    />
+                    <Typography variant="body1">
+                      {selectedPack.primary_color || '#000000'}
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Tier
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 2 }}>
-                    ${selectedPack.price?.toFixed(2) || '0.00'}
+                    {selectedPack.tier || 'N/A'}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Club
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    {selectedPack.club_name || 'Available to all clubs'}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -558,6 +750,63 @@ const UploadGraphicPack = () => {
                   </Typography>
                 </Grid>
               </Grid>
+              
+              <Divider sx={{ my: 3 }} />
+              
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Templates ({templates.length})
+              </Typography>
+              
+              {templates.length === 0 ? (
+                <Typography variant="body2" color="text.secondary">
+                  No templates uploaded yet.
+                </Typography>
+              ) : (
+                <TableContainer component={Paper} variant="outlined">
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Content Type</TableCell>
+                        <TableCell>File Name</TableCell>
+                        <TableCell>Uploaded</TableCell>
+                        <TableCell>Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {templates.map((template) => (
+                        <TableRow key={template.id}>
+                          <TableCell>
+                            <Chip 
+                              label={template.content_type} 
+                              size="small" 
+                              color="primary"
+                              variant="outlined"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {template.file_name || 'N/A'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(template.created_at)}
+                          </TableCell>
+                          <TableCell>
+                            <IconButton
+                              onClick={() => handleDeleteTemplate(template.id)}
+                              color="error"
+                              size="small"
+                              title="Delete Template"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </Box>
           )}
         </DialogContent>
@@ -621,12 +870,44 @@ const UploadGraphicPack = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="Price"
-                    type="number"
-                    value={selectedPack.price}
-                    onChange={(e) => setSelectedPack({...selectedPack, price: parseFloat(e.target.value) || 0})}
-                    inputProps={{ step: 0.01, min: 0 }}
+                    label="Primary Color"
+                    type="color"
+                    value={selectedPack.primary_color || '#000000'}
+                    onChange={(e) => setSelectedPack({...selectedPack, primary_color: e.target.value})}
                   />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Tier</InputLabel>
+                    <Select
+                      value={selectedPack.tier || ''}
+                      onChange={(e) => setSelectedPack({...selectedPack, tier: e.target.value})}
+                      label="Tier"
+                    >
+                      {tiers.map((tier) => (
+                        <MenuItem key={tier.value} value={tier.value}>
+                          {tier.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Club</InputLabel>
+                    <Select
+                      value={selectedPack.club_id || ''}
+                      onChange={(e) => setSelectedPack({...selectedPack, club_id: e.target.value})}
+                      label="Club"
+                    >
+                      <MenuItem value="">Available to all clubs</MenuItem>
+                      {clubs.map((club) => (
+                        <MenuItem key={club.id} value={club.id}>
+                          {club.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12}>
                   <FormControlLabel
@@ -654,6 +935,80 @@ const UploadGraphicPack = () => {
             startIcon={uploading ? <CircularProgress size={20} /> : null}
           >
             {uploading ? 'Updating...' : 'Update'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Template Upload Dialog */}
+      <Dialog
+        open={templateUploadOpen}
+        onClose={() => setTemplateUploadOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography variant="h6">
+            Upload Template to {selectedPack?.name}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <input
+                  id="template-file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleTemplateFileSelect}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor="template-file-input">
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    startIcon={<UploadIcon />}
+                    disabled={uploading}
+                    fullWidth
+                  >
+                    Select Template Image
+                  </Button>
+                </label>
+                {selectedTemplateFile && (
+                  <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+                    Selected: {selectedTemplateFile.name}
+                  </Typography>
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Content Type</InputLabel>
+                  <Select
+                    value={templateContentType}
+                    onChange={(e) => setTemplateContentType(e.target.value)}
+                    label="Content Type"
+                  >
+                    {contentTypes.map((type) => (
+                      <MenuItem key={type.value} value={type.value}>
+                        {type.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTemplateUploadOpen(false)}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleTemplateUpload}
+            variant="contained"
+            disabled={!selectedTemplateFile || !templateContentType || uploading}
+            startIcon={uploading ? <CircularProgress size={20} /> : <UploadIcon />}
+          >
+            {uploading ? 'Uploading...' : 'Upload Template'}
           </Button>
         </DialogActions>
       </Dialog>
