@@ -67,7 +67,8 @@ const UploadGraphicPack = () => {
   const [templateContentType, setTemplateContentType] = useState('');
 
 
-  const sports = [
+  // Ensure arrays are properly initialized and can't be modified
+  const sports = React.useMemo(() => [
     { value: 'football', label: 'Football' },
     { value: 'basketball', label: 'Basketball' },
     { value: 'soccer', label: 'Soccer' },
@@ -77,24 +78,24 @@ const UploadGraphicPack = () => {
     { value: 'hockey', label: 'Hockey' },
     { value: 'baseball', label: 'Baseball' },
     { value: 'general', label: 'General Sports' }
-  ];
+  ], []);
 
-  const tiers = [
+  const tiers = React.useMemo(() => [
     { value: 'basic', label: 'Basic' },
     { value: 'semipro', label: 'SemiPro' },
     { value: 'pro', label: 'Pro' }
-  ];
+  ], []);
 
-  const contentTypes = [
+  const contentTypes = React.useMemo(() => [
     { value: 'matchday', label: 'Matchday' },
     { value: 'startingXI', label: 'Starting XI' },
     { value: 'halftime', label: 'Half Time' },
     { value: 'fulltime', label: 'Full Time' },
     { value: 'sub', label: 'Substitution' },
     { value: 'upcomingfixture', label: 'Upcoming Fixture' }
-  ];
+  ], []);
 
-  const colorOptions = [
+  const colorOptions = React.useMemo(() => [
     { value: 'black', label: 'Black', hex: '#000000' },
     { value: 'grey', label: 'Grey', hex: '#808080' },
     { value: 'white', label: 'White', hex: '#FFFFFF' },
@@ -112,8 +113,7 @@ const UploadGraphicPack = () => {
     { value: 'pink', label: 'Pink', hex: '#FFC0CB' },
     { value: 'maroon', label: 'Maroon', hex: '#A52A2A' },
     { value: 'Claret', label: 'Claret', hex: '#7c2c3b' },
-
-  ];
+  ], []);
 
   // Helper function to convert hex color to color name
   const getColorNameFromHex = (hexColor) => {
@@ -452,7 +452,7 @@ const UploadGraphicPack = () => {
                   label="Primary Color"
                   disabled={uploading}
                 >
-                  {colorOptions.map((color) => (
+                  {colorOptions && colorOptions.length > 0 && colorOptions.map((color) => (
                     <MenuItem key={color.value} value={color.value}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Box
@@ -479,7 +479,7 @@ const UploadGraphicPack = () => {
                   onChange={(e) => setPackSport(e.target.value)}
                   label="Sport"
                 >
-                  {sports.map((sport) => (
+                  {sports && sports.length > 0 && sports.map((sport) => (
                     <MenuItem key={sport.value} value={sport.value}>
                       {sport.label}
                     </MenuItem>
@@ -495,7 +495,7 @@ const UploadGraphicPack = () => {
                   onChange={(e) => setPackTier(e.target.value)}
                   label="Tier"
                 >
-                  {tiers.map((tier) => (
+                  {tiers && tiers.length > 0 && tiers.map((tier) => (
                     <MenuItem key={tier.value} value={tier.value}>
                       {tier.label}
                     </MenuItem>
@@ -947,7 +947,7 @@ const UploadGraphicPack = () => {
                         '& .MuiSvgIcon-root': { color: 'white' }
                       }}
                     >
-                      {sports.map((sport) => (
+                      {sports && sports.length > 0 && sports.map((sport) => (
                         <MenuItem key={sport.value} value={sport.value}>
                           {sport.label}
                         </MenuItem>
@@ -968,7 +968,7 @@ const UploadGraphicPack = () => {
                         '& .MuiSvgIcon-root': { color: 'white' }
                       }}
                     >
-                      {colorOptions.map((color) => (
+                      {colorOptions && colorOptions.length > 0 && colorOptions.map((color) => (
                         <MenuItem key={color.value} value={color.value}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Box
@@ -1000,7 +1000,7 @@ const UploadGraphicPack = () => {
                         '& .MuiSvgIcon-root': { color: 'white' }
                       }}
                     >
-                      {tiers.map((tier) => (
+                      {tiers && tiers.length > 0 && tiers.map((tier) => (
                         <MenuItem key={tier.value} value={tier.value}>
                           {tier.label}
                         </MenuItem>
@@ -1128,7 +1128,7 @@ const UploadGraphicPack = () => {
                     onChange={(e) => setTemplateContentType(e.target.value)}
                     label="Content Type"
                   >
-                    {contentTypes.map((type) => (
+                    {contentTypes && contentTypes.length > 0 && contentTypes.map((type) => (
                       <MenuItem key={type.value} value={type.value}>
                         {type.label}
                       </MenuItem>
