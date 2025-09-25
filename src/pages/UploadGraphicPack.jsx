@@ -47,7 +47,7 @@ const UploadGraphicPack = () => {
   const [selectedPreviewImage, setSelectedPreviewImage] = useState(null);
   const [packName, setPackName] = useState('');
   const [packDescription, setPackDescription] = useState('');
-  const [packPrimaryColor, setPackPrimaryColor] = useState('#000000');
+  const [packPrimaryColor, setPackPrimaryColor] = useState('black');
   const [packCategory, setPackCategory] = useState('');
   const [packTier, setPackTier] = useState('');
   const [packClub, setPackClub] = useState('');
@@ -90,6 +90,21 @@ const UploadGraphicPack = () => {
     { value: 'fulltime', label: 'Full Time' },
     { value: 'sub', label: 'Substitution' },
     { value: 'upcomingfixture', label: 'Upcoming Fixture' }
+  ];
+
+  const colorOptions = [
+    { value: 'black', label: 'Black', hex: '#000000' },
+    { value: 'white', label: 'White', hex: '#FFFFFF' },
+    { value: 'red', label: 'Red', hex: '#FF0000' },
+    { value: 'blue', label: 'Blue', hex: '#0000FF' },
+    { value: 'green', label: 'Green', hex: '#00FF00' },
+    { value: 'yellow', label: 'Yellow', hex: '#FFFF00' },
+    { value: 'orange', label: 'Orange', hex: '#FFA500' },
+    { value: 'purple', label: 'Purple', hex: '#800080' },
+    { value: 'pink', label: 'Pink', hex: '#FFC0CB' },
+    { value: 'brown', label: 'Brown', hex: '#A52A2A' },
+    { value: 'gray', label: 'Gray', hex: '#808080' },
+    { value: 'navy', label: 'Navy', hex: '#000080' }
   ];
 
   useEffect(() => {
@@ -151,10 +166,11 @@ const UploadGraphicPack = () => {
       setUploading(true);
       setError('');
       
+      const selectedColor = colorOptions.find(color => color.value === packPrimaryColor);
       const data = {
         name: packName,
         description: packDescription,
-        primary_color: packPrimaryColor,
+        primary_color: selectedColor ? selectedColor.hex : '#000000',
         category: packCategory,
         tier: packTier,
         assigned_club_id: packClub || null,
@@ -409,14 +425,32 @@ const UploadGraphicPack = () => {
               />
             </Grid>
             <Grid item xs={12} sm={3}>
-              <TextField
-                fullWidth
-                label="Primary Color"
-                type="color"
-                value={packPrimaryColor}
-                onChange={(e) => setPackPrimaryColor(e.target.value)}
-                disabled={uploading}
-              />
+              <FormControl fullWidth>
+                <InputLabel>Primary Color</InputLabel>
+                <Select
+                  value={packPrimaryColor}
+                  onChange={(e) => setPackPrimaryColor(e.target.value)}
+                  label="Primary Color"
+                  disabled={uploading}
+                >
+                  {colorOptions.map((color) => (
+                    <MenuItem key={color.value} value={color.value}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            backgroundColor: color.hex,
+                            border: '1px solid #ccc',
+                            borderRadius: '4px'
+                          }}
+                        />
+                        {color.label}
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={3}>
               <FormControl fullWidth>
@@ -648,26 +682,26 @@ const UploadGraphicPack = () => {
         </DialogTitle>
         <DialogContent>
           {selectedPack && (
-            <Box>
+            <Box sx={{ color: 'white' }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={{ color: 'white' }}>
                     Name
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 2, color: 'white' }}>
                     {selectedPack.name}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={{ color: 'white' }}>
                     Category
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 2, color: 'white' }}>
                     {selectedPack.category}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={{ color: 'white' }}>
                     Primary Color
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
@@ -680,32 +714,32 @@ const UploadGraphicPack = () => {
                         borderRadius: 1
                       }}
                     />
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={{ color: 'white' }}>
                       {selectedPack.primary_color || '#000000'}
                     </Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={{ color: 'white' }}>
                     Tier
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 2, color: 'white' }}>
                     {selectedPack.tier || 'N/A'}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={{ color: 'white' }}>
                     Club
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 2, color: 'white' }}>
                     {selectedPack.club_name || 'Available to all clubs'}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={{ color: 'white' }}>
                     Status
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 2, color: 'white' }}>
                     <Chip 
                       label={selectedPack.is_active ? 'Active' : 'Inactive'} 
                       size="small" 
@@ -714,26 +748,26 @@ const UploadGraphicPack = () => {
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={{ color: 'white' }}>
                     Description
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 2, color: 'white' }}>
                     {selectedPack.description || 'No description provided'}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={{ color: 'white' }}>
                     Created
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 2, color: 'white' }}>
                     {formatDate(selectedPack.created_at)}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={{ color: 'white' }}>
                     Last Updated
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 2, color: 'white' }}>
                     {formatDate(selectedPack.updated_at)}
                   </Typography>
                 </Grid>
@@ -741,12 +775,12 @@ const UploadGraphicPack = () => {
               
               <Divider sx={{ my: 3 }} />
               
-              <Typography variant="h6" sx={{ mb: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2, color: 'white' }}>
                 Templates ({templates.length})
               </Typography>
               
               {templates.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: 'white' }}>
                   No templates uploaded yet.
                 </Typography>
               ) : (
@@ -862,13 +896,31 @@ const UploadGraphicPack = () => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Primary Color"
-                    type="color"
-                    value={selectedPack.primary_color || '#000000'}
-                    onChange={(e) => setSelectedPack({...selectedPack, primary_color: e.target.value})}
-                  />
+                  <FormControl fullWidth>
+                    <InputLabel>Primary Color</InputLabel>
+                    <Select
+                      value={selectedPack.primary_color || 'black'}
+                      onChange={(e) => setSelectedPack({...selectedPack, primary_color: e.target.value})}
+                      label="Primary Color"
+                    >
+                      {colorOptions.map((color) => (
+                        <MenuItem key={color.value} value={color.value}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Box
+                              sx={{
+                                width: 20,
+                                height: 20,
+                                backgroundColor: color.hex,
+                                border: '1px solid #ccc',
+                                borderRadius: '4px'
+                              }}
+                            />
+                            {color.label}
+                          </Box>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
