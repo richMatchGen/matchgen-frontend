@@ -23,14 +23,22 @@ import {
   Chip,
   Alert,
   Snackbar,
-  CircularProgress
+  CircularProgress,
+  Pagination,
+  Grid,
+  Card,
+  CardContent,
+  InputAdornment
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Save as SaveIcon,
-  Cancel as CancelIcon
+  Cancel as CancelIcon,
+  Search as SearchIcon,
+  FilterList as FilterListIcon,
+  Clear as ClearIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 
@@ -41,6 +49,22 @@ const TextElementManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingElement, setEditingElement] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+    pageSize: 20
+  });
+
+  // Filter state
+  const [filters, setFilters] = useState({
+    content_type: '',
+    graphic_pack: '',
+    element_name: '',
+    search: ''
+  });
 
   // Form state
   const [formData, setFormData] = useState({
@@ -106,42 +130,98 @@ const TextElementManagement = () => {
      fetchData();
    }, []);
 
+   // Handle filter changes
+   const handleFilterChange = (filterType, value) => {
+     const newFilters = { ...filters, [filterType]: value };
+     setFilters(newFilters);
+     fetchData(1, newFilters); // Reset to page 1 when filters change
+   };
+
+   // Handle pagination
+   const handlePageChange = (event, page) => {
+     fetchData(page, filters);
+   };
+
+   // Clear all filters
+   const clearFilters = () => {
+     const clearedFilters = {
+       content_type: '',
+       graphic_pack: '',
+       element_name: '',
+       search: ''
+     };
+     setFilters(clearedFilters);
+     fetchData(1, clearedFilters);
+   };
+
    // Debug effect to log when graphicPacks changes
    useEffect(() => {
      console.log('graphicPacks state changed:', graphicPacks);
    }, [graphicPacks]);
 
-  const fetchData = async () => {
+  const fetchData = async (page = 1, currentFilters = filters) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       
-             // Fetch text elements
-       console.log('Fetching text elements...');
-       const elementsResponse = await axios.get(
-         'https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/',
-         { headers: { Authorization: `Bearer ${token}` } }
-       );
-       console.log('Text elements response:', elementsResponse.data);
-       console.log('Text elements type:', typeof elementsResponse.data);
-       
-       // Handle paginated response for text elements too
-       let textElementsData = [];
-       if (elementsResponse.data && elementsResponse.data.results) {
-         // Paginated response - extract results
-         textElementsData = elementsResponse.data.results;
-         console.log('Extracted text elements from paginated response:', textElementsData);
-       } else if (Array.isArray(elementsResponse.data)) {
-         // Direct array response
-         textElementsData = elementsResponse.data;
-         console.log('Direct text elements array response:', textElementsData);
-       } else {
-         console.error('Unexpected text elements response format:', elementsResponse.data);
-         textElementsData = [];
-       }
-       
-       console.log('Final text elements data:', textElementsData);
-       setTextElements(textElementsData);
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append('page', page);
+      
+      // Add filters to query parameters
+      if (currentFilters.content_type) {
+        params.append('content_type', currentFilters.content_type);
+      }
+      if (currentFilters.graphic_pack) {
+        params.append('graphic_pack', currentFilters.graphic_pack);
+      }
+      if (currentFilters.element_name) {
+        params.append('element_name', currentFilters.element_name);
+      }
+      if (currentFilters.search) {
+        params.append('search', currentFilters.search);
+      }
+      
+      // Fetch text elements with pagination and filters
+      console.log('Fetching text elements with params:', params.toString());
+      const elementsResponse = await axios.get(
+        `https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log('Text elements response:', elementsResponse.data);
+      
+      // Handle paginated response
+      let textElementsData = [];
+      let paginationData = {
+        currentPage: 1,
+        totalPages: 1,
+        totalCount: 0,
+        pageSize: 20
+      };
+      
+      if (elementsResponse.data && elementsResponse.data.results) {
+        // Paginated response - extract results and pagination info
+        textElementsData = elementsResponse.data.results;
+        paginationData = {
+          currentPage: elementsResponse.data.current_page || 1,
+          totalPages: elementsResponse.data.total_pages || 1,
+          totalCount: elementsResponse.data.count || 0,
+          pageSize: elementsResponse.data.page_size || 20
+        };
+        console.log('Extracted text elements from paginated response:', textElementsData);
+        console.log('Pagination data:', paginationData);
+      } else if (Array.isArray(elementsResponse.data)) {
+        // Direct array response (fallback)
+        textElementsData = elementsResponse.data;
+        console.log('Direct text elements array response:', textElementsData);
+      } else {
+        console.error('Unexpected text elements response format:', elementsResponse.data);
+        textElementsData = [];
+      }
+      
+      console.log('Final text elements data:', textElementsData);
+      setTextElements(textElementsData);
+      setPagination(paginationData);
 
        // Fetch graphic packs
        console.log('Fetching graphic packs...');
@@ -430,6 +510,104 @@ const TextElementManagement = () => {
          </Typography>
        </Box>
 
+       {/* Filters */}
+       <Card sx={{ mb: 3 }}>
+         <CardContent>
+           <Typography variant="h6" gutterBottom>
+             <FilterListIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+             Filters
+           </Typography>
+           <Grid container spacing={2} alignItems="center">
+             <Grid item xs={12} sm={6} md={3}>
+               <TextField
+                 label="Search"
+                 value={filters.search}
+                 onChange={(e) => handleFilterChange('search', e.target.value)}
+                 fullWidth
+                 size="small"
+                 InputProps={{
+                   startAdornment: (
+                     <InputAdornment position="start">
+                       <SearchIcon />
+                     </InputAdornment>
+                   ),
+                 }}
+               />
+             </Grid>
+             <Grid item xs={12} sm={6} md={3}>
+               <FormControl fullWidth size="small">
+                 <InputLabel>Content Type</InputLabel>
+                 <Select
+                   value={filters.content_type}
+                   onChange={(e) => handleFilterChange('content_type', e.target.value)}
+                   label="Content Type"
+                 >
+                   <MenuItem value="">All Content Types</MenuItem>
+                   {contentTypes.map((type) => (
+                     <MenuItem key={type.value} value={type.value}>
+                       {type.label}
+                     </MenuItem>
+                   ))}
+                 </Select>
+               </FormControl>
+             </Grid>
+             <Grid item xs={12} sm={6} md={3}>
+               <FormControl fullWidth size="small">
+                 <InputLabel>Graphic Pack</InputLabel>
+                 <Select
+                   value={filters.graphic_pack}
+                   onChange={(e) => handleFilterChange('graphic_pack', e.target.value)}
+                   label="Graphic Pack"
+                 >
+                   <MenuItem value="">All Graphic Packs</MenuItem>
+                   {graphicPacks.map((pack) => (
+                     <MenuItem key={pack.id} value={pack.id}>
+                       {pack.name}
+                     </MenuItem>
+                   ))}
+                 </Select>
+               </FormControl>
+             </Grid>
+             <Grid item xs={12} sm={6} md={3}>
+               <FormControl fullWidth size="small">
+                 <InputLabel>Element Name</InputLabel>
+                 <Select
+                   value={filters.element_name}
+                   onChange={(e) => handleFilterChange('element_name', e.target.value)}
+                   label="Element Name"
+                 >
+                   <MenuItem value="">All Element Names</MenuItem>
+                   {elementNames.map((element) => (
+                     <MenuItem key={element.value} value={element.value}>
+                       {element.label}
+                     </MenuItem>
+                   ))}
+                 </Select>
+               </FormControl>
+             </Grid>
+             <Grid item xs={12}>
+               <Box display="flex" gap={1} flexWrap="wrap">
+                 <Button
+                   variant="outlined"
+                   startIcon={<ClearIcon />}
+                   onClick={clearFilters}
+                   size="small"
+                 >
+                   Clear Filters
+                 </Button>
+                 {Object.values(filters).some(filter => filter !== '') && (
+                   <Chip
+                     label={`${Object.values(filters).filter(f => f !== '').length} filter(s) active`}
+                     color="primary"
+                     size="small"
+                   />
+                 )}
+               </Box>
+             </Grid>
+           </Grid>
+         </CardContent>
+       </Card>
+
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer>
           <Table stickyHeader>
@@ -554,6 +732,25 @@ const TextElementManagement = () => {
           </Table>
         </TableContainer>
       </Paper>
+
+      {/* Pagination */}
+      {pagination.totalPages > 1 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, mb: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Showing {((pagination.currentPage - 1) * pagination.pageSize) + 1} to {Math.min(pagination.currentPage * pagination.pageSize, pagination.totalCount)} of {pagination.totalCount} elements
+            </Typography>
+            <Pagination
+              count={pagination.totalPages}
+              page={pagination.currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+        </Box>
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
