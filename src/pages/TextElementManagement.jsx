@@ -79,10 +79,11 @@ const TextElementManagement = () => {
     home_position_y: 150,
     away_position_x: 400,
     away_position_y: 150,
-    // Top-left position from PSD
+    // Multiple anchor positions from PSD
     top_left_x: 0,
     top_left_y: 0,
-    // Top-right position from PSD
+    top_center_x: 0,
+    top_center_y: 0,
     top_right_x: 0,
     top_right_y: 0,
     font_size: 24,
@@ -298,6 +299,8 @@ const TextElementManagement = () => {
         away_position_y: element.away_position_y || element.position_y,
         top_left_x: element.top_left_x || 0,
         top_left_y: element.top_left_y || 0,
+        top_center_x: element.top_center_x || 0,
+        top_center_y: element.top_center_y || 0,
         top_right_x: element.top_right_x || 0,
         top_right_y: element.top_right_y || 0,
         font_size: element.font_size,
@@ -988,6 +991,45 @@ const TextElementManagement = () => {
               onChange={(e) => setFormData({ ...formData, top_left_y: parseInt(e.target.value) || 0 })}
               fullWidth
               helperText="Top-left Y position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            {/* Top-center position from PSD */}
+            <TextField
+              label="Top Center X (from PSD)"
+              type="number"
+              value={formData.top_center_x}
+              onChange={(e) => setFormData({ ...formData, top_center_x: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Top-center X position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            <TextField
+              label="Top Center Y (from PSD)"
+              type="number"
+              value={formData.top_center_y}
+              onChange={(e) => setFormData({ ...formData, top_center_y: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Top-center Y position from PSD layer"
               sx={{
                 '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
                 '& .MuiOutlinedInput-root': {
