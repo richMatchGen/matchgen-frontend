@@ -83,6 +83,7 @@ const TextElementManagement = () => {
     font_family: 'Arial',
     font_color: '#FFFFFF',
     alignment: 'center',
+    text_alignment: 'center',
     font_weight: 'normal',
     // Image-specific fields
     image_width: 100,
@@ -293,6 +294,7 @@ const TextElementManagement = () => {
         font_family: element.font_family,
         font_color: element.font_color,
         alignment: element.alignment,
+        text_alignment: element.text_alignment || 'center',
         font_weight: element.font_weight,
         image_width: element.image_width || 100,
         image_height: element.image_height || 100,
@@ -315,6 +317,7 @@ const TextElementManagement = () => {
         font_family: 'Arial',
         font_color: '#FFFFFF',
         alignment: 'center',
+        text_alignment: 'center',
         font_weight: 'normal',
         image_width: 100,
         image_height: 100,
@@ -1058,11 +1061,39 @@ const TextElementManagement = () => {
             />
 
             <FormControl fullWidth>
-              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Alignment</InputLabel>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Position Alignment</InputLabel>
               <Select
                 value={formData.alignment}
                 onChange={(e) => setFormData({ ...formData, alignment: e.target.value })}
-                label="Alignment"
+                label="Position Alignment"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2196f3',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  }
+                }}
+              >
+                <MenuItem value="left">Left</MenuItem>
+                <MenuItem value="center">Center</MenuItem>
+                <MenuItem value="right">Right</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Text Alignment</InputLabel>
+              <Select
+                value={formData.text_alignment || 'center'}
+                onChange={(e) => setFormData({ ...formData, text_alignment: e.target.value })}
+                label="Text Alignment"
                 sx={{
                   color: 'white',
                   '& .MuiOutlinedInput-notchedOutline': {
