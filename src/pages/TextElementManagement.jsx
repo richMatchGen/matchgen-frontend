@@ -82,6 +82,9 @@ const TextElementManagement = () => {
     // Top-left position from PSD
     top_left_x: 0,
     top_left_y: 0,
+    // Top-right position from PSD
+    top_right_x: 0,
+    top_right_y: 0,
     font_size: 24,
     font_family: 'Arial',
     font_color: '#FFFFFF',
@@ -295,6 +298,8 @@ const TextElementManagement = () => {
         away_position_y: element.away_position_y || element.position_y,
         top_left_x: element.top_left_x || 0,
         top_left_y: element.top_left_y || 0,
+        top_right_x: element.top_right_x || 0,
+        top_right_y: element.top_right_y || 0,
         font_size: element.font_size,
         font_family: element.font_family,
         font_color: element.font_color,
@@ -320,6 +325,8 @@ const TextElementManagement = () => {
         away_position_y: 150,
         top_left_x: 0,
         top_left_y: 0,
+        top_right_x: 0,
+        top_right_y: 0,
         font_size: 24,
         font_family: 'Arial',
         font_color: '#FFFFFF',
@@ -981,6 +988,45 @@ const TextElementManagement = () => {
               onChange={(e) => setFormData({ ...formData, top_left_y: parseInt(e.target.value) || 0 })}
               fullWidth
               helperText="Top-left Y position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            {/* Top-right position from PSD */}
+            <TextField
+              label="Top Right X (from PSD)"
+              type="number"
+              value={formData.top_right_x}
+              onChange={(e) => setFormData({ ...formData, top_right_x: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Top-right X position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            <TextField
+              label="Top Right Y (from PSD)"
+              type="number"
+              value={formData.top_right_y}
+              onChange={(e) => setFormData({ ...formData, top_right_y: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Top-right Y position from PSD layer"
               sx={{
                 '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
                 '& .MuiOutlinedInput-root': {
