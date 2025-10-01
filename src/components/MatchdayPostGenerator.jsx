@@ -357,11 +357,12 @@ const SocialMediaPostGenerator = () => {
         if (substitutions.length > 0) {
           // Filter out empty substitutions and send multiple
           const validSubstitutions = substitutions.filter(sub => 
-            sub.player_on && sub.player_off && sub.minute
+            sub.player_on && sub.player_off
           );
           
           if (validSubstitutions.length > 0) {
             requestData.substitutions = validSubstitutions;
+            requestData.minute = minute || 'Minute';
           } else {
             // Fallback to single substitution format
             requestData.player_on = playerOn || 'Player On';
@@ -766,8 +767,7 @@ const SocialMediaPostGenerator = () => {
                                 const selectedPlayers = e.target.value;
                                 const updatedSubstitutions = selectedPlayers.map((player, index) => ({
                                   player_on: player,
-                                  player_off: substitutions[index]?.player_off || '',
-                                  minute: substitutions[index]?.minute || ''
+                                  player_off: substitutions[index]?.player_off || ''
                                 }));
                                 setSubstitutions(updatedSubstitutions);
                               }}
@@ -804,8 +804,7 @@ const SocialMediaPostGenerator = () => {
                                 const selectedPlayers = e.target.value;
                                 const updatedSubstitutions = selectedPlayers.map((player, index) => ({
                                   player_on: substitutions[index]?.player_on || '',
-                                  player_off: player,
-                                  minute: substitutions[index]?.minute || ''
+                                  player_off: player
                                 }));
                                 setSubstitutions(updatedSubstitutions);
                               }}
@@ -829,31 +828,16 @@ const SocialMediaPostGenerator = () => {
                           </Typography>
                         </Box>
 
-                        {/* Minutes */}
+                        {/* Single minute field */}
                         <Box sx={{ mb: 3 }}>
                           <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                            Substitution Minutes (Select multiple minutes)
+                            Substitution Minute
                           </Typography>
                           <FormControl fullWidth>
                             <Select
-                              multiple
-                              value={substitutions.map(sub => sub.minute).filter(Boolean)}
-                              onChange={(e) => {
-                                const selectedMinutes = e.target.value;
-                                const updatedSubstitutions = selectedMinutes.map((minute, index) => ({
-                                  player_on: substitutions[index]?.player_on || '',
-                                  player_off: substitutions[index]?.player_off || '',
-                                  minute: minute
-                                }));
-                                setSubstitutions(updatedSubstitutions);
-                              }}
-                              renderValue={(selected) => (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                  {selected.map((value) => (
-                                    <Chip key={value} label={`${value}'`} size="small" />
-                                  ))}
-                                </Box>
-                              )}
+                              value={minute}
+                              onChange={(e) => setMinute(e.target.value)}
+                              label="Minute"
                             >
                               {Array.from({ length: 90 }, (_, i) => i + 1).map((min) => (
                                 <MenuItem key={min} value={min.toString()}>
@@ -862,22 +846,19 @@ const SocialMediaPostGenerator = () => {
                               ))}
                             </Select>
                           </FormControl>
-                          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                            {substitutions.filter(sub => sub.minute).length} minutes selected
-                          </Typography>
                         </Box>
 
                         {/* Preview of substitutions */}
-                        {substitutions.some(sub => sub.player_on && sub.player_off && sub.minute) && (
+                        {substitutions.some(sub => sub.player_on && sub.player_off) && (
                           <Box sx={{ mt: 2, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
                             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
                               Substitution Preview:
                             </Typography>
                             {substitutions
-                              .filter(sub => sub.player_on && sub.player_off && sub.minute)
+                              .filter(sub => sub.player_on && sub.player_off)
                               .map((sub, index) => (
                                 <Typography key={index} variant="body2" sx={{ mb: 0.5 }}>
-                                  {sub.player_off} → {sub.player_on} ({sub.minute}')
+                                  {sub.player_off} → {sub.player_on} ({minute || 'Minute'})
                                 </Typography>
                               ))}
                           </Box>
