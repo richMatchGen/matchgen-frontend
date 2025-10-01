@@ -963,7 +963,40 @@ const TextElementManagement = () => {
                     exclusive
                     onChange={(e, newAnchor) => {
                       if (newAnchor !== null) {
-                        setFormData({ ...formData, position_anchor: newAnchor });
+                        const currentAlignment = formData.alignment;
+                        
+                        // Update position based on new anchor and current alignment
+                        let newPositionX, newPositionY;
+                        if (newAnchor === 'top') {
+                          if (currentAlignment === 'left') {
+                            newPositionX = formData.top_left_x;
+                            newPositionY = formData.top_left_y;
+                          } else if (currentAlignment === 'center') {
+                            newPositionX = formData.top_center_x;
+                            newPositionY = formData.top_center_y;
+                          } else { // right
+                            newPositionX = formData.top_right_x;
+                            newPositionY = formData.top_right_y;
+                          }
+                        } else { // bottom
+                          if (currentAlignment === 'left') {
+                            newPositionX = formData.bottom_left_x;
+                            newPositionY = formData.bottom_left_y;
+                          } else if (currentAlignment === 'center') {
+                            newPositionX = formData.bottom_center_x;
+                            newPositionY = formData.bottom_center_y;
+                          } else { // right
+                            newPositionX = formData.bottom_right_x;
+                            newPositionY = formData.bottom_right_y;
+                          }
+                        }
+                        
+                        setFormData({ 
+                          ...formData, 
+                          position_anchor: newAnchor,
+                          position_x: newPositionX,
+                          position_y: newPositionY
+                        });
                       }
                     }}
                     sx={{
@@ -998,7 +1031,27 @@ const TextElementManagement = () => {
                     <Grid item xs={4}>
                       <Button
                         variant={formData.alignment === 'left' ? 'contained' : 'outlined'}
-                        onClick={() => setFormData({ ...formData, alignment: 'left' })}
+                        onClick={() => {
+                          const newAlignment = 'left';
+                          const positionAnchor = formData.position_anchor;
+                          
+                          // Update position based on alignment and anchor
+                          let newPositionX, newPositionY;
+                          if (positionAnchor === 'top') {
+                            newPositionX = formData.top_left_x;
+                            newPositionY = formData.top_left_y;
+                          } else { // bottom
+                            newPositionX = formData.bottom_left_x;
+                            newPositionY = formData.bottom_left_y;
+                          }
+                          
+                          setFormData({ 
+                            ...formData, 
+                            alignment: newAlignment,
+                            position_x: newPositionX,
+                            position_y: newPositionY
+                          });
+                        }}
                         fullWidth
                         sx={{
                           color: 'white',
@@ -1014,7 +1067,27 @@ const TextElementManagement = () => {
                     <Grid item xs={4}>
                       <Button
                         variant={formData.alignment === 'center' ? 'contained' : 'outlined'}
-                        onClick={() => setFormData({ ...formData, alignment: 'center' })}
+                        onClick={() => {
+                          const newAlignment = 'center';
+                          const positionAnchor = formData.position_anchor;
+                          
+                          // Update position based on alignment and anchor
+                          let newPositionX, newPositionY;
+                          if (positionAnchor === 'top') {
+                            newPositionX = formData.top_center_x;
+                            newPositionY = formData.top_center_y;
+                          } else { // bottom
+                            newPositionX = formData.bottom_center_x;
+                            newPositionY = formData.bottom_center_y;
+                          }
+                          
+                          setFormData({ 
+                            ...formData, 
+                            alignment: newAlignment,
+                            position_x: newPositionX,
+                            position_y: newPositionY
+                          });
+                        }}
                         fullWidth
                         sx={{
                           color: 'white',
@@ -1030,7 +1103,27 @@ const TextElementManagement = () => {
                     <Grid item xs={4}>
                       <Button
                         variant={formData.alignment === 'right' ? 'contained' : 'outlined'}
-                        onClick={() => setFormData({ ...formData, alignment: 'right' })}
+                        onClick={() => {
+                          const newAlignment = 'right';
+                          const positionAnchor = formData.position_anchor;
+                          
+                          // Update position based on alignment and anchor
+                          let newPositionX, newPositionY;
+                          if (positionAnchor === 'top') {
+                            newPositionX = formData.top_right_x;
+                            newPositionY = formData.top_right_y;
+                          } else { // bottom
+                            newPositionX = formData.bottom_right_x;
+                            newPositionY = formData.bottom_right_y;
+                          }
+                          
+                          setFormData({ 
+                            ...formData, 
+                            alignment: newAlignment,
+                            position_x: newPositionX,
+                            position_y: newPositionY
+                          });
+                        }}
                         fullWidth
                         sx={{
                           color: 'white',
