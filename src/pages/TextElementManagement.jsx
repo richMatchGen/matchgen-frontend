@@ -382,6 +382,9 @@ const TextElementManagement = () => {
       if (editingElement) {
         // Update existing element
         console.log('Updating text element with data:', formData);
+        console.log('Position anchor being sent:', formData.position_anchor);
+        console.log('Alignment being sent:', formData.alignment);
+        console.log('Position coordinates being sent:', { x: formData.position_x, y: formData.position_y });
         const response = await axios.put(
           `https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/${editingElement.id}/update/`,
           formData,
