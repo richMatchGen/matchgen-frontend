@@ -28,6 +28,8 @@ import {
   Image,
   Schedule,
   LocationOn,
+  Add,
+  Delete,
   SportsSoccer,
   CheckCircle,
   ArrowBack,
@@ -146,6 +148,24 @@ const SocialMediaPostGenerator = () => {
   const [playerOff, setPlayerOff] = useState('');
   const [minute, setMinute] = useState('');
   const [players, setPlayers] = useState([]);
+  
+  // Multiple substitutions state
+  const [substitutions, setSubstitutions] = useState([]);
+  
+  // Functions to handle multiple substitutions
+  const addSubstitution = () => {
+    setSubstitutions([...substitutions, { player_on: '', player_off: '', minute: '' }]);
+  };
+  
+  const removeSubstitution = (index) => {
+    setSubstitutions(substitutions.filter((_, i) => i !== index));
+  };
+  
+  const updateSubstitution = (index, field, value) => {
+    const updated = [...substitutions];
+    updated[index] = { ...updated[index], [field]: value };
+    setSubstitutions(updated);
+  };
   
   // Score-specific state
   const [homeScoreHt, setHomeScoreHt] = useState('0');
@@ -346,9 +366,27 @@ const SocialMediaPostGenerator = () => {
       
       // Add substitution-specific data if post type is 'sub'
       if (selectedPostType === 'sub') {
-        requestData.player_on = playerOn || 'Player On';
-        requestData.player_off = playerOff || 'Player Off';
-        requestData.minute = minute || 'Minute';
+        // Check if we have multiple substitutions
+        if (substitutions.length > 0) {
+          // Filter out empty substitutions and send multiple
+          const validSubstitutions = substitutions.filter(sub => 
+            sub.player_on && sub.player_off && sub.minute
+          );
+          
+          if (validSubstitutions.length > 0) {
+            requestData.substitutions = validSubstitutions;
+          } else {
+            // Fallback to single substitution format
+            requestData.player_on = playerOn || 'Player On';
+            requestData.player_off = playerOff || 'Player Off';
+            requestData.minute = minute || 'Minute';
+          }
+        } else {
+          // Fallback to single substitution format for backward compatibility
+          requestData.player_on = playerOn || 'Player On';
+          requestData.player_off = playerOff || 'Player Off';
+          requestData.minute = minute || 'Minute';
+        }
       }
       
       // Add halftime score data if post type is 'halftime'
@@ -724,54 +762,151 @@ const SocialMediaPostGenerator = () => {
                     {/* Substitution Form - Only show for substitution posts */}
                     {selectedPostType === 'sub' && (
                       <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'blue.50' }}>
-                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                          Substitution Details
-                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                            Substitution Details
+                          </Typography>
+                          <Button
+                            variant="outlined"
+                            startIcon={<Add />}
+                            onClick={addSubstitution}
+                            size="small"
+                          >
+                            Add Substitution
+                          </Button>
+                        </Box>
                         
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                          <InputLabel>Player Coming On</InputLabel>
-                          <Select
-                            value={playerOn}
-                            onChange={(e) => setPlayerOn(e.target.value)}
-                            label="Player Coming On"
-                          >
-                            {players.map((player) => (
-                              <MenuItem key={player.id} value={player.name}>
-                                {player.name} ({player.squad_no}) - {player.position}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
+                        {substitutions.length === 0 && (
+                          <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
+                            <Typography variant="body2">
+                              No substitutions added yet. Click "Add Substitution" to get started.
+                            </Typography>
+                          </Box>
+                        )}
+                        
+                        {substitutions.map((substitution, index) => (
+                          <Paper key={index} elevation={1} sx={{ p: 2, mb: 2, backgroundColor: 'white' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                                Substitution {index + 1}
+                              </Typography>
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                                onClick={() => removeSubstitution(index)}
+                                startIcon={<Delete />}
+                              >
+                                Remove
+                              </Button>
+                            </Box>
+                            
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} sm={4}>
+                                <FormControl fullWidth>
+                                  <InputLabel>Player Coming On</InputLabel>
+                                  <Select
+                                    value={substitution.player_on}
+                                    onChange={(e) => updateSubstitution(index, 'player_on', e.target.value)}
+                                    label="Player Coming On"
+                                  >
+                                    {players.map((player) => (
+                                      <MenuItem key={player.id} value={player.name}>
+                                        {player.name} ({player.squad_no}) - {player.position}
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
+                                </FormControl>
+                              </Grid>
+                              
+                              <Grid item xs={12} sm={4}>
+                                <FormControl fullWidth>
+                                  <InputLabel>Player Going Off</InputLabel>
+                                  <Select
+                                    value={substitution.player_off}
+                                    onChange={(e) => updateSubstitution(index, 'player_off', e.target.value)}
+                                    label="Player Going Off"
+                                  >
+                                    {players.map((player) => (
+                                      <MenuItem key={player.id} value={player.name}>
+                                        {player.name} ({player.squad_no}) - {player.position}
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
+                                </FormControl>
+                              </Grid>
+                              
+                              <Grid item xs={12} sm={4}>
+                                <FormControl fullWidth>
+                                  <InputLabel>Minute</InputLabel>
+                                  <Select
+                                    value={substitution.minute}
+                                    onChange={(e) => updateSubstitution(index, 'minute', e.target.value)}
+                                    label="Minute"
+                                  >
+                                    {Array.from({ length: 90 }, (_, i) => i + 1).map((min) => (
+                                      <MenuItem key={min} value={min.toString()}>
+                                        {min}'
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
+                                </FormControl>
+                              </Grid>
+                            </Grid>
+                          </Paper>
+                        ))}
+                        
+                        {/* Legacy single substitution form for backward compatibility */}
+                        <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                          <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary' }}>
+                            Legacy Single Substitution (for backward compatibility)
+                          </Typography>
+                          
+                          <FormControl fullWidth sx={{ mb: 2 }}>
+                            <InputLabel>Player Coming On</InputLabel>
+                            <Select
+                              value={playerOn}
+                              onChange={(e) => setPlayerOn(e.target.value)}
+                              label="Player Coming On"
+                            >
+                              {players.map((player) => (
+                                <MenuItem key={player.id} value={player.name}>
+                                  {player.name} ({player.squad_no}) - {player.position}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
 
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                          <InputLabel>Player Going Off</InputLabel>
-                          <Select
-                            value={playerOff}
-                            onChange={(e) => setPlayerOff(e.target.value)}
-                            label="Player Going Off"
-                          >
-                            {players.map((player) => (
-                              <MenuItem key={player.id} value={player.name}>
-                                {player.name} ({player.squad_no}) - {player.position}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
+                          <FormControl fullWidth sx={{ mb: 2 }}>
+                            <InputLabel>Player Going Off</InputLabel>
+                            <Select
+                              value={playerOff}
+                              onChange={(e) => setPlayerOff(e.target.value)}
+                              label="Player Going Off"
+                            >
+                              {players.map((player) => (
+                                <MenuItem key={player.id} value={player.name}>
+                                  {player.name} ({player.squad_no}) - {player.position}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
 
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                          <InputLabel>Minute</InputLabel>
-                          <Select
-                            value={minute}
-                            onChange={(e) => setMinute(e.target.value)}
-                            label="Minute"
-                          >
-                            {Array.from({ length: 90 }, (_, i) => i + 1).map((min) => (
-                              <MenuItem key={min} value={min.toString()}>
-                                {min}'
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
+                          <FormControl fullWidth sx={{ mb: 2 }}>
+                            <InputLabel>Minute</InputLabel>
+                            <Select
+                              value={minute}
+                              onChange={(e) => setMinute(e.target.value)}
+                              label="Minute"
+                            >
+                              {Array.from({ length: 90 }, (_, i) => i + 1).map((min) => (
+                                <MenuItem key={min} value={min.toString()}>
+                                  {min}'
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Box>
                       </Paper>
                     )}
 
