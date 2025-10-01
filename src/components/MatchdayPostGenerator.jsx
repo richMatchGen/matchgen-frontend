@@ -152,20 +152,7 @@ const SocialMediaPostGenerator = () => {
   // Multiple substitutions state
   const [substitutions, setSubstitutions] = useState([]);
   
-  // Functions to handle multiple substitutions
-  const addSubstitution = () => {
-    setSubstitutions([...substitutions, { player_on: '', player_off: '', minute: '' }]);
-  };
-  
-  const removeSubstitution = (index) => {
-    setSubstitutions(substitutions.filter((_, i) => i !== index));
-  };
-  
-  const updateSubstitution = (index, field, value) => {
-    const updated = [...substitutions];
-    updated[index] = { ...updated[index], [field]: value };
-    setSubstitutions(updated);
-  };
+  // Functions to handle multiple substitutions (now using multi-select approach)
   
   // Score-specific state
   const [homeScoreHt, setHomeScoreHt] = useState('0');
@@ -762,112 +749,73 @@ const SocialMediaPostGenerator = () => {
                     {/* Substitution Form - Only show for substitution posts */}
                     {selectedPostType === 'sub' && (
                       <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'blue.50' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                            Substitution Details
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Substitution Details
+                        </Typography>
+                        
+                        {/* Players Coming On */}
+                        <Box sx={{ mb: 3 }}>
+                          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                            Players Coming On (Select multiple players)
                           </Typography>
-                          <Button
-                            variant="outlined"
-                            startIcon={<Add />}
-                            onClick={addSubstitution}
-                            size="small"
-                          >
-                            Add Substitution
-                          </Button>
+                          <FormControl fullWidth>
+                            <Select
+                              multiple
+                              value={substitutions.map(sub => sub.player_on).filter(Boolean)}
+                              onChange={(e) => {
+                                const selectedPlayers = e.target.value;
+                                const updatedSubstitutions = selectedPlayers.map((player, index) => ({
+                                  player_on: player,
+                                  player_off: substitutions[index]?.player_off || '',
+                                  minute: substitutions[index]?.minute || ''
+                                }));
+                                setSubstitutions(updatedSubstitutions);
+                              }}
+                              renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                  {selected.map((value) => (
+                                    <Chip key={value} label={value} size="small" />
+                                  ))}
+                                </Box>
+                              )}
+                            >
+                              {players.map((player) => (
+                                <MenuItem key={player.id} value={player.name}>
+                                  {player.name} ({player.squad_no}) - {player.position}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                            {substitutions.filter(sub => sub.player_on).length} players coming on selected
+                          </Typography>
                         </Box>
-                        
-                        {substitutions.length === 0 && (
-                          <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
-                            <Typography variant="body2">
-                              No substitutions added yet. Click "Add Substitution" to get started.
-                            </Typography>
-                          </Box>
-                        )}
-                        
-                        {substitutions.map((substitution, index) => (
-                          <Paper key={index} elevation={1} sx={{ p: 2, mb: 2, backgroundColor: 'white' }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                                Substitution {index + 1}
-                              </Typography>
-                              <Button
-                                variant="outlined"
-                                color="error"
-                                size="small"
-                                onClick={() => removeSubstitution(index)}
-                                startIcon={<Delete />}
-                              >
-                                Remove
-                              </Button>
-                            </Box>
-                            
-                            <Grid container spacing={2}>
-                              <Grid item xs={12} sm={4}>
-                                <FormControl fullWidth>
-                                  <InputLabel>Player Coming On</InputLabel>
-                                  <Select
-                                    value={substitution.player_on}
-                                    onChange={(e) => updateSubstitution(index, 'player_on', e.target.value)}
-                                    label="Player Coming On"
-                                  >
-                                    {players.map((player) => (
-                                      <MenuItem key={player.id} value={player.name}>
-                                        {player.name} ({player.squad_no}) - {player.position}
-                                      </MenuItem>
-                                    ))}
-                                  </Select>
-                                </FormControl>
-                              </Grid>
-                              
-                              <Grid item xs={12} sm={4}>
-                                <FormControl fullWidth>
-                                  <InputLabel>Player Going Off</InputLabel>
-                                  <Select
-                                    value={substitution.player_off}
-                                    onChange={(e) => updateSubstitution(index, 'player_off', e.target.value)}
-                                    label="Player Going Off"
-                                  >
-                                    {players.map((player) => (
-                                      <MenuItem key={player.id} value={player.name}>
-                                        {player.name} ({player.squad_no}) - {player.position}
-                                      </MenuItem>
-                                    ))}
-                                  </Select>
-                                </FormControl>
-                              </Grid>
-                              
-                              <Grid item xs={12} sm={4}>
-                                <FormControl fullWidth>
-                                  <InputLabel>Minute</InputLabel>
-                                  <Select
-                                    value={substitution.minute}
-                                    onChange={(e) => updateSubstitution(index, 'minute', e.target.value)}
-                                    label="Minute"
-                                  >
-                                    {Array.from({ length: 90 }, (_, i) => i + 1).map((min) => (
-                                      <MenuItem key={min} value={min.toString()}>
-                                        {min}'
-                                      </MenuItem>
-                                    ))}
-                                  </Select>
-                                </FormControl>
-                              </Grid>
-                            </Grid>
-                          </Paper>
-                        ))}
-                        
-                        {/* Legacy single substitution form for backward compatibility */}
-                        <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                          <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary' }}>
-                            Legacy Single Substitution (for backward compatibility)
+
+                        {/* Players Going Off */}
+                        <Box sx={{ mb: 3 }}>
+                          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                            Players Going Off (Select multiple players)
                           </Typography>
-                          
-                          <FormControl fullWidth sx={{ mb: 2 }}>
-                            <InputLabel>Player Coming On</InputLabel>
+                          <FormControl fullWidth>
                             <Select
-                              value={playerOn}
-                              onChange={(e) => setPlayerOn(e.target.value)}
-                              label="Player Coming On"
+                              multiple
+                              value={substitutions.map(sub => sub.player_off).filter(Boolean)}
+                              onChange={(e) => {
+                                const selectedPlayers = e.target.value;
+                                const updatedSubstitutions = selectedPlayers.map((player, index) => ({
+                                  player_on: substitutions[index]?.player_on || '',
+                                  player_off: player,
+                                  minute: substitutions[index]?.minute || ''
+                                }));
+                                setSubstitutions(updatedSubstitutions);
+                              }}
+                              renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                  {selected.map((value) => (
+                                    <Chip key={value} label={value} size="small" />
+                                  ))}
+                                </Box>
+                              )}
                             >
                               {players.map((player) => (
                                 <MenuItem key={player.id} value={player.name}>
@@ -876,28 +824,36 @@ const SocialMediaPostGenerator = () => {
                               ))}
                             </Select>
                           </FormControl>
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                            {substitutions.filter(sub => sub.player_off).length} players going off selected
+                          </Typography>
+                        </Box>
 
-                          <FormControl fullWidth sx={{ mb: 2 }}>
-                            <InputLabel>Player Going Off</InputLabel>
+                        {/* Minutes */}
+                        <Box sx={{ mb: 3 }}>
+                          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                            Substitution Minutes (Select multiple minutes)
+                          </Typography>
+                          <FormControl fullWidth>
                             <Select
-                              value={playerOff}
-                              onChange={(e) => setPlayerOff(e.target.value)}
-                              label="Player Going Off"
-                            >
-                              {players.map((player) => (
-                                <MenuItem key={player.id} value={player.name}>
-                                  {player.name} ({player.squad_no}) - {player.position}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-
-                          <FormControl fullWidth sx={{ mb: 2 }}>
-                            <InputLabel>Minute</InputLabel>
-                            <Select
-                              value={minute}
-                              onChange={(e) => setMinute(e.target.value)}
-                              label="Minute"
+                              multiple
+                              value={substitutions.map(sub => sub.minute).filter(Boolean)}
+                              onChange={(e) => {
+                                const selectedMinutes = e.target.value;
+                                const updatedSubstitutions = selectedMinutes.map((minute, index) => ({
+                                  player_on: substitutions[index]?.player_on || '',
+                                  player_off: substitutions[index]?.player_off || '',
+                                  minute: minute
+                                }));
+                                setSubstitutions(updatedSubstitutions);
+                              }}
+                              renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                  {selected.map((value) => (
+                                    <Chip key={value} label={`${value}'`} size="small" />
+                                  ))}
+                                </Box>
+                              )}
                             >
                               {Array.from({ length: 90 }, (_, i) => i + 1).map((min) => (
                                 <MenuItem key={min} value={min.toString()}>
@@ -906,7 +862,26 @@ const SocialMediaPostGenerator = () => {
                               ))}
                             </Select>
                           </FormControl>
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                            {substitutions.filter(sub => sub.minute).length} minutes selected
+                          </Typography>
                         </Box>
+
+                        {/* Preview of substitutions */}
+                        {substitutions.some(sub => sub.player_on && sub.player_off && sub.minute) && (
+                          <Box sx={{ mt: 2, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+                            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                              Substitution Preview:
+                            </Typography>
+                            {substitutions
+                              .filter(sub => sub.player_on && sub.player_off && sub.minute)
+                              .map((sub, index) => (
+                                <Typography key={index} variant="body2" sx={{ mb: 0.5 }}>
+                                  {sub.player_off} → {sub.player_on} ({sub.minute}')
+                                </Typography>
+                              ))}
+                          </Box>
+                        )}
                       </Paper>
                     )}
 
