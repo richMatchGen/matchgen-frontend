@@ -28,7 +28,12 @@ import {
   Grid,
   Card,
   CardContent,
-  InputAdornment
+  InputAdornment,
+  Tabs,
+  Tab,
+  ButtonGroup,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -38,7 +43,13 @@ import {
   Cancel as CancelIcon,
   Search as SearchIcon,
   FilterList as FilterListIcon,
-  Clear as ClearIcon
+  Clear as ClearIcon,
+  FormatAlignLeft,
+  FormatAlignCenter,
+  FormatAlignRight,
+  VerticalAlignTop,
+  VerticalAlignBottom,
+  Settings as SettingsIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 
@@ -48,6 +59,7 @@ const TextElementManagement = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingElement, setEditingElement] = useState(null);
+  const [tabValue, setTabValue] = useState(0); // 0 for Simple, 1 for Advanced
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
   // Pagination state
@@ -793,8 +805,316 @@ const TextElementManagement = () => {
             {editingElement ? 'Edit Element' : 'Add Element'}
           </Typography>
         </DialogTitle>
-        <DialogContent sx={{ color: 'white' }}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
+        <DialogContent sx={{ color: 'white', p: 0 }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs 
+              value={tabValue} 
+              onChange={(e, newValue) => setTabValue(newValue)}
+              sx={{
+                '& .MuiTab-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .Mui-selected': { color: 'white' },
+                '& .MuiTabs-indicator': { backgroundColor: '#2196f3' }
+              }}
+            >
+              <Tab label="Simple View" />
+              <Tab label="Advanced Settings" />
+            </Tabs>
+          </Box>
+          
+          {/* Simple View Tab */}
+          {tabValue === 0 && (
+            <Box sx={{ p: 3 }}>
+              <Grid container spacing={3}>
+                {/* Basic Settings */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+                    Basic Settings
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <FormControl fullWidth>
+                        <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Graphic Pack</InputLabel>
+                        <Select
+                          value={formData.graphic_pack}
+                          onChange={(e) => setFormData({ ...formData, graphic_pack: e.target.value })}
+                          label="Graphic Pack"
+                          sx={{
+                            color: 'white',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(255, 255, 255, 0.3)',
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(255, 255, 255, 0.5)',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#2196f3',
+                            },
+                            '& .MuiSvgIcon-root': {
+                              color: 'white',
+                            }
+                          }}
+                        >
+                          {graphicPacks.map((pack) => (
+                            <MenuItem key={pack.id} value={pack.id}>
+                              {pack.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <FormControl fullWidth>
+                        <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Content Type</InputLabel>
+                        <Select
+                          value={formData.content_type}
+                          onChange={(e) => setFormData({ ...formData, content_type: e.target.value })}
+                          label="Content Type"
+                          sx={{
+                            color: 'white',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(255, 255, 255, 0.3)',
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(255, 255, 255, 0.5)',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#2196f3',
+                            },
+                            '& .MuiSvgIcon-root': {
+                              color: 'white',
+                            }
+                          }}
+                        >
+                          <MenuItem value="matchday">Matchday</MenuItem>
+                          <MenuItem value="startingXI">Starting XI</MenuItem>
+                          <MenuItem value="sub">Substitution</MenuItem>
+                          <MenuItem value="goal">Goal</MenuItem>
+                          <MenuItem value="halftime">Halftime</MenuItem>
+                          <MenuItem value="fulltime">Full-time</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        label="Element Name"
+                        value={formData.element_name}
+                        onChange={(e) => setFormData({ ...formData, element_name: e.target.value })}
+                        fullWidth
+                        sx={{
+                          '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                          },
+                          '& .MuiInputBase-input': { color: 'white' }
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                {/* Text Alignment */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+                    Text Alignment
+                  </Typography>
+                  <ToggleButtonGroup
+                    value={formData.text_alignment}
+                    exclusive
+                    onChange={(e, newAlignment) => {
+                      if (newAlignment !== null) {
+                        setFormData({ ...formData, text_alignment: newAlignment });
+                      }
+                    }}
+                    sx={{
+                      '& .MuiToggleButton-root': {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        '&.Mui-selected': {
+                          color: 'white',
+                          backgroundColor: '#2196f3',
+                          '&:hover': {
+                            backgroundColor: '#1976d2',
+                          }
+                        }
+                      }
+                    }}
+                  >
+                    <ToggleButton value="left">
+                      <FormatAlignLeft />
+                    </ToggleButton>
+                    <ToggleButton value="center">
+                      <FormatAlignCenter />
+                    </ToggleButton>
+                    <ToggleButton value="right">
+                      <FormatAlignRight />
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Grid>
+
+                {/* Position Anchor */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+                    Position Anchor
+                  </Typography>
+                  <ToggleButtonGroup
+                    value={formData.position_anchor}
+                    exclusive
+                    onChange={(e, newAnchor) => {
+                      if (newAnchor !== null) {
+                        setFormData({ ...formData, position_anchor: newAnchor });
+                      }
+                    }}
+                    sx={{
+                      '& .MuiToggleButton-root': {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        '&.Mui-selected': {
+                          color: 'white',
+                          backgroundColor: '#2196f3',
+                          '&:hover': {
+                            backgroundColor: '#1976d2',
+                          }
+                        }
+                      }
+                    }}
+                  >
+                    <ToggleButton value="top">
+                      <VerticalAlignTop />
+                    </ToggleButton>
+                    <ToggleButton value="bottom">
+                      <VerticalAlignBottom />
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Grid>
+
+                {/* Position Presets */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+                    Position Presets
+                  </Typography>
+                  <Grid container spacing={1}>
+                    <Grid item xs={4}>
+                      <Button
+                        variant={formData.alignment === 'left' ? 'contained' : 'outlined'}
+                        onClick={() => setFormData({ ...formData, alignment: 'left' })}
+                        fullWidth
+                        sx={{
+                          color: 'white',
+                          borderColor: 'rgba(255, 255, 255, 0.3)',
+                          '&:hover': {
+                            borderColor: 'rgba(255, 255, 255, 0.5)',
+                          }
+                        }}
+                      >
+                        Left
+                      </Button>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Button
+                        variant={formData.alignment === 'center' ? 'contained' : 'outlined'}
+                        onClick={() => setFormData({ ...formData, alignment: 'center' })}
+                        fullWidth
+                        sx={{
+                          color: 'white',
+                          borderColor: 'rgba(255, 255, 255, 0.3)',
+                          '&:hover': {
+                            borderColor: 'rgba(255, 255, 255, 0.5)',
+                          }
+                        }}
+                      >
+                        Center
+                      </Button>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Button
+                        variant={formData.alignment === 'right' ? 'contained' : 'outlined'}
+                        onClick={() => setFormData({ ...formData, alignment: 'right' })}
+                        fullWidth
+                        sx={{
+                          color: 'white',
+                          borderColor: 'rgba(255, 255, 255, 0.3)',
+                          '&:hover': {
+                            borderColor: 'rgba(255, 255, 255, 0.5)',
+                          }
+                        }}
+                      >
+                        Right
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                {/* Font Settings */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+                    Font Settings
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <TextField
+                        label="Font Size"
+                        type="number"
+                        value={formData.font_size}
+                        onChange={(e) => setFormData({ ...formData, font_size: parseInt(e.target.value) || 0 })}
+                        fullWidth
+                        sx={{
+                          '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                          },
+                          '& .MuiInputBase-input': { color: 'white' }
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        label="Font Family"
+                        value={formData.font_family}
+                        onChange={(e) => setFormData({ ...formData, font_family: e.target.value })}
+                        fullWidth
+                        sx={{
+                          '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                          },
+                          '& .MuiInputBase-input': { color: 'white' }
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        label="Font Color"
+                        type="color"
+                        value={formData.font_color}
+                        onChange={(e) => setFormData({ ...formData, font_color: e.target.value })}
+                        fullWidth
+                        sx={{
+                          '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                          },
+                          '& .MuiInputBase-input': { color: 'white' }
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+
+          {/* Advanced Settings Tab */}
+          {tabValue === 1 && (
+            <Box sx={{ p: 3 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
             <FormControl fullWidth>
               <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Graphic Pack</InputLabel>
               <Select
@@ -1502,7 +1822,9 @@ const TextElementManagement = () => {
                 </FormControl>
               </>
             )}
-          </Box>
+              </Box>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button 
