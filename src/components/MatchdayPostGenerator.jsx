@@ -946,7 +946,7 @@ const SocialMediaPostGenerator = () => {
                           {/* Starting Lineup */}
                           <Box>
                             <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                              Starting Lineup (Selected  {startingLineup.length} players)
+                              Starting Lineup (Selected {startingLineup.length} players)
                             </Typography>
                             <FormControl fullWidth>
                               <Select
@@ -977,14 +977,14 @@ const SocialMediaPostGenerator = () => {
                               </Select>
                             </FormControl>
                             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                              {startingLineup.length}/11 players selected
+                              {/* {startingLineup.length}/11 players selected */}
                             </Typography>
                           </Box>
 
                           {/* Substitutes */}
                           <Box>
                             <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                              Substitutes (Select up to 7 players)
+                              Substitutes (Selected {substitutes.length} players)
                             </Typography>
                             <FormControl fullWidth>
                               <Select
@@ -1015,7 +1015,7 @@ const SocialMediaPostGenerator = () => {
                               </Select>
                             </FormControl>
                             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                              {substitutes.length}/7 substitutes selected
+                              {/* {substitutes.length}/7 substitutes selected */}
                             </Typography>
                           </Box>
                         </Box>
