@@ -74,10 +74,12 @@ export default function AppAppBar() {
             <Button color="primary" variant="contained" size="small">
               Sign up
             </Button>
-            <ColorModeIconDropdown />
+            {/* ColorModeIconDropdown hidden */}
+            {/* <ColorModeIconDropdown /> */}
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
-            <ColorModeIconDropdown size="medium" />
+            {/* ColorModeIconDropdown hidden */}
+            {/* <ColorModeIconDropdown size="medium" /> */}
             <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
               <MenuIcon />
             </IconButton>

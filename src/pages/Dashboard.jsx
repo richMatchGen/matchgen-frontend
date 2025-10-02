@@ -27,7 +27,7 @@ import Header from '../components/Header';
 import MainGrid from "../components/MainGrid";
 import EmailVerificationBanner from '../components/EmailVerificationBanner';
 import SubscriptionBanner from '../components/SubscriptionBanner';
-import ColorModeSelect from '../themes/colormodeselect';
+// import ColorModeSelect from '../themes/colormodeselect'; // Hidden
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 import Overview from "./profile";
 

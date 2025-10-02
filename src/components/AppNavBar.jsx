@@ -71,7 +71,8 @@ export default function AppNavbar() {
               </Link>
             </Typography>
           </Stack>
-          <ColorModeIconDropdown />
+          {/* ColorModeIconDropdown hidden */}
+          {/* <ColorModeIconDropdown /> */}
           <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
             <MenuRoundedIcon />
           </MenuButton>
