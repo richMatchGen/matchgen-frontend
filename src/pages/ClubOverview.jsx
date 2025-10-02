@@ -571,7 +571,7 @@ const ClubOverview = () => {
           {/* Progress indicator */}
           <ProgressIndicator sx={{ width: `${formProgress}%` }} />
           
-          <Container maxWidth="lg" sx={{ py: 4 }}>
+          <Container maxWidth="lg" sx={{ py: 4, mt: { xs: 8, md: 0 } }}>
             <Paper elevation={3} sx={{ p: 4, borderRadius: 3, position: "relative" }}>
               {/* Header with enhanced styling */}
               <Box textAlign="center" sx={{ mb: 4 }}>
