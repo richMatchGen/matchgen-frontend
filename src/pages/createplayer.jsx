@@ -984,16 +984,15 @@ const CreatePlayer = () => {
                 </Zoom>
 
                 {/* Enhanced Formatted Photo Upload - HIDDEN */}
-                {/* <Zoom in timeout={1000}>
+                {/* 
+                <Zoom in timeout={1000}>
                   <StyledCard isActive={activeStep === 2}>
                     <CardContent sx={{ p: 3 }}>
                       <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
                         Formatted Photo
                       </Typography>
                       
-                      {/* Formatted Photo Upload Options */}
                       <Stack spacing={2}>
-                        {/* Enhanced toggle between file upload and URL */}
                         <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
                           <Button
                             variant={!useFormattedPicUrl ? "contained" : "outlined"}
@@ -1014,7 +1013,6 @@ const CreatePlayer = () => {
                         </Box>
 
                         {useFormattedPicUrl ? (
-                          // Enhanced Formatted Photo URL Input
                           <TextField
                             fullWidth
                             label="Formatted Photo URL"
@@ -1025,7 +1023,6 @@ const CreatePlayer = () => {
                             error={!!errors.formattedPicUrl}
                           />
                         ) : (
-                          // Enhanced File Upload
                           <>
                             {formattedPicPreview ? (
                               <Box textAlign="center">
@@ -1095,7 +1092,8 @@ const CreatePlayer = () => {
                       </Stack>
                     </CardContent>
                   </StyledCard>
-                </Zoom> */}
+                </Zoom>
+                */}
               </Stack>
             </Grid>
           </Grid>
