@@ -5,7 +5,7 @@ import { Suspense, lazy } from "react";
 import PrivateRoute from "./components/PrivateRoute";
 import useAuth from "./hooks/useAuth";
 import LoadingSpinner from "./components/LoadingSpinner";
-import { SkipToMainContent, AccessibilityToolbar } from "./components/EnhancedAccessibility";
+import { AccessibilityToolbar } from "./components/EnhancedAccessibility";
 import { ThemeProvider } from "@mui/material/styles";
 import { RateLimitProvider } from "./context";
 import { createMatchGenTheme } from "./themes/MatchGenTheme";
@@ -49,7 +49,6 @@ function App() {
   return (
     <RateLimitProvider>
       <ThemeProvider theme={theme}>
-        <SkipToMainContent />
         <AccessibilityToolbar />
         <Box id="main-content">
 
