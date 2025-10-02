@@ -14,6 +14,11 @@ import {
   Stack,
   Zoom,
   Fade,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
 } from '@mui/material';
 import {
   CheckCircle as CheckCircleIcon,
@@ -200,6 +205,22 @@ const TemplatePackCard = ({ pack, isSelected, onSelect, onViewDetails }) => {
             />
           </Stack>
 
+          {/* Primary Color Display */}
+          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{
+                width: 20,
+                height: 20,
+                backgroundColor: pack.primary_color || '#000000',
+                borderRadius: '50%',
+                border: '1px solid #e0e0e0',
+              }}
+            />
+            <Typography variant="body2" color="text.secondary">
+              Primary Color: {pack.primary_color || '#000000'}
+            </Typography>
+          </Box>
+
           <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
             <Button
               variant="outlined"
@@ -230,10 +251,13 @@ const TemplatePackCard = ({ pack, isSelected, onSelect, onViewDetails }) => {
 export default function EnhancedTemplateSelection() {
   const navigate = useNavigate();
   const [packs, setPacks] = useState([]);
+  const [filteredPacks, setFilteredPacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPackId, setSelectedPackId] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  const [sportFilter, setSportFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Sample packs for demonstration
   const samplePacks = [
@@ -291,6 +315,26 @@ export default function EnhancedTemplateSelection() {
     fetchPacks();
   }, []);
 
+  // Filter packs based on sport and search term
+  useEffect(() => {
+    let filtered = packs;
+    
+    if (sportFilter) {
+      filtered = filtered.filter(pack => 
+        pack.sport && pack.sport.toLowerCase().includes(sportFilter.toLowerCase())
+      );
+    }
+    
+    if (searchTerm) {
+      filtered = filtered.filter(pack => 
+        pack.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pack.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    setFilteredPacks(filtered);
+  }, [packs, sportFilter, searchTerm]);
+
   const fetchPacks = async () => {
     try {
       setLoading(true);
@@ -301,6 +345,7 @@ export default function EnhancedTemplateSelection() {
       );
       const data = Array.isArray(response.data) ? response.data : response.data.results;
       setPacks(data || []);
+      setFilteredPacks(data || []);
     } catch (err) {
       console.error("Failed to load packs", err);
       
@@ -311,6 +356,7 @@ export default function EnhancedTemplateSelection() {
       }
       
       setPacks(samplePacks);
+      setFilteredPacks(samplePacks);
     } finally {
       setLoading(false);
     }
@@ -331,6 +377,24 @@ export default function EnhancedTemplateSelection() {
       );
 
       setSelectedPackId(packId);
+      
+      // Update the pack status to show it as selected
+      setPacks(prevPacks => 
+        prevPacks.map(pack => 
+          pack.id === packId 
+            ? { ...pack, is_selected: true }
+            : { ...pack, is_selected: false }
+        )
+      );
+      
+      setFilteredPacks(prevPacks => 
+        prevPacks.map(pack => 
+          pack.id === packId 
+            ? { ...pack, is_selected: true }
+            : { ...pack, is_selected: false }
+        )
+      );
+      
       setSnackbar({ 
         open: true, 
         message: "Template pack selected successfully!", 
@@ -418,13 +482,44 @@ export default function EnhancedTemplateSelection() {
           )}
         </Box>
 
+        {/* Filters */}
+        <Box sx={{ mb: 4, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+          <TextField
+            label="Search packs..."
+            variant="outlined"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ minWidth: 200 }}
+          />
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Sport</InputLabel>
+            <Select
+              value={sportFilter}
+              label="Sport"
+              onChange={(e) => setSportFilter(e.target.value)}
+            >
+              <MenuItem value="">All Sports</MenuItem>
+              <MenuItem value="football">Football</MenuItem>
+              <MenuItem value="basketball">Basketball</MenuItem>
+              <MenuItem value="soccer">Soccer</MenuItem>
+              <MenuItem value="tennis">Tennis</MenuItem>
+              <MenuItem value="baseball">Baseball</MenuItem>
+              <MenuItem value="hockey">Hockey</MenuItem>
+            </Select>
+          </FormControl>
+          <Typography variant="body2" color="text.secondary">
+            {filteredPacks.length} pack{filteredPacks.length !== 1 ? 's' : ''} found
+          </Typography>
+        </Box>
+
         {/* Template Packs Grid */}
         <Grid container spacing={4}>
-          {packs.map((pack, index) => (
+          {filteredPacks.map((pack, index) => (
             <Grid item xs={12} sm={6} lg={4} key={pack.id}>
               <TemplatePackCard
                 pack={pack}
-                isSelected={selectedPackId === pack.id}
+                isSelected={selectedPackId === pack.id || pack.is_selected}
                 onSelect={handleSelectPack}
                 onViewDetails={handleViewDetails}
               />
