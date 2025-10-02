@@ -55,7 +55,7 @@ export default function HighlightedCard() {
               vs {match.opponent}
             </Typography>
             <Typography sx={{ color: 'text.secondary' }}>
-              {new Date(match.date).toLocaleDateString('en-GB')} — {match.venue}
+              {match.date ? new Date(match.date).toLocaleDateString('en-GB') : 'No match'} — {match.venue || 'TBD'}
             </Typography>
           </Box>
 

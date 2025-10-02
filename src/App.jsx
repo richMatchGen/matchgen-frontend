@@ -10,6 +10,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { RateLimitProvider } from "./context";
 import { createMatchGenTheme } from "./themes/MatchGenTheme";
 import Sitemark from './components/Sitemarkicon';
+import ScrollToTop from './components/ScrollToTop';
 
 // Lazy load components for better performance
 const Login = lazy(() => import("./pages/Login"));
@@ -51,6 +52,7 @@ function App() {
     <RateLimitProvider>
       <ThemeProvider theme={theme}>
         <AccessibilityToolbar />
+        <ScrollToTop />
         <Box id="main-content">
 
       {/* Logout button moved to side menu */}
