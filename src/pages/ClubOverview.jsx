@@ -44,7 +44,6 @@ import {
   Delete as DeleteIcon,
   SportsSoccer as SportsIcon,
   Business as BusinessIcon,
-  CalendarToday as CalendarIcon,
   Palette as PaletteIcon,
   Save as SaveIcon,
   ArrowBack as ArrowBackIcon,
@@ -140,9 +139,6 @@ const ClubOverview = () => {
   const [formData, setFormData] = useState({
     name: "",
     sport: "",
-    founded_year: "",
-    primary_color: "",
-    secondary_color: "",
     logo: "",
   });
   
@@ -166,9 +162,6 @@ const ClubOverview = () => {
       setFormData({
         name: club.name || "",
         sport: club.sport || "",
-        founded_year: club.founded_year || "",
-        primary_color: club.primary_color || "",
-        secondary_color: club.secondary_color || "",
         logo: club.logo || "",
       });
       setLogoUrl(club.logo || "");
@@ -202,13 +195,6 @@ const ClubOverview = () => {
       newErrors.sport = "Please select a sport";
     }
     
-    if (formData.founded_year) {
-      const year = parseInt(formData.founded_year);
-      const currentYear = new Date().getFullYear();
-      if (isNaN(year) || year < 1800 || year > currentYear) {
-        newErrors.founded_year = `Founded year must be between 1800 and ${currentYear}`;
-      }
-    }
 
     if (useLogoUrl && logoUrl && !isValidUrl(logoUrl)) {
       newErrors.logoUrl = "Please enter a valid logo URL";
@@ -341,9 +327,6 @@ const ClubOverview = () => {
       const clubData = {
         name: formData.name.trim(),
         sport: formData.sport,
-        founded_year: formData.founded_year ? parseInt(formData.founded_year) : null,
-        primary_color: formData.primary_color.trim() || null,
-        secondary_color: formData.secondary_color.trim() || null,
         logo: formData.logo || null,
       };
 
@@ -667,151 +650,83 @@ const ClubOverview = () => {
               )}
 
               <Grid container spacing={4}>
-                {/* Left Column - Basic Information */}
-                <Grid item xs={12} md={6}>
-                  <Zoom in timeout={600}>
-                    <StyledCard isActive={activeStep === 0}>
-                      <CardContent sx={{ p: 3 }}>
-                        <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-                          Basic Information
-                        </Typography>
-                        
-                        <Stack spacing={3}>
-                          {/* Enhanced Club Name field */}
-                          <TextField
-                            fullWidth
-                            label="Club Name"
-                            value={formData.name}
-                            onChange={(e) => handleInputChange("name", e.target.value)}
-                            error={!!errors.name}
-                            helperText={errors.name || `${formData.name.length}/100 characters`}
-                            required
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <BusinessIcon color="action" />
-                                </InputAdornment>
-                              ),
-                            }}
-                            sx={{
-                              "& .MuiOutlinedInput-root": {
-                                "&.Mui-focused": {
-                                  "& .MuiOutlinedInput-notchedOutline": {
-                                    borderColor: theme.palette.primary.main,
-                                    borderWidth: 2,
-                                  },
-                                },
-                              },
-                            }}
-                          />
-
-                          {/* Enhanced Sport Selection */}
-                          <TextField
-                            fullWidth
-                            label="Sport"
-                            value={formData.sport}
-                            onChange={(e) => handleInputChange("sport", e.target.value)}
-                            select
-                            error={!!errors.sport}
-                            helperText={errors.sport}
-                            required
-                            SelectProps={{
-                              MenuProps: {
-                                PaperProps: {
-                                  sx: { maxHeight: 300 }
-                                }
-                              }
-                            }}
-                          >
-                            {sportOptions.map((option) => (
-                              <MenuItem key={option.value} value={option.value}>
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                  <Box sx={{ color: option.color }}>
-                                    {option.icon}
-                                  </Box>
-                                  {option.label}
-                                </Box>
-                              </MenuItem>
-                            ))}
-                          </TextField>
-
-                          {/* Enhanced Founded Year field */}
-                          <TextField
-                            fullWidth
-                            label="Founded Year"
-                            type="number"
-                            value={formData.founded_year}
-                            onChange={(e) => handleInputChange("founded_year", e.target.value)}
-                            error={!!errors.founded_year}
-                            helperText={errors.founded_year || "Optional (e.g., 1995)"}
-                            placeholder="e.g., 1995"
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <CalendarIcon color="action" />
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        </Stack>
-                      </CardContent>
-                    </StyledCard>
-                  </Zoom>
-                </Grid>
-
-                {/* Right Column - Colors and Logo */}
-                <Grid item xs={12} md={6}>
+                {/* Single Column - Basic Information and Logo */}
+                <Grid item xs={12}>
                   <Stack spacing={3}>
-                    {/* Enhanced Colors Section */}
-                    <Zoom in timeout={800}>
-                      <StyledCard isActive={activeStep === 1}>
+                    {/* Basic Information */}
+                    <Zoom in timeout={600}>
+                      <StyledCard isActive={activeStep === 0}>
                         <CardContent sx={{ p: 3 }}>
                           <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-                            Club Colors
+                            Basic Information
                           </Typography>
                           
                           <Stack spacing={3}>
-                            {/* Primary Color */}
+                            {/* Enhanced Club Name field */}
                             <TextField
                               fullWidth
-                              label="Primary Color"
-                              value={formData.primary_color}
-                              onChange={(e) => handleInputChange("primary_color", e.target.value)}
-                              placeholder="#1976d2"
-                              helperText="Hex color code (e.g., #1976d2)"
+                              label="Club Name"
+                              value={formData.name}
+                              onChange={(e) => handleInputChange("name", e.target.value)}
+                              error={!!errors.name}
+                              helperText={errors.name || `${formData.name.length}/100 characters`}
+                              required
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">
-                                    <PaletteIcon color="action" />
+                                    <BusinessIcon color="action" />
                                   </InputAdornment>
                                 ),
+                              }}
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  "&.Mui-focused": {
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                      borderColor: theme.palette.primary.main,
+                                      borderWidth: 2,
+                                    },
+                                  },
+                                },
                               }}
                             />
 
-                            {/* Secondary Color */}
+                            {/* Enhanced Sport Selection */}
                             <TextField
                               fullWidth
-                              label="Secondary Color"
-                              value={formData.secondary_color}
-                              onChange={(e) => handleInputChange("secondary_color", e.target.value)}
-                              placeholder="#f57c00"
-                              helperText="Hex color code (e.g., #f57c00)"
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    <PaletteIcon color="action" />
-                                  </InputAdornment>
-                                ),
+                              label="Sport"
+                              value={formData.sport}
+                              onChange={(e) => handleInputChange("sport", e.target.value)}
+                              select
+                              error={!!errors.sport}
+                              helperText={errors.sport}
+                              required
+                              SelectProps={{
+                                MenuProps: {
+                                  PaperProps: {
+                                    sx: { maxHeight: 300 }
+                                  }
+                                }
                               }}
-                            />
+                            >
+                              {sportOptions.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <Box sx={{ color: option.color }}>
+                                      {option.icon}
+                                    </Box>
+                                    {option.label}
+                                  </Box>
+                                </MenuItem>
+                              ))}
+                            </TextField>
                           </Stack>
                         </CardContent>
                       </StyledCard>
                     </Zoom>
 
                     {/* Enhanced Logo Upload */}
-                    <Zoom in timeout={1000}>
-                      <StyledCard isActive={activeStep === 2}>
+                    <Zoom in timeout={800}>
+                      <StyledCard isActive={activeStep === 1}>
                         <CardContent sx={{ p: 3 }}>
                           <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
                             Club Logo

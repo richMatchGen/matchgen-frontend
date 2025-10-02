@@ -96,7 +96,7 @@ export default function SideMenuMobile({ open, toggleDrawer }) {
         {/* CardAlert hidden */}
         {/* <CardAlert /> */}
         <Stack sx={{ p: 2 }}>
-          <Button 
+          {/* <Button 
             variant="outlined" 
             fullWidth 
             startIcon={<LogoutRoundedIcon />}
@@ -104,7 +104,7 @@ export default function SideMenuMobile({ open, toggleDrawer }) {
             sx={{ color: '#d32f2f', borderColor: '#d32f2f', '&:hover': { backgroundColor: '#ffebee' } }}
           >
             Logout
-          </Button>
+          </Button> */}
         </Stack>
       </Stack>
     </Drawer>
