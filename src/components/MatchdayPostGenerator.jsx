@@ -946,7 +946,7 @@ const SocialMediaPostGenerator = () => {
                           {/* Starting Lineup */}
                           <Box>
                             <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                              Starting Lineup (Select 11 players)
+                              Starting Lineup (Selected  {startingLineup.length} players)
                             </Typography>
                             <FormControl fullWidth>
                               <Select
