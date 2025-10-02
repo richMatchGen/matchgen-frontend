@@ -115,7 +115,7 @@ const Dashboard = () => {
               alignItems: 'center',
               mx: 3,
               pb: 5,
-              mt: { xs: 8, md: 0 },
+              mt: { xs: 0, md: 0 }, // No top margin needed - header handles spacing
             }}
           >
             <Header />
