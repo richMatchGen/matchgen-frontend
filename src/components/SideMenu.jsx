@@ -48,7 +48,8 @@ const BrandSection = styled(Box)(({ theme }) => ({
 
 const UserSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
-  backgroundColor: '#fafafa',
+  backgroundColor: '#f2fd7d',
+  color: '#333',
   borderTop: '1px solid #e0e0e0',
 }));
 
@@ -111,7 +112,7 @@ export default function SideMenu({ user }) {
     >
       {/* Brand Section */}
       <BrandSection>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Sitemark />
         </Box>
         {/* {club && (
@@ -187,7 +188,7 @@ export default function SideMenu({ user }) {
             <Typography 
               variant="caption" 
               sx={{ 
-                color: 'rgba(255,255,255,0.6)',
+                color: 'rgba(41, 41, 41, 0.6)',
                 fontSize: '0.75rem',
               }}
               noWrap
