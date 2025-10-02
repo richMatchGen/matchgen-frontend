@@ -53,25 +53,7 @@ function App() {
         <AccessibilityToolbar />
         <Box id="main-content">
 
-      {/* Global logout button */}
-      {auth.token && (
-        <Button
-          variant="outlined"
-          onClick={logout}
-          sx={{ 
-            position: 'fixed', 
-            top: '1rem', 
-            right: '1rem', 
-            zIndex: 1000,
-            backgroundColor: 'background.paper',
-            '&:hover': {
-              backgroundColor: 'action.hover'
-            }
-          }}
-        >
-          Logout
-        </Button>
-      )}
+      {/* Logout button moved to side menu */}
 
       <Suspense fallback={
         <Box

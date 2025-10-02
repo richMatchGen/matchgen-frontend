@@ -16,6 +16,7 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import { getToken } from "../hooks/auth";
 import { getProfile } from '../hooks/auth';
 import useClubSingleton from "../hooks/useClubSingleton";
+import useAuth from '../hooks/useAuth';
 import Sitemark from '../components/Sitemarkicon'
 import PropTypes from 'prop-types';
 
@@ -36,6 +37,7 @@ export default function SideMenuMobile({ open, toggleDrawer }) {
   const [error, setError] = useState("");
   const [userProfile, setUserProfile] = useState(null);
   const { club, loading, error: clubError, rateLimited } = useClubSingleton();
+  const { logout } = useAuth();
   
   const token = getToken();
 
@@ -91,9 +93,16 @@ export default function SideMenuMobile({ open, toggleDrawer }) {
           <MenuContent />
           <Divider />
         </Stack>
-        <CardAlert />
+        {/* CardAlert hidden */}
+        {/* <CardAlert /> */}
         <Stack sx={{ p: 2 }}>
-          <Button variant="outlined" fullWidth startIcon={<LogoutRoundedIcon />}>
+          <Button 
+            variant="outlined" 
+            fullWidth 
+            startIcon={<LogoutRoundedIcon />}
+            onClick={logout}
+            sx={{ color: '#d32f2f', borderColor: '#d32f2f', '&:hover': { backgroundColor: '#ffebee' } }}
+          >
             Logout
           </Button>
         </Stack>

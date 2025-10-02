@@ -22,6 +22,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import ImageIcon from '@mui/icons-material/Image';
 import UploadIcon from '@mui/icons-material/Upload';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
 import Box from '@mui/material/Box';
@@ -79,6 +80,7 @@ const secondaryListItems = [
   { text: 'Settings', icon: <SettingsRoundedIcon />, link: '/settings' },
   { text: 'About', icon: <InfoRoundedIcon />, link: '/about' },
   { text: 'Feedback', icon: <HelpRoundedIcon />, link: '/feedback' },
+  { text: 'Logout', icon: <LogoutIcon />, link: '/logout', isLogout: true },
 ];
 
 const adminListItems = [
@@ -89,13 +91,17 @@ const adminListItems = [
 
 export default function MenuContent() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const isActive = (link) => {
     if (link === '/dashboard') {
       return location.pathname === '/dashboard';
     }
     return location.pathname.startsWith(link);
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   return (
@@ -146,14 +152,24 @@ export default function MenuContent() {
         <List dense disablePadding>
           {secondaryListItems.map((item, index) => (
             <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-              <StyledListItemButton 
-                component={Link} 
-                to={item.link} 
-                selected={isActive(item.link)}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </StyledListItemButton>
+              {item.isLogout ? (
+                <StyledListItemButton 
+                  onClick={handleLogout}
+                  sx={{ color: '#d32f2f', '&:hover': { backgroundColor: '#ffebee' } }}
+                >
+                  <ListItemIcon sx={{ color: '#d32f2f' }}>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </StyledListItemButton>
+              ) : (
+                <StyledListItemButton 
+                  component={Link} 
+                  to={item.link} 
+                  selected={isActive(item.link)}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </StyledListItemButton>
+              )}
             </ListItem>
           ))}
         </List>
