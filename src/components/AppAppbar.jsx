@@ -54,7 +54,9 @@ export default function AppAppBar() {
       <Container maxWidth="lg">
         <StyledToolbar variant="dense" disableGutters>
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', px: 0 }}>
-            <Sitemark />
+            <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+              <Sitemark />
+            </Link>
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
               {['Features', 'Testimonials', 'Highlights', 'Pricing', 'FAQ', 'Blog'].map((item) => (
                 <Button key={item} variant="text" color="info" size="small">

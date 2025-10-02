@@ -12,7 +12,8 @@ import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import SideMenuMobile from './SideMenuMobile';
 import MenuButton from './MenuButton';
 import ColorModeIconDropdown from '../themes/ColorModeIconDropdown';
-import Sitemark from '../components/Sitemarkicon'
+import Sitemark from '../components/Sitemarkicon';
+import { Link } from 'react-router-dom';
 
 const Toolbar = styled(MuiToolbar)({
   width: '100%',
@@ -65,7 +66,9 @@ export default function AppNavbar() {
           >
             <CustomIcon />
             <Typography variant="h4" component="h1" sx={{ color: 'text.primary' }}>
-            <Sitemark />
+              <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+                <Sitemark />
+              </Link>
             </Typography>
           </Stack>
           <ColorModeIconDropdown />

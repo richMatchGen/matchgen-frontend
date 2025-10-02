@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { getProfile } from '../hooks/auth';
 import useClubSingleton from "../hooks/useClubSingleton";
 import Sitemark from '../components/Sitemarkicon';
+import { Link } from 'react-router-dom';
 import {
   Settings as SettingsIcon,
   Person as PersonIcon,
@@ -113,7 +114,9 @@ export default function SideMenu({ user }) {
       {/* Brand Section */}
       <BrandSection>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Sitemark />
+          <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+            <Sitemark />
+          </Link>
         </Box>
         {/* {club && (
           <Box sx={{ mt: 2 }}>
