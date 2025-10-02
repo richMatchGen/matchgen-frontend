@@ -68,9 +68,28 @@ const Dashboard = () => {
     fetchData();
   }, [navigate]); // ✅ no infinite loop
 
-  if (loading) return <p>Loading your dashboard...</p>;
-  if (!user) return null; // user fetch failure already handled
 
+
+
+  if (loading) {
+    return (
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="100vh"
+        sx={{ backgroundColor: 'background.default' }}
+      >
+        <Box textAlign="center">
+          <CircularProgress size={60} sx={{ mb: 2 }} />
+          <Typography variant="h6" color="text.primary">
+            Loading Dashboard...
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+  if (!user) return null; // user fetch failure already handled
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
