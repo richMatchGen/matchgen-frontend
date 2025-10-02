@@ -42,6 +42,7 @@ const UserProfile = lazy(() => import("./pages/UserProfile"));
 const Account = lazy(() => import("./pages/Account"));
 const PSDProcessor = lazy(() => import("./pages/PSDProcessor"));
 const UploadGraphicPack = lazy(() => import("./pages/UploadGraphicPack"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 
 function App() {
@@ -99,6 +100,7 @@ function App() {
           } />
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/register" element={<EnhancedSignup2 />} />
           <Route path="/enhanced-signup" element={<EnhancedSignup />} />
           <Route path="/enhanced-signup2" element={<register />} />

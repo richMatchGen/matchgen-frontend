@@ -529,144 +529,25 @@ const EnhancedSignup2 = () => {
       <StyledBox>
         {/* Left side - Image/Visual section */}
         <ImageBox>
-          <Box sx={{ 
-            textAlign: 'center', 
-            color: '#1a1a1a', 
-            p: 4, 
-            position: 'relative',
-            zIndex: 3,
-            maxWidth: 500,
-            mx: 'auto'
-          }}>
-            {/* Decorative shapes */}
-            <Box sx={{
-              position: 'absolute',
-              top: -50,
-              right: -50,
-              width: 200,
-              height: 200,
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.1)',
-              zIndex: -1,
-            }} />
-            <Box sx={{
-              position: 'absolute',
-              bottom: -30,
-              left: -30,
-              width: 150,
-              height: 150,
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.05)',
-              zIndex: -1,
-            }} />
-            
-            <Typography variant="h2" component="h1" gutterBottom sx={{ 
-              fontWeight: 'bold', 
-              mb: 3,
-              background: 'linear-gradient(45deg, #1a1a1a 0%, #4a4a4a 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>
-              Join MatchGen
+          <Box sx={{ textAlign: 'center', color: 'white', p: 4 }}>
+            <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
+              Join Us!
             </Typography>
-            
-            <Typography variant="h5" sx={{ 
-              mb: 4, 
-              color: '#2d2d2d',
-              fontWeight: 500,
-              lineHeight: 1.4
-            }}>
+            <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
               Create your club's digital presence in minutes
             </Typography>
-            
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: 3, 
-              maxWidth: 400, 
-              mx: 'auto',
-              mt: 4
-            }}>
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 3,
-                p: 2,
-                borderRadius: 2,
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  transform: 'translateY(-2px)',
-                }
-              }}>
-                <Box sx={{ 
-                  width: 12, 
-                  height: 12, 
-                  bgcolor: '#4CAF50', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 10px rgba(76, 175, 80, 0.3)'
-                }} />
-                <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
-                  Professional graphics without the designer
-                </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 300, mx: 'auto' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Typography variant="body1">Professional graphics</Typography>
               </Box>
-              
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 3,
-                p: 2,
-                borderRadius: 2,
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  transform: 'translateY(-2px)',
-                }
-              }}>
-                <Box sx={{ 
-                  width: 12, 
-                  height: 12, 
-                  bgcolor: '#2196F3', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 10px rgba(33, 150, 243, 0.3)'
-                }} />
-                <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
-                  Easy team and match management
-                </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Typography variant="body1">Team management</Typography>
               </Box>
-              
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 3,
-                p: 2,
-                borderRadius: 2,
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  transform: 'translateY(-2px)',
-                }
-              }}>
-                <Box sx={{ 
-                  width: 12, 
-                  height: 12, 
-                  bgcolor: '#FF9800', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 10px rgba(255, 152, 0, 0.3)'
-                }} />
-                <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
-                  Social media automation made simple
-                </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Typography variant="body1">Social media automation</Typography>
               </Box>
             </Box>
           </Box>

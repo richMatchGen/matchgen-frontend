@@ -264,7 +264,7 @@ const Login = () => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>
-              Welcome to MatchGen
+              Welcome
             </Typography>
             
             <Typography variant="h5" sx={{ 
@@ -299,13 +299,6 @@ const Login = () => {
                   transform: 'translateY(-2px)',
                 }
               }}>
-                <Box sx={{ 
-                  width: 12, 
-                  height: 12, 
-                  bgcolor: '#4CAF50', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 10px rgba(76, 175, 80, 0.3)'
-                }} />
                 <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
                   Ready-made templates tailored for your club
                 </Typography>
@@ -326,13 +319,6 @@ const Login = () => {
                   transform: 'translateY(-2px)',
                 }
               }}>
-                <Box sx={{ 
-                  width: 12, 
-                  height: 12, 
-                  bgcolor: '#2196F3', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 10px rgba(33, 150, 243, 0.3)'
-                }} />
                 <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
                   Professional-quality designs, no designer needed
                 </Typography>
@@ -353,13 +339,6 @@ const Login = () => {
                   transform: 'translateY(-2px)',
                 }
               }}>
-                <Box sx={{ 
-                  width: 12, 
-                  height: 12, 
-                  bgcolor: '#FF9800', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 10px rgba(255, 152, 0, 0.3)'
-                }} />
                 <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
                   Save hours on team and matchday posts
                 </Typography>
@@ -434,7 +413,12 @@ const Login = () => {
                 <Link 
                   component="button" 
                   variant="body2" 
-                  sx={{ textDecoration: 'none' }}
+                  sx={{ 
+                    textDecoration: 'none',
+                    '&:hover': {
+                      backgroundColor: 'transparent'
+                    }
+                  }}
                   onClick={() => setForgotPasswordOpen(true)}
                 >
                   Forgot your password?
@@ -538,7 +522,7 @@ const Login = () => {
                 '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
                 '&.Mui-focused fieldset': { borderColor: '#2196f3' }
               },
-              '& .MuiInputBase-input': { color: 'white' },
+              '& .MuiInputBase-input': { color: 'Black' },
               '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
             }}
           />
