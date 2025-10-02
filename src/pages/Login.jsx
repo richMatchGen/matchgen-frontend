@@ -13,7 +13,7 @@ import {
   FormControl,
   Link,
   Stack,
-  MuiCard,
+  Card,
   Paper,
   Grid
 } from "@mui/material";

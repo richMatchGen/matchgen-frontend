@@ -12,6 +12,8 @@ import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 import { alpha } from '@mui/material/styles';
 
 import Stack from '@mui/material/Stack';
@@ -168,32 +170,8 @@ const Dashboard = () => {
             <MainGrid />
 
           </Stack>
-    {/* <div>
-      <h1>Welcome to your Dashboard 👋</h1>
-
-      <h2>User Info</h2>
-      <p><strong>Email:</strong> {user.email}</p>
-      {user.profile_picture && <img src={user.profile_picture} alt="Profile" width={100} />}
-
-      <h2>Club Info</h2>
-      {club ? (
-        <>
-          <p><strong>Club Name:</strong> {club.name}</p>
-          <p><strong>Sport:</strong> {club.sport}</p>
-          {club.logo && <img src={club.logo} alt="Club Logo" width={100} />}
-          <button onClick={() => navigate(`/edit-club/${club.id}`)}>Edit Club</button>
-        </>
-      ) : (
-        <p>No club found. <button onClick={() => navigate("/create-club")}>Create one</button></p>
-      )}
-
-      <br />
-      {/* <button onClick={logout}>Logout</button> */}
-    {/* </div> */}
-
-
-    </Box>
-    </Box>
+        </Box>
+      </Box>
     </AppTheme>
   );
 };
