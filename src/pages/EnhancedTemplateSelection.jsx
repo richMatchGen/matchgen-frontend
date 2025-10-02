@@ -217,7 +217,7 @@ const TemplatePackCard = ({ pack, isSelected, onSelect, onViewDetails }) => {
               }}
             />
             <Typography variant="body2" color="text.secondary">
-              Primary Color: {pack.primary_color || '#000000'}
+              {/* Primary Color: {pack.primary_color || '#000000'} */}
             </Typography>
           </Box>
 
