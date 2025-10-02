@@ -539,13 +539,13 @@ const SocialMediaPostGenerator = () => {
   return (
     <AppTheme>
       <CssBaseline />
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', overflow: 'hidden' }}>
         <SideMenu />
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1, overflow: 'hidden', minWidth: 0 }}>
           <AppNavbar />
            <Header title="Social Media Post Generator" />
            
-           <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+           <Container maxWidth="xl" sx={{ mt: 4, mb: 4, px: { xs: 1, sm: 2, md: 3 } }}>
              <EmailVerificationBanner 
                user={user} 
                onVerificationComplete={() => {
@@ -575,7 +575,7 @@ const SocialMediaPostGenerator = () => {
               </Typography>
             </Box>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={3} sx={{ overflow: 'hidden' }}>
               {/* Left Panel - Post Type Selection */}
               <Grid item xs={12} md={4}>
                 <Card elevation={3}>
@@ -747,7 +747,11 @@ const SocialMediaPostGenerator = () => {
                           Substitution Details
                         </Typography>
                         
-                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+                        <Box sx={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
+                          gap: 3 
+                        }}>
                           {/* Players Coming On */}
                           <Box>
                             <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
