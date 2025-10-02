@@ -48,7 +48,7 @@ const BrandSection = styled(Box)(({ theme }) => ({
 
 const UserSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
-  backgroundColor: '#f2fd7d',
+  backgroundColor: '#ffffff',
   color: '#333',
   borderTop: '1px solid #e0e0e0',
 }));
