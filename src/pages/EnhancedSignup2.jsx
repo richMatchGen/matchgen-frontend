@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Card,
@@ -18,13 +18,59 @@ import {
   MenuItem,
   Grid,
   InputAdornment,
-  IconButton
+  IconButton,
+  CssBaseline,
+  Divider,
+  Link
 } from '@mui/material';
 import { Visibility, VisibilityOff, Email, CheckCircle } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import useAuth from '../hooks/useAuth';
+import AppTheme from '../themes/AppTheme';
+import ColorModeSelect from '../themes/colormodeselect';
+import Sitemark from '../components/Sitemarkicon';
 
 const steps = ['Create Account', 'Verify Email', 'Setup Club'];
+
+// Styled components for the sign-in-side template
+const StyledBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  height: '100vh',
+}));
+
+const ImageBox = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flex: 1,
+  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  [theme.breakpoints.down('md')]: {
+    display: 'none',
+  },
+}));
+
+const FormBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flex: 1,
+  padding: theme.spacing(3),
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(4),
+  },
+}));
+
+const FormContainer = styled(Box)(({ theme }) => ({
+  width: '100%',
+  maxWidth: 600,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(2),
+}));
 
 const EnhancedSignup2 = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -35,6 +81,14 @@ const EnhancedSignup2 = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const { auth, logout } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (auth.token) {
+      navigate('/dashboard');
+    }
+  }, [auth.token, navigate]);
 
   // Step 1: Account creation
   const [accountData, setAccountData] = useState({
@@ -419,66 +473,139 @@ const EnhancedSignup2 = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Card>
-        <CardContent>
-          <Typography variant="h4" align="center" gutterBottom>
-            Welcome to MatchGen
-          </Typography>
-          <Typography variant="body1" align="center" color="text.secondary" gutterBottom>
-            Create your account and set up your club in just a few steps
-          </Typography>
-
-          <Stepper activeStep={activeStep} sx={{ my: 4 }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {success}
-            </Alert>
-          )}
-
-          {renderStepContent(activeStep)}
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-            <Button
-              disabled={activeStep === 0}
-              onClick={handleBack}
-            >
-              Back
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              disabled={loading}
-              sx={{ minWidth: 120 }}
-              startIcon={loading ? <CircularProgress size={20} /> : null}
-            >
-              {loading ? (
-                'Processing...'
-              ) : activeStep === 0 ? (
-                'Create Account'
-              ) : activeStep === 1 ? (
-                'Verify Email'
-              ) : (
-                'Create Club'
-              )}
-            </Button>
+    <AppTheme>
+      <CssBaseline enableColorScheme />
+      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 1000 }} />
+      {auth.token && (
+        <Button
+          variant="outlined"
+          onClick={logout}
+          sx={{ 
+            position: 'fixed', 
+            top: '1rem', 
+            left: '1rem', 
+            zIndex: 1000,
+            color: 'white',
+            borderColor: 'white',
+            '&:hover': {
+              borderColor: 'white',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+            }
+          }}
+        >
+          Logout
+        </Button>
+      )}
+      
+      <StyledBox>
+        {/* Left side - Image/Visual section */}
+        <ImageBox>
+          <Box sx={{ textAlign: 'center', color: 'white', p: 4 }}>
+            <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
+              Join MatchGen
+            </Typography>
+            <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
+              Create your club's digital presence in minutes
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 300, mx: 'auto' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Typography variant="body1">Professional graphics</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Typography variant="body1">Team management</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Typography variant="body1">Social media automation</Typography>
+              </Box>
+            </Box>
           </Box>
-        </CardContent>
-      </Card>
-    </Container>
+        </ImageBox>
+
+        {/* Right side - Form section */}
+        <FormBox>
+          <FormContainer>
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <Sitemark />
+              <Typography variant="h4" component="h1" sx={{ mt: 2, fontWeight: 'bold' }}>
+                Create Account
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Set up your club in just a few steps
+              </Typography>
+            </Box>
+
+            <Stepper activeStep={activeStep} sx={{ my: 3 }}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                {success}
+              </Alert>
+            )}
+
+            <Card sx={{ p: 3, mb: 3 }}>
+              {renderStepContent(activeStep)}
+            </Card>
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+              <Button
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                variant="outlined"
+              >
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleNext}
+                disabled={loading}
+                sx={{ minWidth: 120 }}
+                startIcon={loading ? <CircularProgress size={20} /> : null}
+              >
+                {loading ? (
+                  'Processing...'
+                ) : activeStep === 0 ? (
+                  'Create Account'
+                ) : activeStep === 1 ? (
+                  'Verify Email'
+                ) : (
+                  'Create Club'
+                )}
+              </Button>
+            </Box>
+
+            <Divider sx={{ my: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                or
+              </Typography>
+            </Divider>
+
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Already have an account?{' '}
+                <Link href="/login" variant="body2" sx={{ fontWeight: 'bold' }}>
+                  Sign in
+                </Link>
+              </Typography>
+            </Box>
+          </FormContainer>
+        </FormBox>
+      </StyledBox>
+    </AppTheme>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   TextField, 
   Button, 
@@ -18,6 +18,7 @@ import {
   Grid
 } from "@mui/material";
 import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
 import AppTheme from '../themes/AppTheme';
@@ -37,7 +38,7 @@ const ImageBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   flex: 1,
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  background: 'linear-gradient(135deg,rgb(6, 22, 94) 0%, #764ba2 100%)',
   [theme.breakpoints.down('md')]: {
     display: 'none',
   },
@@ -66,10 +67,18 @@ const FormContainer = styled(Box)(({ theme }) => ({
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth(); // ✅ use login from hook
+  const { auth, login, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (auth.token) {
+      navigate('/dashboard');
+    }
+  }, [auth.token, navigate]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -121,6 +130,26 @@ const Login = () => {
     <AppTheme>
       <CssBaseline enableColorScheme />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 1000 }} />
+      {auth.token && (
+        <Button
+          variant="outlined"
+          onClick={logout}
+          sx={{ 
+            position: 'fixed', 
+            top: '1rem', 
+            left: '1rem', 
+            zIndex: 1000,
+            color: 'white',
+            borderColor: 'white',
+            '&:hover': {
+              borderColor: 'white',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+            }
+          }}
+        >
+          Logout
+        </Button>
+      )}
       
       <StyledBox>
         {/* Left side - Image/Visual section */}
@@ -242,7 +271,7 @@ const Login = () => {
               </Typography>
             </Divider>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Button
                 fullWidth
                 variant="outlined"
@@ -261,7 +290,7 @@ const Login = () => {
               >
                 Sign in with Facebook
               </Button>
-            </Box>
+            </Box> */}
 
             <Box sx={{ textAlign: 'center', mt: 3 }}>
               <Typography variant="body2" color="text.secondary">

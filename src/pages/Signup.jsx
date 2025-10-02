@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 const Signup = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
+  const { auth, logout } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (auth.token) {
+      navigate('/dashboard');
+    }
+  }, [auth.token, navigate]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -23,6 +32,20 @@ const Signup = () => {
 
   return (
     <Container maxWidth="xs">
+      {auth.token && (
+        <Button
+          variant="outlined"
+          onClick={logout}
+          sx={{ 
+            position: 'fixed', 
+            top: '1rem', 
+            right: '1rem', 
+            zIndex: 1000
+          }}
+        >
+          Logout
+        </Button>
+      )}
       <Box mt={8}>
         <Typography variant="h5" gutterBottom>Sign Up</Typography>
         <form onSubmit={handleSubmit}>

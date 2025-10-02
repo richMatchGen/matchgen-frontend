@@ -52,8 +52,25 @@ function App() {
         <AccessibilityToolbar />
         <Box id="main-content">
 
-      {/* Optional: Add logout button for testing
-      {auth.token && <button onClick={logout}>Logout</button>} */}
+      {/* Global logout button */}
+      {auth.token && (
+        <Button
+          variant="outlined"
+          onClick={logout}
+          sx={{ 
+            position: 'fixed', 
+            top: '1rem', 
+            right: '1rem', 
+            zIndex: 1000,
+            backgroundColor: 'background.paper',
+            '&:hover': {
+              backgroundColor: 'action.hover'
+            }
+          }}
+        >
+          Logout
+        </Button>
+      )}
 
       <Suspense fallback={
         <Box
@@ -88,9 +105,9 @@ function App() {
           } />
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Signup />} />
+          <Route path="/register" element={<EnhancedSignup2 />} />
           <Route path="/enhanced-signup" element={<EnhancedSignup />} />
-          <Route path="/enhanced-signup2" element={<EnhancedSignup2 />} />
+          <Route path="/enhanced-signup2" element={<register />} />
           <Route path="/verify-email" element={<EmailVerification />} />
           <Route path="/dashboard" element={
             <PrivateRoute>
