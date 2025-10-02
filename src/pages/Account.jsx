@@ -48,6 +48,7 @@ const Account = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   
@@ -62,6 +63,11 @@ const Account = () => {
     new: false,
     confirm: false
   });
+
+  // Reset password form
+  const [resetPasswordEmail, setResetPasswordEmail] = useState('');
+  const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
+  const [resetPasswordMessage, setResetPasswordMessage] = useState('');
   
   // Account preferences
   const [preferences, setPreferences] = useState({
@@ -134,6 +140,35 @@ const Account = () => {
       setError(error.response?.data?.detail || 'Failed to change password');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetPasswordEmail) {
+      setResetPasswordMessage('Please enter your email address');
+      return;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(resetPasswordEmail)) {
+      setResetPasswordMessage('Please enter a valid email address');
+      return;
+    }
+
+    setResetPasswordLoading(true);
+    setResetPasswordMessage('');
+
+    try {
+      await axios.post(`${API_BASE_URL}users/forgot-password/`, {
+        email: resetPasswordEmail
+      });
+      
+      setResetPasswordMessage('Password reset instructions have been sent to your email address.');
+    } catch (error) {
+      const errorMessage = error.response?.data?.detail || 'Failed to send reset instructions. Please try again.';
+      setResetPasswordMessage(errorMessage);
+      console.error('Reset password error:', error);
+    } finally {
+      setResetPasswordLoading(false);
     }
   };
 
@@ -239,6 +274,27 @@ const Account = () => {
                             onClick={() => setPasswordDialogOpen(true)}
                           >
                             Change
+                          </Button>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      
+                      <Divider />
+                      
+                      <ListItem>
+                        <ListItemIcon>
+                          <SecurityIcon color="action" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Reset Password"
+                          secondary="Send password reset instructions to your email"
+                        />
+                        <ListItemSecondaryAction>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => setResetPasswordDialogOpen(true)}
+                          >
+                            Reset
                           </Button>
                         </ListItemSecondaryAction>
                       </ListItem>
@@ -639,6 +695,81 @@ const Account = () => {
             startIcon={<DeleteIcon />}
           >
             Delete Account
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog 
+        open={resetPasswordDialogOpen} 
+        onClose={() => {
+          setResetPasswordDialogOpen(false);
+          setResetPasswordEmail('');
+          setResetPasswordMessage('');
+        }} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white' }}>Reset Password</DialogTitle>
+        <DialogContent sx={{ color: 'white' }}>
+          <Typography variant="body1" paragraph sx={{ color: 'white', mb: 2 }}>
+            Enter your email address and we'll send you instructions to reset your password.
+          </Typography>
+          
+          <TextField
+            fullWidth
+            label="Email Address"
+            type="email"
+            value={resetPasswordEmail}
+            onChange={(e) => setResetPasswordEmail(e.target.value)}
+            margin="normal"
+            placeholder="your@email.com"
+            sx={{
+              '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+              },
+              '& .MuiInputBase-input': { color: 'white' },
+              '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+            }}
+          />
+
+          {resetPasswordMessage && (
+            <Alert 
+              severity={resetPasswordMessage.includes("sent") ? "success" : "error"} 
+              sx={{ mt: 2 }}
+            >
+              {resetPasswordMessage}
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => {
+              setResetPasswordDialogOpen(false);
+              setResetPasswordEmail('');
+              setResetPasswordMessage('');
+            }}
+            sx={{ color: 'white' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleResetPassword}
+            disabled={resetPasswordLoading}
+            startIcon={resetPasswordLoading ? <CircularProgress size={20} /> : null}
+          >
+            {resetPasswordLoading ? "Sending..." : "Send Reset Instructions"}
           </Button>
         </DialogActions>
       </Dialog>

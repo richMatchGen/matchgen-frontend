@@ -15,7 +15,13 @@ import {
   Stack,
   Card,
   Paper,
-  Grid
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert,
+  CircularProgress
 } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +44,8 @@ const ImageBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   flex: 1,
-  background: 'linear-gradient(135deg,rgb(6, 22, 94) 0%, #764ba2 100%)',
+  // background: 'linear-gradient(135deg,rgb(6, 22, 94) 0%, #764ba2 100%)',
+  background: 'rgb(211, 211, 211) 0%',
   [theme.breakpoints.down('md')]: {
     display: 'none',
   },
@@ -72,6 +79,12 @@ const Login = () => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Forgot password state
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [forgotPasswordMessage, setForgotPasswordMessage] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
@@ -126,6 +139,36 @@ const Login = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!forgotPasswordEmail) {
+      setForgotPasswordMessage("Please enter your email address");
+      return;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(forgotPasswordEmail)) {
+      setForgotPasswordMessage("Please enter a valid email address");
+      return;
+    }
+
+    setForgotPasswordLoading(true);
+    setForgotPasswordMessage("");
+
+    try {
+      await axios.post(
+        "https://matchgen-backend-production.up.railway.app/api/users/forgot-password/",
+        { email: forgotPasswordEmail }
+      );
+      
+      setForgotPasswordMessage("Password reset instructions have been sent to your email address.");
+    } catch (error) {
+      const errorMessage = error.response?.data?.detail || "Failed to send reset instructions. Please try again.";
+      setForgotPasswordMessage(errorMessage);
+      console.error("Forgot password error:", error);
+    } finally {
+      setForgotPasswordLoading(false);
+    }
+  };
+
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
@@ -155,25 +198,25 @@ const Login = () => {
       <StyledBox>
         {/* Left side - Image/Visual section */}
         <ImageBox>
-          <Box sx={{ textAlign: 'center', color: 'white', p: 4 }}>
+          <Box sx={{ textAlign: 'center', color: 'hsl(220, 30%, 6%)', p: 4 }}>
             <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
               Welcome to MatchGen
             </Typography>
             <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
-              Create stunning social media posts for your football club
+              Matchday's Made Easier! Power up your club’s social media in minutes
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 300, mx: 'auto' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
-                <Typography variant="body1">Customizable templates</Typography>
+                <Typography variant="body1">Ready-made templates tailored for your club</Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
-                <Typography variant="body1">Professional graphics</Typography>
+                <Typography variant="body1">Professional-quality designs, no designer needed</Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
-                <Typography variant="body1">Easy team management</Typography>
+                <Typography variant="body1">Save hours on team and matchday posts</Typography>
               </Box>
             </Box>
           </Box>
@@ -242,7 +285,12 @@ const Login = () => {
                   control={<Checkbox size="small" />}
                   label="Remember me"
                 />
-                <Link href="#" variant="body2" sx={{ textDecoration: 'none' }}>
+                <Link 
+                  component="button" 
+                  variant="body2" 
+                  sx={{ textDecoration: 'none' }}
+                  onClick={() => setForgotPasswordOpen(true)}
+                >
                   Forgot your password?
                 </Link>
               </Box>
@@ -304,6 +352,81 @@ const Login = () => {
           </FormContainer>
         </FormBox>
       </StyledBox>
+
+      {/* Forgot Password Dialog */}
+      <Dialog 
+        open={forgotPasswordOpen} 
+        onClose={() => {
+          setForgotPasswordOpen(false);
+          setForgotPasswordEmail("");
+          setForgotPasswordMessage("");
+        }} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white' }}>Reset Password</DialogTitle>
+        <DialogContent sx={{ color: 'white' }}>
+          <Typography variant="body1" paragraph sx={{ color: 'white', mb: 2 }}>
+            Enter your email address and we'll send you instructions to reset your password.
+          </Typography>
+          
+          <TextField
+            fullWidth
+            label="Email Address"
+            type="email"
+            value={forgotPasswordEmail}
+            onChange={(e) => setForgotPasswordEmail(e.target.value)}
+            margin="normal"
+            placeholder="your@email.com"
+            sx={{
+              '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+              },
+              '& .MuiInputBase-input': { color: 'white' },
+              '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+            }}
+          />
+
+          {forgotPasswordMessage && (
+            <Alert 
+              severity={forgotPasswordMessage.includes("sent") ? "success" : "error"} 
+              sx={{ mt: 2 }}
+            >
+              {forgotPasswordMessage}
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => {
+              setForgotPasswordOpen(false);
+              setForgotPasswordEmail("");
+              setForgotPasswordMessage("");
+            }}
+            sx={{ color: 'white' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleForgotPassword}
+            disabled={forgotPasswordLoading}
+            startIcon={forgotPasswordLoading ? <CircularProgress size={20} /> : null}
+          >
+            {forgotPasswordLoading ? "Sending..." : "Send Reset Instructions"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </AppTheme>
   );
 };
