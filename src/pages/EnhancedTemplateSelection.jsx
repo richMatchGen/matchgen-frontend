@@ -168,6 +168,7 @@ const TemplatePackCard = ({ pack, isSelected, onSelect, onViewDetails }) => {
             className="pack-image"
             sx={{
               objectFit: 'cover',
+              objectPosition: 'top center',
               transition: 'transform 0.3s ease',
             }}
           />
@@ -197,6 +198,16 @@ const TemplatePackCard = ({ pack, isSelected, onSelect, onViewDetails }) => {
               <Typography variant="body2" color="text.secondary">
                 {pack.templates_count || 0} Templates
               </Typography>
+              <Box
+                sx={{
+                  width: 16,
+                  height: 16,
+                  backgroundColor: pack.primary_color || '#000000',
+                  borderRadius: '50%',
+                  border: '1px solid #e0e0e0',
+                  ml: 1,
+                }}
+              />
             </Box>
             <Chip
               label={isSelected ? 'Selected' : 'Available'}
@@ -204,22 +215,6 @@ const TemplatePackCard = ({ pack, isSelected, onSelect, onViewDetails }) => {
               variant={isSelected ? 'filled' : 'outlined'}
             />
           </Stack>
-
-          {/* Primary Color Display */}
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
-              sx={{
-                width: 20,
-                height: 20,
-                backgroundColor: pack.primary_color || '#000000',
-                borderRadius: '50%',
-                border: '1px solid #e0e0e0',
-              }}
-            />
-            <Typography variant="body2" color="text.secondary">
-              {/* Primary Color: {pack.primary_color || '#000000'} */}
-            </Typography>
-          </Box>
 
           <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
             <Button
