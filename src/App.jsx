@@ -79,7 +79,14 @@ function App() {
         </Box>
       }>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={
+            auth.token ? (
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            ) : <Login />
+          } />
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Signup />} />
           <Route path="/enhanced-signup" element={<EnhancedSignup />} />

@@ -1,49 +1,66 @@
 import React, { useState } from "react";
-import { TextField, Button, Container, Typography } from "@mui/material";
+import { 
+  TextField, 
+  Button, 
+  Container, 
+  Typography, 
+  Box,
+  Checkbox,
+  CssBaseline,
+  FormControlLabel,
+  Divider,
+  FormLabel,
+  FormControl,
+  Link,
+  Stack,
+  MuiCard,
+  Paper,
+  Grid
+} from "@mui/material";
+import { styled } from '@mui/material/styles';
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
-import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
-import CssBaseline from '@mui/material/CssBaseline';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Divider from '@mui/material/Divider';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
-import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles';
-import ForgotPassword from '../components/forgotpassword';
 import AppTheme from '../themes/AppTheme';
 import ColorModeSelect from '../themes/colormodeselect';
-import Sitemark from '../components/Sitemarkicon'
+import Sitemark from '../components/Sitemarkicon';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "100%",
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: "auto",
-  [theme.breakpoints.up("sm")]: {
-    maxWidth: "450px",
-  },
-  boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
+// Styled components for the sign-in-side template
+const StyledBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  height: '100vh',
 }));
 
-const SignInContainer = styled(Stack)(({ theme }) => ({
-  height: "100vh",
-  minHeight: "100%",
-  padding: theme.spacing(2),
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  [theme.breakpoints.up("sm")]: {
+const ImageBox = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flex: 1,
+  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  [theme.breakpoints.down('md')]: {
+    display: 'none',
+  },
+}));
+
+const FormBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flex: 1,
+  padding: theme.spacing(3),
+  [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(4),
   },
+}));
+
+const FormContainer = styled(Box)(({ theme }) => ({
+  width: '100%',
+  maxWidth: 400,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(2),
 }));
 
 const Login = () => {
@@ -103,98 +120,160 @@ const Login = () => {
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
-      <SignInContainer direction="column">
-  <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
-  <Card variant="outlined">
-    <Sitemark />
-    <Typography
-      component="h1"
-      variant="h4"
-      sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-    >
-      Sign in
-    </Typography>
-
-    <Box
-      component="form"
-      onSubmit={handleLogin}
-      noValidate
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        gap: 2,
-      }}
-    >
-                  <FormControl error={!!errors.email}>
-              <FormLabel htmlFor="email">Email</FormLabel>
-              <TextField
-                error={!!errors.email}
-                helperText={errors.email}
-                id="email"
-                type="email"
-                name="email"
-                placeholder="your@email.com"
-                autoComplete="email"
-                autoFocus
-                required
-                fullWidth
-                variant="outlined"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isSubmitting}
-              />
-            </FormControl>
+      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 1000 }} />
       
-                  <FormControl error={!!errors.password}>
-              <FormLabel htmlFor="password">Password</FormLabel>
-              <TextField
-                error={!!errors.password}
-                helperText={errors.password}
-                name="password"
-                placeholder="••••••"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                required
+      <StyledBox>
+        {/* Left side - Image/Visual section */}
+        <ImageBox>
+          <Box sx={{ textAlign: 'center', color: 'white', p: 4 }}>
+            <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
+              Welcome to MatchGen
+            </Typography>
+            <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
+              Create stunning social media posts for your football club
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 300, mx: 'auto' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Typography variant="body1">Customizable templates</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Typography variant="body1">Professional graphics</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Typography variant="body1">Easy team management</Typography>
+              </Box>
+            </Box>
+          </Box>
+        </ImageBox>
+
+        {/* Right side - Form section */}
+        <FormBox>
+          <FormContainer>
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <Sitemark />
+              <Typography variant="h4" component="h1" sx={{ mt: 2, fontWeight: 'bold' }}>
+                Sign in
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Enter your credentials to access your account
+              </Typography>
+            </Box>
+
+            <Box
+              component="form"
+              onSubmit={handleLogin}
+              noValidate
+              sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+            >
+              <FormControl error={!!errors.email}>
+                <FormLabel htmlFor="email">Email</FormLabel>
+                <TextField
+                  error={!!errors.email}
+                  helperText={errors.email}
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="your@email.com"
+                  autoComplete="email"
+                  autoFocus
+                  required
+                  fullWidth
+                  variant="outlined"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+
+              <FormControl error={!!errors.password}>
+                <FormLabel htmlFor="password">Password</FormLabel>
+                <TextField
+                  error={!!errors.password}
+                  helperText={errors.password}
+                  name="password"
+                  placeholder="••••••"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  required
+                  fullWidth
+                  variant="outlined"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <FormControlLabel
+                  control={<Checkbox size="small" />}
+                  label="Remember me"
+                />
+                <Link href="#" variant="body2" sx={{ textDecoration: 'none' }}>
+                  Forgot your password?
+                </Link>
+              </Box>
+
+              {errors.submit && (
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                  {errors.submit}
+                </Typography>
+              )}
+
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                onClick={handleLogin}
+                disabled={isSubmitting}
+                sx={{ mt: 2, py: 1.5 }}
+                size="large"
+              >
+                {isSubmitting ? "Signing in..." : "Sign in"}
+              </Button>
+            </Box>
+
+            <Divider sx={{ my: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                or
+              </Typography>
+            </Divider>
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Button
                 fullWidth
                 variant="outlined"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isSubmitting}
-              />
-            </FormControl>
+                startIcon={<GoogleIcon />}
+                sx={{ py: 1.5 }}
+                disabled
+              >
+                Sign in with Google
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<FacebookIcon />}
+                sx={{ py: 1.5 }}
+                disabled
+              >
+                Sign in with Facebook
+              </Button>
+            </Box>
 
-      {errors.submit && (
-        <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-          {errors.submit}
-        </Typography>
-      )}
-
-      <Button
-        fullWidth
-        variant="contained"
-        color="primary"
-        onClick={handleLogin}
-        disabled={isSubmitting}
-        sx={{ mt: 2 }}
-      >
-        {isSubmitting ? "Signing in..." : "Sign in"}
-      </Button>
-    </Box>
-
-    <Divider>or</Divider>
-
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Typography sx={{ textAlign: 'center' }}>
-        Don&apos;t have an account?{' '}
-        <Link href="/register" variant="body2">
-          Sign up
-        </Link>
-      </Typography>
-    </Box>
-  </Card>
-</SignInContainer>
+            <Box sx={{ textAlign: 'center', mt: 3 }}>
+              <Typography variant="body2" color="text.secondary">
+                Don&apos;t have an account?{' '}
+                <Link href="/register" variant="body2" sx={{ fontWeight: 'bold' }}>
+                  Sign up
+                </Link>
+              </Typography>
+            </Box>
+          </FormContainer>
+        </FormBox>
+      </StyledBox>
     </AppTheme>
   );
 };
