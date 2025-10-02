@@ -9,6 +9,7 @@ import { AccessibilityToolbar } from "./components/EnhancedAccessibility";
 import { ThemeProvider } from "@mui/material/styles";
 import { RateLimitProvider } from "./context";
 import { createMatchGenTheme } from "./themes/MatchGenTheme";
+import Sitemark from './components/Sitemarkicon';
 
 // Lazy load components for better performance
 const Login = lazy(() => import("./pages/Login"));
@@ -79,19 +80,28 @@ function App() {
           justifyContent="center"
           minHeight="100vh"
           sx={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
+            background: "#f2fd7d",
+            color: "#333",
           }}
         >
-          <Box textAlign="center">
-            <Typography variant="h4" sx={{ mb: 2, fontWeight: 700 }}>
+          <Box textAlign="center" sx={{ maxWidth: 400, mx: 'auto', px: 3 }}>
+            <Sitemark />
+            <Typography variant="h4" sx={{ mt: 2, mb: 3, fontWeight: 700, color: '#333' }}>
               MatchGen
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 4, color: '#666', opacity: 0.8 }}>
+              Creating your football club's digital presence...
             </Typography>
             <LoadingSpinner 
               message="Loading application..." 
               variant="dots"
               size={60}
             />
+            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
+              <Box sx={{ width: 8, height: 8, bgcolor: '#333', borderRadius: '50%', opacity: 0.6 }} />
+              <Box sx={{ width: 8, height: 8, bgcolor: '#333', borderRadius: '50%', opacity: 0.4 }} />
+              <Box sx={{ width: 8, height: 8, bgcolor: '#333', borderRadius: '50%', opacity: 0.2 }} />
+            </Box>
           </Box>
         </Box>
       }>

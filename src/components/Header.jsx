@@ -93,7 +93,7 @@ export default function Header() {
       </Stack>
 
       {/* Right Section - Actions */}
-      <Stack direction="row" spacing={1} alignItems="center">
+      {/* <Stack direction="row" spacing={1} alignItems="center">
         <Tooltip title="Search">
           <ActionButton size="small">
             <SearchIcon fontSize="small" />
@@ -111,7 +111,7 @@ export default function Header() {
         </Tooltip>
         
         <ColorModeIconDropdown />
-      </Stack>
+      </Stack> */}
     </HeaderContainer>
   );
 }

@@ -129,7 +129,8 @@ const Login = () => {
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
-      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 1000 }} />
+      {/* ColorModeSelect hidden - defaulting to light mode */}
+      {/* <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 1000 }} /> */}
       {auth.token && (
         <Button
           variant="outlined"
