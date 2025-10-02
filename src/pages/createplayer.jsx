@@ -135,7 +135,7 @@ const positionOptions = [
 const formSteps = [
   { label: "Basic Info", description: "Player name and position" },
   { label: "Details", description: "Jersey number and sponsor" },
-  { label: "Images", description: "Player and formatted photos" },
+  { label: "Images", description: "Player photo only" },
 ];
 
 const CreatePlayer = () => {
@@ -983,8 +983,8 @@ const CreatePlayer = () => {
                   </StyledCard>
                 </Zoom>
 
-                {/* Enhanced Formatted Photo Upload */}
-                <Zoom in timeout={1000}>
+                {/* Enhanced Formatted Photo Upload - HIDDEN */}
+                {/* <Zoom in timeout={1000}>
                   <StyledCard isActive={activeStep === 2}>
                     <CardContent sx={{ p: 3 }}>
                       <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
@@ -1095,7 +1095,7 @@ const CreatePlayer = () => {
                       </Stack>
                     </CardContent>
                   </StyledCard>
-                </Zoom>
+                </Zoom> */}
               </Stack>
             </Grid>
           </Grid>
