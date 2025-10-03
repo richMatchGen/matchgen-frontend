@@ -48,6 +48,7 @@ import {
   FormatAlignCenter,
   FormatAlignRight,
   VerticalAlignTop,
+  VerticalAlignCenter,
   VerticalAlignBottom,
   Settings as SettingsIcon
 } from '@mui/icons-material';
@@ -105,6 +106,12 @@ const TextElementManagement = () => {
     bottom_center_y: 0,
     bottom_right_x: 0,
     bottom_right_y: 0,
+    center_left_x: 0,
+    center_left_y: 0,
+    center_center_x: 0,
+    center_center_y: 0,
+    center_right_x: 0,
+    center_right_y: 0,
     font_size: 24,
     font_family: 'Arial',
     font_color: '#FFFFFF',
@@ -329,6 +336,12 @@ const TextElementManagement = () => {
         bottom_center_y: element.bottom_center_y || 0,
         bottom_right_x: element.bottom_right_x || 0,
         bottom_right_y: element.bottom_right_y || 0,
+        center_left_x: element.center_left_x || 0,
+        center_left_y: element.center_left_y || 0,
+        center_center_x: element.center_center_x || 0,
+        center_center_y: element.center_center_y || 0,
+        center_right_x: element.center_right_x || 0,
+        center_right_y: element.center_right_y || 0,
         font_size: element.font_size,
         font_family: element.font_family,
         font_color: element.font_color,
@@ -981,6 +994,17 @@ const TextElementManagement = () => {
                             newPositionX = formData.top_right_x;
                             newPositionY = formData.top_right_y;
                           }
+                        } else if (newAnchor === 'center') {
+                          if (currentAlignment === 'left') {
+                            newPositionX = formData.center_left_x;
+                            newPositionY = formData.center_left_y;
+                          } else if (currentAlignment === 'center') {
+                            newPositionX = formData.center_center_x;
+                            newPositionY = formData.center_center_y;
+                          } else { // right
+                            newPositionX = formData.center_right_x;
+                            newPositionY = formData.center_right_y;
+                          }
                         } else { // bottom
                           if (currentAlignment === 'left') {
                             newPositionX = formData.bottom_left_x;
@@ -1019,6 +1043,9 @@ const TextElementManagement = () => {
                     <ToggleButton value="top">
                       <VerticalAlignTop />
                     </ToggleButton>
+                    <ToggleButton value="center">
+                      <VerticalAlignCenter />
+                    </ToggleButton>
                     <ToggleButton value="bottom">
                       <VerticalAlignBottom />
                     </ToggleButton>
@@ -1043,6 +1070,9 @@ const TextElementManagement = () => {
                           if (positionAnchor === 'top') {
                             newPositionX = formData.top_left_x;
                             newPositionY = formData.top_left_y;
+                          } else if (positionAnchor === 'center') {
+                            newPositionX = formData.center_left_x;
+                            newPositionY = formData.center_left_y;
                           } else { // bottom
                             newPositionX = formData.bottom_left_x;
                             newPositionY = formData.bottom_left_y;
@@ -1079,6 +1109,9 @@ const TextElementManagement = () => {
                           if (positionAnchor === 'top') {
                             newPositionX = formData.top_center_x;
                             newPositionY = formData.top_center_y;
+                          } else if (positionAnchor === 'center') {
+                            newPositionX = formData.center_center_x;
+                            newPositionY = formData.center_center_y;
                           } else { // bottom
                             newPositionX = formData.bottom_center_x;
                             newPositionY = formData.bottom_center_y;
@@ -1115,6 +1148,9 @@ const TextElementManagement = () => {
                           if (positionAnchor === 'top') {
                             newPositionX = formData.top_right_x;
                             newPositionY = formData.top_right_y;
+                          } else if (positionAnchor === 'center') {
+                            newPositionX = formData.center_right_x;
+                            newPositionY = formData.center_right_y;
                           } else { // bottom
                             newPositionX = formData.bottom_right_x;
                             newPositionY = formData.bottom_right_y;
@@ -1617,6 +1653,121 @@ const TextElementManagement = () => {
               onChange={(e) => setFormData({ ...formData, bottom_right_y: parseInt(e.target.value) || 0 })}
               fullWidth
               helperText="Bottom-right Y position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            {/* Center position fields from PSD */}
+            <TextField
+              label="Center Left X (from PSD)"
+              type="number"
+              value={formData.center_left_x}
+              onChange={(e) => setFormData({ ...formData, center_left_x: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Center-left X position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            <TextField
+              label="Center Left Y (from PSD)"
+              type="number"
+              value={formData.center_left_y}
+              onChange={(e) => setFormData({ ...formData, center_left_y: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Center-left Y position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            <TextField
+              label="Center Center X (from PSD)"
+              type="number"
+              value={formData.center_center_x}
+              onChange={(e) => setFormData({ ...formData, center_center_x: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Center-center X position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            <TextField
+              label="Center Center Y (from PSD)"
+              type="number"
+              value={formData.center_center_y}
+              onChange={(e) => setFormData({ ...formData, center_center_y: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Center-center Y position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            <TextField
+              label="Center Right X (from PSD)"
+              type="number"
+              value={formData.center_right_x}
+              onChange={(e) => setFormData({ ...formData, center_right_x: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Center-right X position from PSD layer"
+              sx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2196f3' }
+                },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
+              }}
+            />
+
+            <TextField
+              label="Center Right Y (from PSD)"
+              type="number"
+              value={formData.center_right_y}
+              onChange={(e) => setFormData({ ...formData, center_right_y: parseInt(e.target.value) || 0 })}
+              fullWidth
+              helperText="Center-right Y position from PSD layer"
               sx={{
                 '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
                 '& .MuiOutlinedInput-root': {
