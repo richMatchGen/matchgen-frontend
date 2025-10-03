@@ -978,12 +978,14 @@ const TextElementManagement = () => {
                     value={formData.position_anchor}
                     exclusive
                     onChange={(e, newAnchor) => {
-                      if (newAnchor !== null) {
+                      // Handle case where newAnchor might be an array
+                      const anchorValue = Array.isArray(newAnchor) ? newAnchor[0] : newAnchor;
+                      if (anchorValue !== null && anchorValue !== undefined) {
                         const currentAlignment = formData.alignment;
                         
                         // Update position based on new anchor and current alignment
                         let newPositionX, newPositionY;
-                        if (newAnchor === 'top') {
+                        if (anchorValue === 'top') {
                           if (currentAlignment === 'left') {
                             newPositionX = formData.top_left_x;
                             newPositionY = formData.top_left_y;
@@ -994,7 +996,7 @@ const TextElementManagement = () => {
                             newPositionX = formData.top_right_x;
                             newPositionY = formData.top_right_y;
                           }
-                        } else if (newAnchor === 'center') {
+                        } else if (anchorValue === 'center') {
                           if (currentAlignment === 'left') {
                             newPositionX = formData.center_left_x;
                             newPositionY = formData.center_left_y;
@@ -1020,7 +1022,7 @@ const TextElementManagement = () => {
                         
                         setFormData({ 
                           ...formData, 
-                          position_anchor: newAnchor,
+                          position_anchor: anchorValue,
                           position_x: newPositionX,
                           position_y: newPositionY
                         });
