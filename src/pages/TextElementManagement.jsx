@@ -1153,7 +1153,9 @@ const TextElementManagement = () => {
                         label="Font Size"
                         type="number"
                         value={formData.font_size}
-                        onChange={(e) => setFormData({ ...formData, font_size: parseInt(e.target.value) || 0 })}
+                        onChange={(e) => setFormData({ ...formData, font_size: parseInt(e.target.value) || 8 })}
+                        inputProps={{ min: 8 }}
+                        helperText="Minimum: 8px (no maximum)"
                         fullWidth
                         sx={{
                           '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
@@ -1162,7 +1164,8 @@ const TextElementManagement = () => {
                             '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
                             '&.Mui-focused fieldset': { borderColor: '#2196f3' }
                           },
-                          '& .MuiInputBase-input': { color: 'white' }
+                          '& .MuiInputBase-input': { color: 'white' },
+                          '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.7)' }
                         }}
                       />
                     </Grid>
@@ -1707,7 +1710,9 @@ const TextElementManagement = () => {
               label="Font Size"
               type="number"
               value={formData.font_size}
-              onChange={(e) => setFormData({ ...formData, font_size: parseInt(e.target.value) || 12 })}
+              onChange={(e) => setFormData({ ...formData, font_size: parseInt(e.target.value) || 8 })}
+              inputProps={{ min: 8 }}
+              helperText="Minimum: 8px (no maximum)"
               fullWidth
               sx={{
                 '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
