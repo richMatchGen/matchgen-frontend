@@ -11,6 +11,9 @@ import HighlightedCard from './ResultCard';
 import MatchDayCard from './MatchdayCard';
 import FixtureCard from './FixtureCard';
 import QuickLinksCard from './quickLinksCard';
+import MediaManager from './MediaManager';
+import SocialMediaConnect from './SocialMediaConnect';
+import ScheduledPosts from './ScheduledPosts';
 import PageViewsBarChart from './PageViewsBarChart';
 import SessionsChart from './SessionsChart';
 import StatCard from './StatCard';
@@ -28,67 +31,38 @@ export default function MainGrid() {
       {/* Todo List for new users */}
       <TodoList />
       
-      {/* cards */}
-      {/* <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-      <Link
-        component={RouterLink}
-        to="/results"
-        underline="none"
-        color="inherit"
-        sx={{ marginRight: 1 }}
-      >
-        Results
-      </Link>
-      &amp;
-      <Link
-        component={RouterLink}
-        to="/fixtures"
-        underline="none"
-        color="inherit"
-        sx={{ marginLeft: 1 }}
-      >
-        Fixtures
-      </Link>
-    </Typography> */}
-      <Grid
-        container
-        spacing={2}
-        columns={12}
-        sx={{ mb: 2 }}
-      >
-        {/* {data.map((card, index) => (
-          <Grid key={index} size={{ xs: 12, sm: 6, lg: 3 }}>
-            <StatCard {...card} />
-          </Grid>
-        ))} */}
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                  <HighlightedCard />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                  <MatchDayCard />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                <FixtureCard />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                <QuickLinksCard />
-          </Grid>
-          {/* <Grid size={{ xs: 12, md: 12 }}>
-                <SessionsChart />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <PageViewsBarChart />
-            </Grid> */}
+      {/* 1st Row: 3 Fixture Cards */}
+      <Grid container spacing={2} columns={12} sx={{ mb: 2 }}>
+        <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+          <HighlightedCard />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+          <MatchDayCard />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+          <FixtureCard />
+        </Grid>
       </Grid>
 
-      {/* <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        Club Profile
-      </Typography> */}
-        <Grid container spacing={2} columns={12}>
-          <Grid size={{ xs: 12, lg: 12}}>
-              <ClubProfileDetails />
-          </Grid>
+      {/* 2nd Row: Quick Links + Social Media (Left) | Media Manager (Right) */}
+      <Grid container spacing={2} columns={12} sx={{ mb: 2 }}>
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <Stack spacing={2}>
+            <QuickLinksCard />
+            <SocialMediaConnect />
+          </Stack>
         </Grid>
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <MediaManager />
+        </Grid>
+      </Grid>
+
+      {/* 3rd Row: Scheduled Posts + Calendar */}
+      <Grid container spacing={2} columns={12} sx={{ mb: 2 }}>
+        <Grid size={{ xs: 12 }}>
+          <ScheduledPosts />
+        </Grid>
+      </Grid>
 
 <Copyright sx={{ my: 4 }} />
     </Box>
