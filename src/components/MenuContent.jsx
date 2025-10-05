@@ -77,7 +77,7 @@ const mainListItems = [
   { text: 'Templates', icon: <AssignmentRoundedIcon />, link: '/gen/templates' },
   { text: 'Fixtures', icon: <EventIcon />, link: '/fixture/creatematch' },
   { text: 'Players', icon: <PersonIcon />, link: '/squad/createplayer' },
-  { text: 'Media', icon: <CameraIcon />, link: '/mediamanagement' },
+  { text: 'Media', icon: <CameraIcon />, link: '/media-manager' },
 ];
 
 const secondaryListItems = [

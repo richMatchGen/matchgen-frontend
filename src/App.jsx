@@ -11,6 +11,7 @@ import { RateLimitProvider } from "./context";
 import { createMatchGenTheme } from "./themes/MatchGenTheme";
 import Sitemark from './components/Sitemarkicon';
 import ScrollToTop from './components/ScrollToTop';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy load components for better performance
 const Login = lazy(() => import("./pages/Login"));
@@ -42,10 +43,13 @@ const UserProfile = lazy(() => import("./pages/UserProfile"));
 const Account = lazy(() => import("./pages/Account"));
 const PSDProcessor = lazy(() => import("./pages/PSDProcessor"));
 const UploadGraphicPack = lazy(() => import("./pages/UploadGraphicPack"));
-const MediaManager = lazy(() => import("./components/MediaManager"));
+const MediaManager = lazy(() => import("./pages/MediaManager"));
 const About = lazy(() => import("./pages/About"));
 const Feedback = lazy(() => import("./pages/Feedback"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Error400 = lazy(() => import("./pages/Error400"));
+const Error404 = lazy(() => import("./pages/Error404"));
+const Error500 = lazy(() => import("./pages/Error500"));
 
 
 function App() {
@@ -53,11 +57,12 @@ function App() {
   const theme = createMatchGenTheme('light');
 
   return (
-    <RateLimitProvider>
-      <ThemeProvider theme={theme}>
-        <AccessibilityToolbar />
-        <ScrollToTop />
-        <Box id="main-content">
+    <ErrorBoundary>
+      <RateLimitProvider>
+        <ThemeProvider theme={theme}>
+          <AccessibilityToolbar />
+          <ScrollToTop />
+          <Box id="main-content">
 
       {/* Logout button moved to side menu */}
 
@@ -154,11 +159,20 @@ function App() {
           
           {/* Media Management */}
           <Route path="/media-manager" element={<PrivateRoute><MediaManager /></PrivateRoute>} />
+          
+          {/* Error Pages */}
+          <Route path="/error/400" element={<Error400 />} />
+          <Route path="/error/404" element={<Error404 />} />
+          <Route path="/error/500" element={<Error500 />} />
+          
+          {/* Catch-all route for 404 */}
+          <Route path="*" element={<Error404 />} />
         </Routes>
       </Suspense>
       </Box>
     </ThemeProvider>
     </RateLimitProvider>
+    </ErrorBoundary>
   );
 }
 
