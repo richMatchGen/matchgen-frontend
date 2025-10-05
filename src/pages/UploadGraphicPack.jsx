@@ -93,7 +93,7 @@ const UploadGraphicPack = () => {
     { value: 'fulltime', label: 'Full Time' },
     { value: 'sub', label: 'Substitution' },
     { value: 'goal', label: 'Goal' },
-    { value: 'upcomingfixture', label: 'Upcoming Fixture' }
+    { value: 'upcomingFixture', label: 'Upcoming Fixture' }
   ], []);
 
   const colorOptions = React.useMemo(() => [

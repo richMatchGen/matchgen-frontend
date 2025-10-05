@@ -78,7 +78,7 @@ const PSDProcessor = () => {
     { value: 'matchday', label: 'Match Day' },
     { value: 'sub', label: 'Substitution' },
     { value: 'goal', label: 'Goal' },
-    { value: 'upcomingfixture', label: 'Upcoming Fixture' },
+    { value: 'upcomingFixture', label: 'Upcoming Fixture' },
     { value: 'startingXI', label: 'Starting XI' }
   ];
 
