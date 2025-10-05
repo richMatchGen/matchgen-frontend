@@ -149,6 +149,10 @@ const SocialMediaPostGenerator = () => {
   const [minute, setMinute] = useState('');
   const [players, setPlayers] = useState([]);
   
+  // Goal-specific state
+  const [goalScorer, setGoalScorer] = useState('');
+  const [goalMinute, setGoalMinute] = useState('');
+  
   // New flexible substitution state
   const [playersOn, setPlayersOn] = useState([]);
   const [playersOff, setPlayersOff] = useState([]);
@@ -386,6 +390,12 @@ const SocialMediaPostGenerator = () => {
       if (selectedPostType === 'startingXI') {
         requestData.starting_lineup = startingLineup || [];
         requestData.substitutes = substitutes || [];
+      }
+      
+      // Add goal data if post type is 'goal'
+      if (selectedPostType === 'goal') {
+        requestData.goal_scorer = goalScorer || 'Player Name';
+        requestData.goal_minute = goalMinute || 'Minute';
       }
       
       const response = await axios.post(
@@ -851,6 +861,88 @@ const SocialMediaPostGenerator = () => {
                             )}
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                               <strong>Minute:</strong> {minute || 'Not selected'}'
+                            </Typography>
+                          </Box>
+                        )}
+                      </Paper>
+                    )}
+
+                    {/* Goal Form - Only show for goal posts */}
+                    {selectedPostType === 'goal' && (
+                      <Paper elevation={1} sx={{ p: 2, mb: 3, backgroundColor: 'yellow.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          Goal Details
+                        </Typography>
+                        
+                        <Box sx={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
+                          gap: 3 
+                        }}>
+                          {/* Goal Scorer */}
+                          <Box>
+                            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                              Goal Scorer
+                            </Typography>
+                            <FormControl fullWidth>
+                              <Select
+                                value={goalScorer}
+                                onChange={(e) => setGoalScorer(e.target.value)}
+                                displayEmpty
+                              >
+                                <MenuItem value="">
+                                  <em>Select Goal Scorer</em>
+                                </MenuItem>
+                                {players.map((player) => (
+                                  <MenuItem key={player.id} value={player.name}>
+                                    {player.name} ({player.squad_no}) - {player.position}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              Select the player who scored the goal
+                            </Typography>
+                          </Box>
+
+                          {/* Goal Minute */}
+                          <Box>
+                            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                              Goal Minute
+                            </Typography>
+                            <FormControl fullWidth>
+                              <Select
+                                value={goalMinute}
+                                onChange={(e) => setGoalMinute(e.target.value)}
+                                displayEmpty
+                              >
+                                <MenuItem value="">
+                                  <em>Select Minute</em>
+                                </MenuItem>
+                                {Array.from({ length: 90 }, (_, i) => i + 1).map((min) => (
+                                  <MenuItem key={min} value={min.toString()}>
+                                    {min}'
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              Select the minute when the goal was scored
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        {/* Preview of goal */}
+                        {(goalScorer || goalMinute) && (
+                          <Box sx={{ mt: 2, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+                            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                              Goal Preview:
+                            </Typography>
+                            <Typography variant="body2" sx={{ mb: 0.5, color: 'success.main' }}>
+                              <strong>Goal Scorer:</strong> {goalScorer || 'Not selected'}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                              <strong>Minute:</strong> {goalMinute || 'Not selected'}'
                             </Typography>
                           </Box>
                         )}
