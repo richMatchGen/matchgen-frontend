@@ -68,7 +68,7 @@ const PSDProcessor = () => {
   const predefinedLayers = [
     'away_score_ft', 'home_score_ft', 'away_score_ht', 'home_score_ht',
     'club_logo', 'opponent_logo', 'substitutes', 'starting_lineup',
-    'player_on', 'player_off', 'date', 'time'
+    'player_on', 'player_off', 'player_name', 'venue', 'date', 'time'
   ];
 
   const contentTypes = [
