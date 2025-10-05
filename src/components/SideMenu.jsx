@@ -215,7 +215,7 @@ export default function SideMenu({ user }) {
           <Tooltip title="Profile">
             <ActionButton 
               size="small"
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate('/club')}
             >
               <PersonIcon fontSize="small" />
             </ActionButton>

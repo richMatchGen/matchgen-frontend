@@ -42,6 +42,9 @@ const UserProfile = lazy(() => import("./pages/UserProfile"));
 const Account = lazy(() => import("./pages/Account"));
 const PSDProcessor = lazy(() => import("./pages/PSDProcessor"));
 const UploadGraphicPack = lazy(() => import("./pages/UploadGraphicPack"));
+const MediaManager = lazy(() => import("./components/MediaManager"));
+const About = lazy(() => import("./pages/About"));
+const Feedback = lazy(() => import("./pages/Feedback"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 
@@ -99,6 +102,8 @@ function App() {
             ) : <Login />
           } />
           <Route path="/landing" element={<LandingPage />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/feedback" element={<Feedback />} />
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/register" element={<EnhancedSignup2 />} />
@@ -146,6 +151,9 @@ function App() {
           
           {/* Admin Routes */}
           <Route path="/upload-graphic-pack" element={<PrivateRoute><UploadGraphicPack /></PrivateRoute>} />
+          
+          {/* Media Management */}
+          <Route path="/media-manager" element={<PrivateRoute><MediaManager /></PrivateRoute>} />
         </Routes>
       </Suspense>
       </Box>
