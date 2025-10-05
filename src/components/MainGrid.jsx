@@ -46,13 +46,13 @@ export default function MainGrid() {
 
       {/* 2nd Row: Quick Links + Social Media (Left) | Media Manager (Right) */}
       <Grid container spacing={2} columns={12} sx={{ mb: 2 }}>
-        <Grid size={{ xs: 12, lg: 4 }}>
+        <Grid size={{ xs: 12, lg: 2 }}>
           <Stack spacing={2}>
             <QuickLinksCard />
             <SocialMediaConnect />
           </Stack>
         </Grid>
-        <Grid size={{ xs: 12, lg: 8 }}>
+        <Grid size={{ xs: 12, lg: 10}}>
           <MediaManager />
         </Grid>
       </Grid>
