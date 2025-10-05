@@ -23,6 +23,8 @@ import TextFieldsIcon from '@mui/icons-material/TextFields';
 import ImageIcon from '@mui/icons-material/Image';
 import UploadIcon from '@mui/icons-material/Upload';
 import LogoutIcon from '@mui/icons-material/Logout';
+import CameraIcon from '@mui/icons-material/Camera';
+import PersonIcon from '@mui/icons-material/Person';
 import { getToken } from "../hooks/auth";
 import { useNavigate } from "react-router-dom";
 import Box from '@mui/material/Box';
