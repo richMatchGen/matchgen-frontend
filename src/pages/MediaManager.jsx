@@ -49,9 +49,9 @@ import { alpha } from '@mui/material/styles';
 import useAuth from '../hooks/useAuth';
 import apiClient from '../api/config';
 import AppTheme from '../themes/AppTheme';
-import SideMenu from './SideMenu';
-import AppNavbar from './AppNavBar';
-import Header from './Header';
+import SideMenu from '../components/SideMenu';
+import AppNavbar from '../components/AppNavBar';
+import Header from '../components/Header';
 
 const MediaManager = () => {
   const { auth } = useAuth();
