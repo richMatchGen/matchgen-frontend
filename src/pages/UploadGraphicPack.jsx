@@ -92,6 +92,7 @@ const UploadGraphicPack = () => {
     { value: 'halftime', label: 'Half Time' },
     { value: 'fulltime', label: 'Full Time' },
     { value: 'sub', label: 'Substitution' },
+    { value: 'goal', label: 'Goal' },
     { value: 'upcomingfixture', label: 'Upcoming Fixture' }
   ], []);
 
