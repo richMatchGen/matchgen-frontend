@@ -83,8 +83,8 @@ const mainListItems = [
 const secondaryListItems = [
   { text: 'Subscription', icon: <PaymentIcon />, link: '/subscription' },
   { text: 'Settings', icon: <SettingsRoundedIcon />, link: '/settings' },
-  { text: 'About', icon: <InfoRoundedIcon />, link: '/about' },
-  { text: 'Feedback', icon: <HelpRoundedIcon />, link: '/feedback' },
+  // { text: 'About', icon: <InfoRoundedIcon />, link: '/about' },
+  // { text: 'Feedback', icon: <HelpRoundedIcon />, link: '/feedback' },
   { text: 'Logout', icon: <LogoutIcon />, link: '/logout', isLogout: true },
 ];
 
