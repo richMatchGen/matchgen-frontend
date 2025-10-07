@@ -50,7 +50,11 @@ import {
   VerticalAlignTop,
   VerticalAlignCenter,
   VerticalAlignBottom,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  SelectAll as SelectAllIcon,
+  CheckBox as CheckBoxIcon,
+  CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
+  BatchPrediction as BatchPredictionIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 
@@ -76,7 +80,21 @@ const TextElementManagement = () => {
     content_type: '',
     graphic_pack: '',
     element_name: '',
-    search: ''
+    search: '',
+    font_family: '',
+    font_color: ''
+  });
+
+  // Bulk edit state
+  const [selectedElements, setSelectedElements] = useState([]);
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [bulkEditData, setBulkEditData] = useState({
+    font_family: '',
+    font_size: '',
+    font_color: '',
+    position_preset: '',
+    position_anchor: '',
+    text_alignment: ''
   });
 
   // Form state
@@ -176,17 +194,83 @@ const TextElementManagement = () => {
      fetchData(page, filters);
    };
 
-   // Clear all filters
-   const clearFilters = () => {
-     const clearedFilters = {
-       content_type: '',
-       graphic_pack: '',
-       element_name: '',
-       search: ''
-     };
-     setFilters(clearedFilters);
-     fetchData(1, clearedFilters);
-   };
+  // Clear all filters
+  const clearFilters = () => {
+    const clearedFilters = {
+      content_type: '',
+      graphic_pack: '',
+      element_name: '',
+      search: '',
+      font_family: '',
+      font_color: ''
+    };
+    setFilters(clearedFilters);
+    fetchData(1, clearedFilters);
+  };
+
+  // Bulk edit functions
+  const handleSelectElement = (elementId) => {
+    setSelectedElements(prev => 
+      prev.includes(elementId) 
+        ? prev.filter(id => id !== elementId)
+        : [...prev, elementId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedElements.length === textElements.length) {
+      setSelectedElements([]);
+    } else {
+      setSelectedElements(textElements.map(element => element.id));
+    }
+  };
+
+  const handleBulkEdit = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const updates = {};
+      
+      // Only include fields that have values
+      if (bulkEditData.font_family) updates.font_family = bulkEditData.font_family;
+      if (bulkEditData.font_size) updates.font_size = parseInt(bulkEditData.font_size);
+      if (bulkEditData.font_color) updates.font_color = bulkEditData.font_color;
+      if (bulkEditData.position_preset) updates.position_preset = bulkEditData.position_preset;
+      if (bulkEditData.position_anchor) updates.position_anchor = bulkEditData.position_anchor;
+      if (bulkEditData.text_alignment) updates.text_alignment = bulkEditData.text_alignment;
+
+      if (Object.keys(updates).length === 0) {
+        setSnackbar({ open: true, message: 'Please select at least one field to update', severity: 'warning' });
+        return;
+      }
+
+      const response = await axios.post(
+        'https://matchgen-backend-production.up.railway.app/api/graphicpack/bulk-update-text-elements/',
+        {
+          element_ids: selectedElements,
+          updates: updates
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      setSnackbar({ open: true, message: `Successfully updated ${selectedElements.length} elements`, severity: 'success' });
+      setBulkEditOpen(false);
+      setSelectedElements([]);
+      setBulkEditData({
+        font_family: '',
+        font_size: '',
+        font_color: '',
+        position_preset: '',
+        position_anchor: '',
+        text_alignment: ''
+      });
+      fetchData(pagination.currentPage, filters);
+    } catch (error) {
+      console.error('Bulk update error:', error);
+      setSnackbar({ open: true, message: 'Failed to update elements', severity: 'error' });
+    }
+  };
 
    // Debug effect to log when graphicPacks changes
    useEffect(() => {
@@ -562,6 +646,16 @@ const TextElementManagement = () => {
             >
               Add Element
             </Button>
+            {selectedElements.length > 0 && (
+              <Button
+                variant="outlined"
+                startIcon={<BatchPredictionIcon />}
+                onClick={() => setBulkEditOpen(true)}
+                color="secondary"
+              >
+                Bulk Edit ({selectedElements.length})
+              </Button>
+            )}
           </Box>
        </Box>
        
@@ -647,6 +741,45 @@ const TextElementManagement = () => {
                  </Select>
                </FormControl>
              </Grid>
+             <Grid item xs={12} sm={6} md={3}>
+               <FormControl fullWidth size="small">
+                 <InputLabel>Font Family</InputLabel>
+                 <Select
+                   value={filters.font_family}
+                   onChange={(e) => handleFilterChange('font_family', e.target.value)}
+                   label="Font Family"
+                 >
+                   <MenuItem value="">All Fonts</MenuItem>
+                   <MenuItem value="Arial">Arial</MenuItem>
+                   <MenuItem value="Helvetica">Helvetica</MenuItem>
+                   <MenuItem value="Times New Roman">Times New Roman</MenuItem>
+                   <MenuItem value="Georgia">Georgia</MenuItem>
+                   <MenuItem value="Verdana">Verdana</MenuItem>
+                   <MenuItem value="Impact">Impact</MenuItem>
+                   <MenuItem value="Comic Sans MS">Comic Sans MS</MenuItem>
+                 </Select>
+               </FormControl>
+             </Grid>
+             <Grid item xs={12} sm={6} md={3}>
+               <FormControl fullWidth size="small">
+                 <InputLabel>Font Color</InputLabel>
+                 <Select
+                   value={filters.font_color}
+                   onChange={(e) => handleFilterChange('font_color', e.target.value)}
+                   label="Font Color"
+                 >
+                   <MenuItem value="">All Colors</MenuItem>
+                   <MenuItem value="#FFFFFF">White</MenuItem>
+                   <MenuItem value="#000000">Black</MenuItem>
+                   <MenuItem value="#FF0000">Red</MenuItem>
+                   <MenuItem value="#00FF00">Green</MenuItem>
+                   <MenuItem value="#0000FF">Blue</MenuItem>
+                   <MenuItem value="#FFFF00">Yellow</MenuItem>
+                   <MenuItem value="#FF00FF">Magenta</MenuItem>
+                   <MenuItem value="#00FFFF">Cyan</MenuItem>
+                 </Select>
+               </FormControl>
+             </Grid>
              <Grid item xs={12}>
                <Box display="flex" gap={1} flexWrap="wrap">
                  <Button
@@ -675,16 +808,24 @@ const TextElementManagement = () => {
           <Table stickyHeader>
             <TableHead>
               <TableRow>
+                <TableCell padding="checkbox">
+                  <IconButton onClick={handleSelectAll} size="small">
+                    {selectedElements.length === textElements.length ? 
+                      <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />
+                    }
+                  </IconButton>
+                </TableCell>
                 <TableCell>Graphic Pack</TableCell>
                 <TableCell>Content Type</TableCell>
                 <TableCell>Element Name</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Position (X, Y)</TableCell>
-                <TableCell>Home/Away Position</TableCell>
+                <TableCell>Position Preset</TableCell>
+                <TableCell>Position Anchor</TableCell>
+                <TableCell>Text Alignment</TableCell>
                 <TableCell>Font Size</TableCell>
                 <TableCell>Font Family</TableCell>
                 <TableCell>Color</TableCell>
-                <TableCell>Alignment</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -692,6 +833,16 @@ const TextElementManagement = () => {
                {Array.isArray(textElements) && textElements.length > 0 ? (
                  textElements.map((element) => (
                    <TableRow key={element.id} hover>
+                     <TableCell padding="checkbox">
+                       <IconButton 
+                         onClick={() => handleSelectElement(element.id)} 
+                         size="small"
+                       >
+                         {selectedElements.includes(element.id) ? 
+                           <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />
+                         }
+                       </IconButton>
+                     </TableCell>
                      <TableCell>{element.graphic_pack_name}</TableCell>
                      <TableCell>
                        <Chip 
@@ -721,14 +872,28 @@ const TextElementManagement = () => {
                        ({element.position_x}, {element.position_y})
                      </TableCell>
                      <TableCell>
-                       <Box>
-                         <Typography variant="caption" display="block">
-                           Home: ({element.home_position_x || element.position_x}, {element.home_position_y || element.position_y})
-                         </Typography>
-                         <Typography variant="caption" display="block">
-                           Away: ({element.away_position_x || element.position_x}, {element.away_position_y || element.position_y})
-                         </Typography>
-                       </Box>
+                       <Chip 
+                         label={element.position_preset || 'Default'} 
+                         size="small" 
+                         variant="outlined"
+                         color="info"
+                       />
+                     </TableCell>
+                     <TableCell>
+                       <Chip 
+                         label={element.position_anchor || 'top-left'} 
+                         size="small" 
+                         variant="outlined"
+                         color="secondary"
+                       />
+                     </TableCell>
+                     <TableCell>
+                       <Chip 
+                         label={element.text_alignment || element.alignment || 'center'} 
+                         size="small" 
+                         variant="outlined"
+                         color="primary"
+                       />
                      </TableCell>
                      <TableCell>
                        {element.element_type === 'image' ? 
@@ -2095,6 +2260,139 @@ const TextElementManagement = () => {
             disabled={!formData.graphic_pack || !formData.content_type || !formData.element_name || !formData.element_type}
           >
             {editingElement ? 'Update' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Edit Dialog */}
+      <Dialog open={bulkEditOpen} onClose={() => setBulkEditOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <BatchPredictionIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+          Bulk Edit {selectedElements.length} Elements
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Select the fields you want to update for all selected elements. Leave fields empty to keep current values.
+            </Typography>
+            
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Font Family</InputLabel>
+                  <Select
+                    value={bulkEditData.font_family}
+                    onChange={(e) => setBulkEditData({ ...bulkEditData, font_family: e.target.value })}
+                    label="Font Family"
+                  >
+                    <MenuItem value="">Keep Current</MenuItem>
+                    <MenuItem value="Arial">Arial</MenuItem>
+                    <MenuItem value="Helvetica">Helvetica</MenuItem>
+                    <MenuItem value="Times New Roman">Times New Roman</MenuItem>
+                    <MenuItem value="Georgia">Georgia</MenuItem>
+                    <MenuItem value="Verdana">Verdana</MenuItem>
+                    <MenuItem value="Impact">Impact</MenuItem>
+                    <MenuItem value="Comic Sans MS">Comic Sans MS</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Font Size"
+                  type="number"
+                  value={bulkEditData.font_size}
+                  onChange={(e) => setBulkEditData({ ...bulkEditData, font_size: e.target.value })}
+                  fullWidth
+                  helperText="Leave empty to keep current size"
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Font Color"
+                  type="color"
+                  value={bulkEditData.font_color}
+                  onChange={(e) => setBulkEditData({ ...bulkEditData, font_color: e.target.value })}
+                  fullWidth
+                  helperText="Leave empty to keep current color"
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Position Preset</InputLabel>
+                  <Select
+                    value={bulkEditData.position_preset}
+                    onChange={(e) => setBulkEditData({ ...bulkEditData, position_preset: e.target.value })}
+                    label="Position Preset"
+                  >
+                    <MenuItem value="">Keep Current</MenuItem>
+                    <MenuItem value="top-left">Top Left</MenuItem>
+                    <MenuItem value="top-center">Top Center</MenuItem>
+                    <MenuItem value="top-right">Top Right</MenuItem>
+                    <MenuItem value="center-left">Center Left</MenuItem>
+                    <MenuItem value="center">Center</MenuItem>
+                    <MenuItem value="center-right">Center Right</MenuItem>
+                    <MenuItem value="bottom-left">Bottom Left</MenuItem>
+                    <MenuItem value="bottom-center">Bottom Center</MenuItem>
+                    <MenuItem value="bottom-right">Bottom Right</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Position Anchor</InputLabel>
+                  <Select
+                    value={bulkEditData.position_anchor}
+                    onChange={(e) => setBulkEditData({ ...bulkEditData, position_anchor: e.target.value })}
+                    label="Position Anchor"
+                  >
+                    <MenuItem value="">Keep Current</MenuItem>
+                    <MenuItem value="top-left">Top Left</MenuItem>
+                    <MenuItem value="top-center">Top Center</MenuItem>
+                    <MenuItem value="top-right">Top Right</MenuItem>
+                    <MenuItem value="center-left">Center Left</MenuItem>
+                    <MenuItem value="center">Center</MenuItem>
+                    <MenuItem value="center-right">Center Right</MenuItem>
+                    <MenuItem value="bottom-left">Bottom Left</MenuItem>
+                    <MenuItem value="bottom-center">Bottom Center</MenuItem>
+                    <MenuItem value="bottom-right">Bottom Right</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Text Alignment</InputLabel>
+                  <Select
+                    value={bulkEditData.text_alignment}
+                    onChange={(e) => setBulkEditData({ ...bulkEditData, text_alignment: e.target.value })}
+                    label="Text Alignment"
+                  >
+                    <MenuItem value="">Keep Current</MenuItem>
+                    <MenuItem value="left">Left</MenuItem>
+                    <MenuItem value="center">Center</MenuItem>
+                    <MenuItem value="right">Right</MenuItem>
+                    <MenuItem value="justify">Justify</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkEditOpen(false)} startIcon={<CancelIcon />}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleBulkEdit} 
+            variant="contained" 
+            startIcon={<SaveIcon />}
+            disabled={!Object.values(bulkEditData).some(value => value !== '')}
+          >
+            Update {selectedElements.length} Elements
           </Button>
         </DialogActions>
       </Dialog>
