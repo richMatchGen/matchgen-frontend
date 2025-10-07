@@ -130,7 +130,7 @@ const formSteps = [
 const ClubOverview = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const { club, loading, error } = useClubSingleton();
+  const { club, loading, error, refreshClub } = useClubSingleton();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const fileInputRef = useRef(null);
@@ -390,6 +390,9 @@ const ClubOverview = () => {
       );
 
       console.log("Club update response:", response.data);
+
+      // Refresh club data to get the updated information
+      await refreshClub();
 
       setSuccess("Club details updated successfully!");
       setSnackbar({
