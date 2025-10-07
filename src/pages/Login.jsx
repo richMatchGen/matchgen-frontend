@@ -432,10 +432,10 @@ const Login = () => {
               )}
 
               <Button
+                type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
-                onClick={handleLogin}
                 disabled={isSubmitting}
                 sx={{ mt: 2, py: 1.5 }}
                 size="large"
