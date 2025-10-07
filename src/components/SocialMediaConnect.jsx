@@ -58,7 +58,7 @@ const SocialMediaConnect = () => {
     <StyledCard>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Connect Social Media
+          Connect Social Media (Coming Soon)
         </Typography>
         
         <Stack spacing={1}>
