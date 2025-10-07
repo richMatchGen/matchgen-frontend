@@ -2298,6 +2298,11 @@ const TextElementManagement = () => {
                     <MenuItem value="Verdana">Verdana</MenuItem>
                     <MenuItem value="Impact">Impact</MenuItem>
                     <MenuItem value="Comic Sans MS">Comic Sans MS</MenuItem>
+                    <MenuItem value="Quickly">Quickly</MenuItem>
+                    <MenuItem value="Dana">Dana</MenuItem>
+                    <MenuItem value="Roboto">Roboto</MenuItem>
+                    <MenuItem value="DejaVuSans">DejaVuSans</MenuItem>
+                    <MenuItem value="Montserrat">Montserrat</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
