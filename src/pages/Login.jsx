@@ -363,6 +363,12 @@ const Login = () => {
             <Box
               component="form"
               onSubmit={handleLogin}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleLogin(e);
+                }
+              }}
               noValidate
               sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
             >
@@ -411,15 +417,18 @@ const Login = () => {
                   label="Remember me"
                 />
                 <Link 
-                  component="button" 
                   variant="body2" 
                   sx={{ 
                     textDecoration: 'none',
+                    cursor: 'pointer',
                     '&:hover': {
                       backgroundColor: 'transparent'
                     }
                   }}
-                  onClick={() => setForgotPasswordOpen(true)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setForgotPasswordOpen(true);
+                  }}
                 >
                   Forgot your password?
                 </Link>
