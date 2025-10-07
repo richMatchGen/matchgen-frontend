@@ -236,7 +236,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
         if (!token) return;
 
         const response = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/my-club",
+          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
           {
             headers: {
               Authorization: `Bearer ${token}`,

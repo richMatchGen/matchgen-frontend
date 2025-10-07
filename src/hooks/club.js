@@ -9,7 +9,7 @@ export async function getClub() {
     return null;
   }
   try {
-    const response = await axios.get(`https://matchgen-backend-production.up.railway.app/api/users/my-club`, {
+    const response = await axios.get(`https://matchgen-backend-production.up.railway.app/api/users/my-club/`, {
       headers: {
         Authorization: `Bearer ${token}`, // ✅ Attach token in headers
         "Content-Type": "application/json",
