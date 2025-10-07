@@ -19,7 +19,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  DialogContentText
+  DialogContentText,
+  CssBaseline
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -27,9 +28,14 @@ import {
   Add as AddIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
+import { alpha } from '@mui/material/styles';
 import axios from 'axios';
 import EditFixtureModal from '../components/EditFixtureModal';
 import AddFixtureModal from '../components/AddFixtureModal';
+import AppTheme from '../themes/AppTheme';
+import SideMenu from '../components/SideMenu';
+import AppNavbar from '../components/AppNavBar';
+import Header from '../components/Header';
 
 const FixturesManagement = () => {
   const [fixtures, setFixtures] = useState([]);
@@ -177,22 +183,40 @@ const FixturesManagement = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
-          Fixtures Management
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={fetchFixtures}
-          >
-            Refresh
-          </Button>
-          <AddFixtureModal onFixtureAdded={handleAddFixture} />
-        </Box>
-      </Box>
+    <AppTheme>
+      <CssBaseline enableColorScheme />
+      <Box sx={{ display: 'flex' }}>
+        <SideMenu />
+        <AppNavbar />
+        {/* Main content */}
+        <Box
+          component="main"
+          sx={(theme) => ({
+            flexGrow: 1,
+            backgroundColor: theme.vars
+              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+              : alpha(theme.palette.background.default, 1),
+            overflow: 'auto',
+            mt: { xs: 12, md: 0 }, // Clear AppNavBar on mobile
+          })}
+        >
+          <Box sx={{ p: 3 }}>
+            <Header />
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+              <Typography variant="h4" component="h1">
+                Fixtures Management
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={fetchFixtures}
+                >
+                  Refresh
+                </Button>
+                <AddFixtureModal onFixtureAdded={handleAddFixture} />
+              </Box>
+            </Box>
 
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer>
@@ -344,7 +368,10 @@ const FixturesManagement = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+          </Box>
+        </Box>
+      </Box>
+    </AppTheme>
   );
 };
 

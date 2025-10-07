@@ -262,6 +262,11 @@ const CreatePlayer = () => {
   }, []);
 
   // Handle tab change
+  // Fetch players on component mount
+  useEffect(() => {
+    fetchPlayers();
+  }, [fetchPlayers]);
+
   const handleTabChange = useCallback((event, newValue) => {
     setActiveTab(newValue);
     if (newValue === 1 && players.length === 0) {
@@ -643,6 +648,7 @@ const CreatePlayer = () => {
               ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
               : alpha(theme.palette.background.default, 1),
             overflow: 'auto',
+            mt: { xs: 12, md: 0 }, // Clear AppNavBar on mobile
           })}
         >
           {/* Progress indicator */}
