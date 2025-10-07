@@ -631,6 +631,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
               ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
               : alpha(theme.palette.background.default, 1),
             overflow: 'auto',
+            mt: { xs: 12, md: 0 }, // Clear AppNavBar on mobile
           })}
         >
           {/* Progress indicator */}

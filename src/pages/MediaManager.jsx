@@ -37,7 +37,8 @@ const MediaManager = () => {
             minHeight: '100vh',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            mt: { xs: 12, md: 0 }, // Clear AppNavBar on mobile
           })}
         >
           <Box sx={{ width: '100%', maxWidth: '100%', p: 3 }}>
