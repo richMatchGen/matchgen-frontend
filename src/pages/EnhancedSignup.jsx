@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import env from '../config/environment';
 
 const steps = ['Create Account', 'Verify Email', 'Setup Club'];
 
@@ -150,7 +151,7 @@ const EnhancedSignup = () => {
     try {
       // Try to login to check if email is verified
       const response = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/users/token/',
+        `${env.API_BASE_URL}/users/token/`,
         {
           email: accountData.email,
           password: accountData.password
@@ -199,7 +200,7 @@ const EnhancedSignup = () => {
     try {
       // First, login to get token
       const loginResponse = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/users/token/',
+        `${env.API_BASE_URL}/users/token/`,
         {
           email: accountData.email,
           password: accountData.password

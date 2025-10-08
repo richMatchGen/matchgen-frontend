@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import env from "../config/environment";
 import useAuth from "../hooks/useAuth";
 
 const Dashboard = () => {
@@ -22,7 +23,7 @@ const Dashboard = () => {
     const fetchUser = async () => {
       try {
         const userRes = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/me/",
+          `${env.API_BASE_URL}/users/me/`,
           { headers }
         );
         setUser(userRes.data);

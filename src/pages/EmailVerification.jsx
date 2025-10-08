@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import env from '../config/environment';
 
 const EmailVerification = () => {
   const [searchParams] = useSearchParams();
@@ -63,7 +64,7 @@ const EmailVerification = () => {
     try {
       // First, try to login to get token
       const loginResponse = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/users/token/',
+        `${env.API_BASE_URL}/users/token/`,
         { email, password: '' } // We'll handle this differently
       );
 

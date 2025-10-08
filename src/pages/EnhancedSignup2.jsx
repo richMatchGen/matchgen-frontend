@@ -27,6 +27,7 @@ import { Visibility, VisibilityOff, Email, CheckCircle } from '@mui/icons-materi
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import env from '../config/environment';
 import useAuth from '../hooks/useAuth';
 import AppTheme from '../themes/AppTheme';
 import ColorModeSelect from '../themes/colormodeselect';
@@ -259,7 +260,7 @@ const EnhancedSignup2 = () => {
     try {
       // First, login to get token
       const loginResponse = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/users/token/',
+        `${env.API_BASE_URL}/users/token/`,
         {
           email: accountData.email,
           password: accountData.password

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import env from "../config/environment";
 import useAuth from "../hooks/useAuth";
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
@@ -43,7 +44,7 @@ const Fixtures = () => {
   
     const fetchData = async () => {
       try {
-        const userRes = await axios.get("/api/users/me/", { headers });
+        const userRes = await axios.get(`${env.API_BASE_URL}/users/me/`, { headers });
         setUser(userRes.data);
       } catch {
         logout();
