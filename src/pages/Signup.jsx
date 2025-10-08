@@ -3,6 +3,7 @@ import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import env from '../config/environment';
 
 const Signup = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -23,7 +24,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('https://matchgen-backend-production.up.railway.app/api/users/register/', formData);
+      await axios.post(`${env.API_BASE_URL}/users/register/`, formData);
       navigate('/login');
     } catch (err) {
       alert('Signup failed. Please try again.');

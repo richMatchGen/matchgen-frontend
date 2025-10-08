@@ -41,6 +41,7 @@ import AppTheme from '../themes/AppTheme';
 import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
+import env from '../config/environment';
 
 const Account = () => {
   const [user, setUser] = useState(null);
@@ -78,9 +79,6 @@ const Account = () => {
   });
 
   // API Configuration
-  const API_BASE_URL = import.meta.env.MODE === 'production' 
-    ? 'https://matchgen-backend-production.up.railway.app/api/'
-    : 'http://localhost:8000/api/';
 
   useEffect(() => {
     fetchUserData();
@@ -91,7 +89,7 @@ const Account = () => {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       
-      const response = await axios.get(`${API_BASE_URL}users/profile/`, {
+      const response = await axios.get(`${env.API_BASE_URL}/users/profile/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

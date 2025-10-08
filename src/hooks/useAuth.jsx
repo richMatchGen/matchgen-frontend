@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import env from "../config/environment";
 
 const useAuth = () => {
   const [auth, setAuth] = useState({
@@ -15,7 +16,7 @@ const useAuth = () => {
       if (refresh) {
         try {
           const res = await axios.post(
-            "https://matchgen-backend-production.up.railway.app/api/token/refresh/",
+            `${env.API_BASE_URL}/token/refresh/`,
             { refresh }
           );
           localStorage.setItem("accessToken", res.data.access);
@@ -54,7 +55,7 @@ const useAuth = () => {
       if (auth.token && !user) {
         try {
           const response = await axios.get(
-            "https://matchgen-backend-production.up.railway.app/api/users/me/",
+            `${env.API_BASE_URL}/users/me/`,
             { headers: { Authorization: `Bearer ${auth.token}` } }
           );
           setUser(response.data);

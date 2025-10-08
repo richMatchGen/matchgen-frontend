@@ -1,6 +1,7 @@
 import axios from "axios";
+import env from "../config/environment";
 
-const API_URL = "https://matchgen-backend-production.up.railway.app/api/users/";
+const API_URL = `${env.API_BASE_URL}/users/`;
 
 export async function getClub() {
   const token = localStorage.getItem("accessToken");
@@ -9,7 +10,7 @@ export async function getClub() {
     return null;
   }
   try {
-    const response = await axios.get(`https://matchgen-backend-production.up.railway.app/api/users/my-club/`, {
+    const response = await axios.get(`${env.API_BASE_URL}/users/my-club/`, {
       headers: {
         Authorization: `Bearer ${token}`, // ✅ Attach token in headers
         "Content-Type": "application/json",
