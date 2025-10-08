@@ -673,7 +673,7 @@ const CreatePlayer = () => {
                   mb: 2
                 }}
               >
-                Add New 
+                Add New Player!!
               </Typography>
             </Fade>
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: "auto" }}>
