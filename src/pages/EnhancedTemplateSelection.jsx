@@ -34,6 +34,7 @@ import AppNavbar from '../components/AppNavBar';
 import AppTheme from '../themes/AppTheme';
 import { CssBaseline } from '@mui/material';
 
+import env from '../config/environment';
 // Enhanced Template Preview Component
 const TemplatePreview = ({ template, isSelected, onSelect, onPreview }) => {
   const [hovered, setHovered] = useState(false);
@@ -336,7 +337,7 @@ export default function EnhancedTemplateSelection() {
       setError(null);
       
       const response = await axios.get(
-        "https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/"
+        "${env.API_BASE_URL}/graphicpack/graphic-packs/"
       );
       const data = Array.isArray(response.data) ? response.data : response.data.results;
       setPacks(data || []);
@@ -362,7 +363,7 @@ export default function EnhancedTemplateSelection() {
       const token = localStorage.getItem("accessToken");
 
       await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/graphicpack/select-pack/",
+        "${env.API_BASE_URL}/graphicpack/select-pack/",
         { pack_id: packId },
         {
           headers: {

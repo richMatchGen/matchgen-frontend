@@ -13,6 +13,7 @@ import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import { Link as RouterLink } from 'react-router-dom';
 
+import env from '../config/environment';
 export default function FixtureCard() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -21,7 +22,7 @@ export default function FixtureCard() {
   React.useEffect(() => {
     const fetchUpcomingMatch = async () => {
       try {
-        const res = await axios.get('https://matchgen-backend-production.up.railway.app/api/content/matches/upcoming/', {
+        const res = await axios.get('${env.API_BASE_URL}/content/matches/upcoming/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },

@@ -26,9 +26,10 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 
+import env from '../config/environment';
 // API Configuration
 const API_BASE_URL = import.meta.env.MODE === 'production' 
-  ? 'https://matchgen-backend-production.up.railway.app/api/'
+  ? '${env.API_BASE_URL}/'
   : 'http://localhost:8000/api/';
 
 const FeatureRestrictedElement = ({ 

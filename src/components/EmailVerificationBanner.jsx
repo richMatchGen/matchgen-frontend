@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
+import env from '../config/environment';
 const EmailVerificationBanner = ({ user, onVerificationComplete }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,7 +22,7 @@ const EmailVerificationBanner = ({ user, onVerificationComplete }) => {
     try {
       const token = localStorage.getItem('accessToken');
       await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/users/resend-verification/',
+        '${env.API_BASE_URL}/users/resend-verification/',
         {},
         {
           headers: {

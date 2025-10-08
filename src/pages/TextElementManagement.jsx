@@ -58,6 +58,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 
+import env from '../config/environment';
 const TextElementManagement = () => {
   const [textElements, setTextElements] = useState([]);
   const [graphicPacks, setGraphicPacks] = useState([]);
@@ -244,7 +245,7 @@ const TextElementManagement = () => {
       }
 
       const response = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/bulk-update-text-elements/',
+        '${env.API_BASE_URL}/graphicpack/bulk-update-text-elements/',
         {
           element_ids: selectedElements,
           updates: updates
@@ -303,7 +304,7 @@ const TextElementManagement = () => {
       // Fetch text elements with pagination and filters
       console.log('Fetching text elements with params:', params.toString());
       const elementsResponse = await axios.get(
-        `https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/?${params.toString()}`,
+        `${env.API_BASE_URL}/graphicpack/text-elements/?${params.toString()}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log('Text elements response:', elementsResponse.data);
@@ -344,7 +345,7 @@ const TextElementManagement = () => {
        // Fetch graphic packs
        console.log('Fetching graphic packs...');
        const packsResponse = await axios.get(
-         'https://matchgen-backend-production.up.railway.app/api/graphicpack/packs/',
+         '${env.API_BASE_URL}/graphicpack/packs/',
          { headers: { Authorization: `Bearer ${token}` } }
        );
        console.log('Graphic packs response:', packsResponse.data);
@@ -483,7 +484,7 @@ const TextElementManagement = () => {
         console.log('Alignment being sent:', formData.alignment);
         console.log('Position coordinates being sent:', { x: formData.position_x, y: formData.position_y });
         const response = await axios.put(
-          `https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/${editingElement.id}/update/`,
+          `${env.API_BASE_URL}/graphicpack/text-elements/${editingElement.id}/update/`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -497,7 +498,7 @@ const TextElementManagement = () => {
         // Create new element
         console.log('Creating text element with data:', formData);
         const response = await axios.post(
-          'https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/create/',
+          '${env.API_BASE_URL}/graphicpack/text-elements/create/',
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -530,7 +531,7 @@ const TextElementManagement = () => {
      try {
        const token = localStorage.getItem('accessToken');
        await axios.delete(
-         `https://matchgen-backend-production.up.railway.app/api/graphicpack/text-elements/${elementId}/delete/`,
+         `${env.API_BASE_URL}/graphicpack/text-elements/${elementId}/delete/`,
          { headers: { Authorization: `Bearer ${token}` } }
        );
        
@@ -554,7 +555,7 @@ const TextElementManagement = () => {
     try {
       const token = localStorage.getItem('accessToken');
       const response = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/create-test-data/',
+        '${env.API_BASE_URL}/graphicpack/create-test-data/',
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -581,7 +582,7 @@ const TextElementManagement = () => {
     try {
       const token = localStorage.getItem('accessToken');
       const response = await axios.post(
-        'https://matchgen-backend-production.up.railway.app/api/graphicpack/add-club-logo-element/',
+        '${env.API_BASE_URL}/graphicpack/add-club-logo-element/',
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

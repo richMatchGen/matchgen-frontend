@@ -37,6 +37,7 @@ import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
 
+import env from '../config/environment';
 const FixturesManagement = () => {
   const [fixtures, setFixtures] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +57,7 @@ const FixturesManagement = () => {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       const response = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/content/matches/',
+        '${env.API_BASE_URL}/content/matches/',
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
@@ -117,7 +118,7 @@ const FixturesManagement = () => {
     try {
       const token = localStorage.getItem('accessToken');
       await axios.delete(
-        `https://matchgen-backend-production.up.railway.app/api/content/matches/${fixtureToDelete.id}/`,
+        `${env.API_BASE_URL}/content/matches/${fixtureToDelete.id}/`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       

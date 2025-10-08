@@ -32,6 +32,7 @@ import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
 import stripeService from '../services/stripeService';
 
+import env from '../config/environment';
 const SubscriptionManagement = () => {
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -56,7 +57,7 @@ const SubscriptionManagement = () => {
       if (!clubId) {
         try {
           const API_BASE_URL = import.meta.env.MODE === 'production' 
-            ? 'https://matchgen-backend-production.up.railway.app/api/'
+            ? '${env.API_BASE_URL}/'
             : 'http://localhost:8000/api/';
             
           const clubResponse = await axios.get(
@@ -86,7 +87,7 @@ const SubscriptionManagement = () => {
       // Only fetch feature access if we have a valid club ID
       if (clubId && clubId !== 'null') {
         const API_BASE_URL = import.meta.env.MODE === 'production' 
-          ? 'https://matchgen-backend-production.up.railway.app/api/'
+          ? '${env.API_BASE_URL}/'
           : 'http://localhost:8000/api/';
           
         console.log('Fetching feature access for club:', clubId);

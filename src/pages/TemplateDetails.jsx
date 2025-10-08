@@ -39,6 +39,7 @@ import AppTheme from '../themes/AppTheme';
 import { CssBaseline } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
+import env from '../config/environment';
 // Template Preview Component
 const TemplatePreview = ({ template, onSelect, onPreview }) => {
   const [hovered, setHovered] = useState(false);
@@ -140,7 +141,7 @@ export default function TemplateDetails() {
       }
 
       const response = await axios.get(
-        `https://matchgen-backend-production.up.railway.app/api/graphicpack/templates/${packId}/`,
+        `${env.API_BASE_URL}/graphicpack/templates/${packId}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -191,7 +192,7 @@ export default function TemplateDetails() {
       const token = localStorage.getItem("accessToken");
 
       await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/graphicpack/select-pack/",
+        "${env.API_BASE_URL}/graphicpack/select-pack/",
         { pack_id: packId },
         {
           headers: {

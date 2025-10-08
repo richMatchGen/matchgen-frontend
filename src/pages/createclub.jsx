@@ -65,6 +65,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { uploadClubLogo } from "../hooks/club";
 
+import env from '../config/environment';
 // Enhanced styled components
 const StyledCard = styled(Card)(({ theme, isActive }) => ({
   height: "100%",
@@ -432,7 +433,7 @@ const CreateClub = () => {
       console.log("Sending club data:", clubData);
 
       const response = await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/users/club/",
+        "${env.API_BASE_URL}/users/club/",
         clubData,
         {
           headers: {

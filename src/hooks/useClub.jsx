@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
  
+import env from '../config/environment';
 const useClub = (clubId) => {
   const [club, setClub] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -11,7 +12,7 @@ const useClub = (clubId) => {
       try {
         const token = localStorage.getItem("accessToken");
         const res = await axios.get(
-          `https://matchgen-backend-production.up.railway.app/api/users/club/${clubId}/`,
+          `${env.API_BASE_URL}/users/club/${clubId}/`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

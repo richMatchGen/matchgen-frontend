@@ -9,6 +9,7 @@ import AppNavbar from '../components/AppNavBar';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+import env from '../config/environment';
 export default function ChoosePackPage() {
   const navigate = useNavigate();
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
@@ -18,7 +19,7 @@ export default function ChoosePackPage() {
       const token = localStorage.getItem("accessToken");
 
       await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/graphicpack/select-pack/",
+        "${env.API_BASE_URL}/graphicpack/select-pack/",
         { pack_id: packId },
         {
           headers: {

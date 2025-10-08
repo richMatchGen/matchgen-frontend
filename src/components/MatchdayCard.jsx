@@ -14,6 +14,7 @@ import axios from 'axios';
 import { Link as RouterLink } from 'react-router-dom';
 import NestedModal from './AddPlayerModal';
 
+import env from '../config/environment';
 export default function MatchDayCard() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -22,7 +23,7 @@ export default function MatchDayCard() {
   React.useEffect(() => {
     const fetchMatchDay = async () => {
       try {
-        const res = await axios.get('https://matchgen-backend-production.up.railway.app/api/content/matches/matchday/', {
+        const res = await axios.get('${env.API_BASE_URL}/content/matches/matchday/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },

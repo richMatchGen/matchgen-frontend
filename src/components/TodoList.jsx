@@ -29,6 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import useClubSingleton from '../hooks/useClubSingleton';
 import axios from 'axios';
 
+import env from '../config/environment';
 const TodoList = () => {
   const navigate = useNavigate();
   const { club } = useClubSingleton();
@@ -59,7 +60,7 @@ const TodoList = () => {
         // Fetch players count
         try {
           const playersRes = await axios.get(
-            'https://matchgen-backend-production.up.railway.app/api/content/players/',
+            '${env.API_BASE_URL}/content/players/',
             { headers }
           );
           setPlayersCount(playersRes.data.results?.length || 0);
@@ -70,7 +71,7 @@ const TodoList = () => {
         // Fetch fixtures count
         try {
           const fixturesRes = await axios.get(
-            'https://matchgen-backend-production.up.railway.app/api/content/matches/',
+            '${env.API_BASE_URL}/content/matches/',
             { headers }
           );
           setFixturesCount(fixturesRes.data.results?.length || 0);

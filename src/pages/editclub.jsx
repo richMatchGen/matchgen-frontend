@@ -4,6 +4,7 @@ import useClub from "../hooks/useClub";
 import { TextField, Button, Container, Typography, MenuItem } from "@mui/material";
 import axios from "axios";
 
+import env from '../config/environment';
 const EditClub = () => {
   const { clubId } = useParams();                     // ✅ should be inside the component
   const { club, loading, error } = useClub(clubId);   // ✅ same here
@@ -25,7 +26,7 @@ const EditClub = () => {
     try {
       const token = localStorage.getItem("accessToken");
       await axios.put(
-        `https://matchgen-backend-production.up.railway.app/api/users/club/${clubId}/`,
+        `${env.API_BASE_URL}/users/club/${clubId}/`,
         { name, sport, logo },
         {
           headers: { Authorization: `Bearer ${token}` },

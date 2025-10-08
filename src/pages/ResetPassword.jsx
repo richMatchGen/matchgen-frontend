@@ -15,6 +15,7 @@ import axios from "axios";
 import AppTheme from '../themes/AppTheme';
 import Sitemark from '../components/Sitemarkicon';
 
+import env from '../config/environment';
 // Styled components for the sign-in-side template
 const StyledBox = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -133,7 +134,7 @@ const ResetPassword = () => {
     
     try {
       const response = await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/users/reset-password/",
+        "${env.API_BASE_URL}/users/reset-password/",
         { 
           token: token,
           new_password: newPassword 

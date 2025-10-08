@@ -45,9 +45,10 @@ import Header from './Header';
 import FeatureGate from './FeatureGate';
 import useFeatureAccess from '../hooks/useFeatureAccess';
 
+import env from '../config/environment';
 // API Configuration - same as apiClient
 const API_BASE_URL = import.meta.env.MODE === 'production' 
-  ? 'https://matchgen-backend-production.up.railway.app/api/'
+  ? '${env.API_BASE_URL}/'
   : 'http://localhost:8000/api/';
 
 // Post type definitions - Monochrome theme

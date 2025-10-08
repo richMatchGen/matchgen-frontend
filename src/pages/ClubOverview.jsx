@@ -52,6 +52,7 @@ import {
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 
+import env from '../config/environment';
 // Enhanced styled components
 const StyledCard = styled(Card)(({ theme, isActive }) => ({
   height: "100%",
@@ -342,7 +343,7 @@ const ClubOverview = () => {
           logoFormData.append('logo', logoFile);
           
           const logoResponse = await axios.post(
-            'https://matchgen-backend-production.up.railway.app/api/users/club/upload-logo/',
+            '${env.API_BASE_URL}/users/club/upload-logo/',
             logoFormData,
             {
               headers: {
@@ -379,7 +380,7 @@ const ClubOverview = () => {
       console.log("Sending club data:", clubData);
 
       const response = await axios.put(
-        `https://matchgen-backend-production.up.railway.app/api/users/club/${club.id}/`,
+        `${env.API_BASE_URL}/users/club/${club.id}/`,
         clubData,
         {
           headers: {

@@ -51,6 +51,7 @@ import AppNavbar from './AppNavBar';
 import Header from './Header';
 import stripeService from '../services/stripeService';
 
+import env from '../config/environment';
 const FeatureCatalog = () => {
   const [featureCatalog, setFeatureCatalog] = useState(null);
   const [clubFeatures, setClubFeatures] = useState(null);
@@ -69,7 +70,7 @@ const FeatureCatalog = () => {
     try {
       const token = localStorage.getItem('accessToken');
       const API_BASE_URL = import.meta.env.MODE === 'production' 
-        ? 'https://matchgen-backend-production.up.railway.app/api/'
+        ? '${env.API_BASE_URL}/'
         : 'http://localhost:8000/api/';
         
       const response = await axios.get(
@@ -91,7 +92,7 @@ const FeatureCatalog = () => {
       const token = localStorage.getItem('accessToken');
       let clubId = localStorage.getItem('selectedClubId');
       const API_BASE_URL = import.meta.env.MODE === 'production' 
-        ? 'https://matchgen-backend-production.up.railway.app/api/'
+        ? '${env.API_BASE_URL}/'
         : 'http://localhost:8000/api/';
       
       // If no club ID, try to fetch it first

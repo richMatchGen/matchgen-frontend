@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import EventIcon from '@mui/icons-material/Event';
 
+import env from '../config/environment';
 export default function QuickLinksCard() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -22,7 +23,7 @@ export default function QuickLinksCard() {
   React.useEffect(() => {
     const fetchMatchDay = async () => {
       try {
-        const res = await axios.get('https://matchgen-backend-production.up.railway.app/api/content/matches/matchday/', {
+        const res = await axios.get('${env.API_BASE_URL}/content/matches/matchday/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },

@@ -71,6 +71,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import FeatureRestrictedButton from "../components/FeatureRestrictedButton";
 
+import env from '../config/environment';
 // Enhanced styled components
 const StyledCard = styled(Card)(({ theme, isActive }) => ({
   height: "100%",
@@ -195,7 +196,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
       if (!token) return;
 
       const response = await axios.get(
-        "https://matchgen-backend-production.up.railway.app/api/content/matches/",
+        "${env.API_BASE_URL}/content/matches/",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -236,7 +237,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
         if (!token) return;
 
         const response = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
+          "${env.API_BASE_URL}/users/my-club/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -455,7 +456,7 @@ const CreateMatch = ({ onFixtureAdded }) => {
           formData.append('logo', opponentLogoFile);
           
           const uploadResponse = await axios.post(
-            "https://matchgen-backend-production.up.railway.app/api/content/matches/upload-opponent-logo/",
+            "${env.API_BASE_URL}/content/matches/upload-opponent-logo/",
             formData,
             {
               headers: {
@@ -493,11 +494,11 @@ const CreateMatch = ({ onFixtureAdded }) => {
       });
 
       console.log("Sending match data:", matchData);
-      console.log("API endpoint:", "https://matchgen-backend-production.up.railway.app/api/content/matches/");
+      console.log("API endpoint:", "${env.API_BASE_URL}/content/matches/");
       console.log("Authorization header:", `Bearer ${token}`);
 
       const response = await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/content/matches/",
+        "${env.API_BASE_URL}/content/matches/",
         matchData,
         {
           headers: {

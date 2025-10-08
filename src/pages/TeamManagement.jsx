@@ -65,6 +65,7 @@ import AppNavbar from '../components/AppNavBar';
 import Header from '../components/Header';
 import FeatureRestrictedButton from '../components/FeatureRestrictedButton';
 
+import env from '../config/environment';
 const TeamManagement = () => {
   const [teamData, setTeamData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -99,7 +100,7 @@ const TeamManagement = () => {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       const API_BASE_URL = import.meta.env.MODE === 'production' 
-        ? 'https://matchgen-backend-production.up.railway.app/api/'
+        ? '${env.API_BASE_URL}/'
         : 'http://localhost:8000/api/';
         
       const response = await axios.get(
@@ -120,7 +121,7 @@ const TeamManagement = () => {
     try {
       const token = localStorage.getItem('accessToken');
       const API_BASE_URL = import.meta.env.MODE === 'production' 
-        ? 'https://matchgen-backend-production.up.railway.app/api/'
+        ? '${env.API_BASE_URL}/'
         : 'http://localhost:8000/api/';
         
       await axios.post(
@@ -156,7 +157,7 @@ const TeamManagement = () => {
     try {
       const token = localStorage.getItem('accessToken');
       const API_BASE_URL = import.meta.env.MODE === 'production' 
-        ? 'https://matchgen-backend-production.up.railway.app/api/'
+        ? '${env.API_BASE_URL}/'
         : 'http://localhost:8000/api/';
         
       await axios.put(
@@ -203,7 +204,7 @@ const TeamManagement = () => {
     try {
       const token = localStorage.getItem('accessToken');
       const API_BASE_URL = import.meta.env.MODE === 'production' 
-        ? 'https://matchgen-backend-production.up.railway.app/api/'
+        ? '${env.API_BASE_URL}/'
         : 'http://localhost:8000/api/';
         
       await axios.delete(

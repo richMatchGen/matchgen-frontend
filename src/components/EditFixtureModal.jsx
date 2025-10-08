@@ -15,6 +15,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import axios from 'axios';
 
+import env from '../config/environment';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -171,7 +172,7 @@ export default function EditFixtureModal({ open, onClose, fixture, onUpdate }) {
       console.log("Updating match data:", matchData);
 
       const response = await axios.put(
-        `https://matchgen-backend-production.up.railway.app/api/content/matches/${fixture.id}/`,
+        `${env.API_BASE_URL}/content/matches/${fixture.id}/`,
         matchData,
         {
           headers: {

@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://matchgen-backend-production.up.railway.app/api/users/";
+import env from '../config/environment';
+const API_URL = "${env.API_BASE_URL}/users/";
 
 export const login = async (username, password) => {
   try {

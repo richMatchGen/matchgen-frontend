@@ -52,9 +52,10 @@ import FeatureGate from './FeatureGate';
 import useFeatureAccess from '../hooks/useFeatureAccess';
 import EmailVerificationBanner from './EmailVerificationBanner';
 
+import env from '../config/environment';
 // API Configuration - same as apiClient
 const API_BASE_URL = import.meta.env.MODE === 'production' 
-  ? 'https://matchgen-backend-production.up.railway.app/api/'
+  ? '${env.API_BASE_URL}/'
   : 'http://localhost:8000/api/';
 
 // Post type definitions
@@ -207,7 +208,7 @@ const SocialMediaPostGenerator = () => {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       const response = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/content/matches/',
+        '${env.API_BASE_URL}/content/matches/',
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMatches(response.data.results || []);
@@ -223,7 +224,7 @@ const SocialMediaPostGenerator = () => {
     try {
       const token = localStorage.getItem('accessToken');
       const response = await axios.get(
-        'https://matchgen-backend-production.up.railway.app/api/content/players/substitution/',
+        '${env.API_BASE_URL}/content/players/substitution/',
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setPlayers(response.data || []);

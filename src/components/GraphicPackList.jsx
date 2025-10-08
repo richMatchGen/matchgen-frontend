@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import env from '../config/environment';
 import {
   Grid,
   Card,
@@ -45,7 +46,7 @@ export default function GraphicPackList({ onSelect }) {
         setLoading(true);
         setError(null);
         
-        const response = await axios.get("https://matchgen-backend-production.up.railway.app/api/graphicpack/graphic-packs/");
+        const response = await axios.get("${env.API_BASE_URL}/graphicpack/graphic-packs/");
         const data = Array.isArray(response.data) ? response.data : response.data.results;
         setPacks(data || []);
       } catch (err) {

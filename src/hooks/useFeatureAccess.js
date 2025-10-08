@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
+import env from '../config/environment';
 // API Configuration
 const API_BASE_URL = import.meta.env.MODE === 'production' 
-  ? 'https://matchgen-backend-production.up.railway.app/api/'
+  ? '${env.API_BASE_URL}/'
   : 'http://localhost:8000/api/';
 
 export const useFeatureAccess = (featureCode) => {
