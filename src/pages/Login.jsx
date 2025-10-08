@@ -27,6 +27,7 @@ import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import { env } from "../config/environment";
 import AppTheme from '../themes/AppTheme';
 import ColorModeSelect from '../themes/colormodeselect';
 import Sitemark from '../components/Sitemarkicon';
@@ -150,7 +151,7 @@ const Login = () => {
     
     try {
       const response = await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/users/token/",
+        `${env.API_BASE_URL}/users/token/`,
         { email, password }
       );
 
@@ -182,7 +183,7 @@ const Login = () => {
 
     try {
       await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/users/forgot-password/",
+        `${env.API_BASE_URL}/users/forgot-password/`,
         { email: forgotPasswordEmail }
       );
       

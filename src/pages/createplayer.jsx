@@ -672,7 +672,7 @@ const CreatePlayer = () => {
                   mb: 2
                 }}
               >
-                Add New Player
+                Add New 
               </Typography>
             </Fade>
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: "auto" }}>
@@ -720,13 +720,13 @@ const CreatePlayer = () => {
           </Collapse>
 
           {/* Club Display (if available) */}
-          {userClub && (
+          {/* {userClub && (
             <Box sx={{ mb: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1, border: 1, borderColor: 'divider' }}>
               <Typography variant="body2" color="text.secondary">
                 Adding player to: <strong>{userClub.name}</strong>
               </Typography>
             </Box>
-          )}
+          )} */}
 
           {/* Tabs */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
