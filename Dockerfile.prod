@@ -38,3 +38,4 @@ EXPOSE 3000
 
 # Start the application
 CMD ["nginx", "-g", "daemon off;"]
+
