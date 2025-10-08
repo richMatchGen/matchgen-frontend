@@ -60,6 +60,7 @@ import {
 import { styled } from "@mui/material/styles";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import env from "../config/environment";
 
 // Enhanced styled components
 const StyledCard = styled(Card)(({ theme, isActive }) => ({
@@ -185,7 +186,7 @@ const CreatePlayer = () => {
         if (!token) return;
 
         const response = await axios.get(
-          "https://matchgen-backend-production.up.railway.app/api/users/my-club/",
+          `${env.API_BASE_URL}/users/my-club/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -222,7 +223,7 @@ const CreatePlayer = () => {
       if (!token) return;
 
       const response = await axios.get(
-        "https://matchgen-backend-production.up.railway.app/api/content/players/",
+        `${env.API_BASE_URL}/content/players/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -475,7 +476,7 @@ const CreatePlayer = () => {
           photoFormData.append('photo', playerPicFile);
           
           const photoResponse = await axios.post(
-            'https://matchgen-backend-production.up.railway.app/api/content/players/upload-photo/',
+            `${env.API_BASE_URL}/content/players/upload-photo/`,
             photoFormData,
             {
               headers: {
@@ -510,7 +511,7 @@ const CreatePlayer = () => {
           formattedPhotoFormData.append('photo', formattedPicFile);
           
           const formattedPhotoResponse = await axios.post(
-            'https://matchgen-backend-production.up.railway.app/api/content/players/upload-photo/',
+            `${env.API_BASE_URL}/content/players/upload-photo/`,
             formattedPhotoFormData,
             {
               headers: {
@@ -544,7 +545,7 @@ const CreatePlayer = () => {
       console.log("Sending player data:", playerData);
 
       const response = await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/content/players/",
+        `${env.API_BASE_URL}/content/players/`,
         playerData,
         {
           headers: {

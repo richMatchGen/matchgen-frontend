@@ -73,7 +73,7 @@ export const uploadClubLogo = async (token, file) => {
 };
 
 export const getSquad = async (token) => {
-  return axios.get(`https://matchgen-backend-production.up.railway.app/api/content/players/`, {
+  return axios.get(`${env.API_BASE_URL}/content/players/`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
