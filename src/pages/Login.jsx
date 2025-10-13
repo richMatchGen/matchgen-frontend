@@ -22,9 +22,9 @@ import {
   DialogActions,
   Alert,
   InputAdornment,
-  CircularProgress,
-  Email
+  CircularProgress
 } from "@mui/material";
+import { Email } from "@mui/icons-material";
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
