@@ -293,7 +293,7 @@ const EnhancedSignup2 = () => {
 
       setSuccess('Club created successfully! Please choose your subscription plan to get started.');
       setTimeout(() => {
-        navigate('/subscription');
+        navigate('/dashboard');
       }, 2000);
       localStorage.setItem('accessToken', token);
       localStorage.setItem('refreshToken', loginResponse.data.refresh);
@@ -403,7 +403,8 @@ const EnhancedSignup2 = () => {
             </Typography>
             
             {success && (
-              <Alert severity="success" sx={{ mb: 2 }}>
+              <Alert severity="success" sx={{ mb: 2 ,backgroundColor: 'success.light',
+                color: 'success.contrastText'}}>
                 {success}
               </Alert>
             )}
@@ -529,7 +530,7 @@ const EnhancedSignup2 = () => {
       <StyledBox>
         {/* Left side - Image/Visual section */}
         <ImageBox>
-          <Box sx={{ textAlign: 'center', color: 'white', p: 4 }}>
+          <Box sx={{ textAlign: 'center', color: 'black', p: 4 }}>
             <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
               Join Us!
             </Typography>
@@ -538,15 +539,15 @@ const EnhancedSignup2 = () => {
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 300, mx: 'auto' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Box sx={{ width: 8, height: 8, bgcolor: 'black', borderRadius: '50%' }} />
                 <Typography variant="body1">Professional graphics</Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Box sx={{ width: 8, height: 8, bgcolor: 'black', borderRadius: '50%' }} />
                 <Typography variant="body1">Team management</Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%' }} />
+                <Box sx={{ width: 8, height: 8, bgcolor: 'black', borderRadius: '50%' }} />
                 <Typography variant="body1">Social media automation</Typography>
               </Box>
             </Box>
@@ -575,16 +576,17 @@ const EnhancedSignup2 = () => {
             </Stepper>
 
             {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
+              <Alert severity="error" sx={{ mb: 2, backgroundColor: 'success.light',
+                color: 'success.contrastText'}}>
                 {error}
               </Alert>
             )}
 
-            {success && (
+            {/* {success && (
               <Alert severity="success" sx={{ mb: 2 }}>
                 {success}
               </Alert>
-            )}
+            )} */}
 
             <Card sx={{ p: 3, mb: 3 }}>
               {renderStepContent(activeStep)}
@@ -595,6 +597,7 @@ const EnhancedSignup2 = () => {
                 disabled={activeStep === 0}
                 onClick={handleBack}
                 variant="outlined"
+                display="none"
               >
                 Back
               </Button>

@@ -21,7 +21,9 @@ import {
   DialogContent,
   DialogActions,
   Alert,
-  CircularProgress
+  InputAdornment,
+  CircularProgress,
+  Email
 } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +32,8 @@ import useAuth from "../hooks/useAuth";
 import AppTheme from '../themes/AppTheme';
 import ColorModeSelect from '../themes/colormodeselect';
 import Sitemark from '../components/Sitemarkicon';
+import matchgen from '../components/MatchGenLogo';
+
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 
 // Styled components for the sign-in-side template
@@ -290,9 +294,9 @@ const Login = () => {
                 gap: 3,
                 p: 2,
                 borderRadius: 2,
-                background: 'rgba(255, 255, 255, 0.1)',
+                // background: 'rgba(255, 255, 255, 0.1)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                // border: '1px solid rgba(255, 255, 255, 0.2)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   background: 'rgba(255, 255, 255, 0.15)',
@@ -302,17 +306,23 @@ const Login = () => {
                 <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
                   Ready-made templates tailored for your club
                 </Typography>
+                <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
+                  Professional-quality designs, no designer needed
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
+                  Save hours on team and matchday posts
+                </Typography>
               </Box>
               
-              <Box sx={{ 
+              {/* <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: 3,
                 p: 2,
                 borderRadius: 2,
-                background: 'rgba(255, 255, 255, 0.1)',
+                // background: 'rgba(255, 255, 255, 0.1)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                // border: '1px solid rgba(255, 255, 255, 0.2)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   background: 'rgba(255, 255, 255, 0.15)',
@@ -322,9 +332,12 @@ const Login = () => {
                 <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
                   Professional-quality designs, no designer needed
                 </Typography>
-              </Box>
+                <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
+                  Save hours on team and matchday posts
+                </Typography>
+              </Box> */}
               
-              <Box sx={{ 
+              {/* <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: 3,
@@ -339,10 +352,8 @@ const Login = () => {
                   transform: 'translateY(-2px)',
                 }
               }}>
-                <Typography variant="body1" sx={{ color: '#2d2d2d', fontWeight: 500 }}>
-                  Save hours on team and matchday posts
-                </Typography>
-              </Box>
+
+              </Box> */}
             </Box>
           </Box>
         </ImageBox>
@@ -351,7 +362,7 @@ const Login = () => {
         <FormBox>
           <FormContainer>
             <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <Sitemark />
+              <matchgen />
               <Typography variant="h4" component="h1" sx={{ mt: 2, fontWeight: 'bold' }}>
                 Sign in
               </Typography>
@@ -389,6 +400,13 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isSubmitting}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Email />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </FormControl>
 
