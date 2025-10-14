@@ -31,6 +31,7 @@ import useAuth from '../hooks/useAuth';
 import AppTheme from '../themes/AppTheme';
 import ColorModeSelect from '../themes/colormodeselect';
 import Sitemark from '../components/Sitemarkicon';
+import MatchGen from '../components/MatchGenLogo';
 
 const steps = ['Create Account', 'Verify Email', 'Setup Club'];
 
@@ -558,7 +559,7 @@ const EnhancedSignup2 = () => {
         <FormBox>
           <FormContainer>
             <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <Sitemark />
+              <MatchGen />
               <Typography variant="h4" component="h1" sx={{ mt: 2, fontWeight: 'bold' }}>
                 Create Account
               </Typography>
@@ -593,14 +594,14 @@ const EnhancedSignup2 = () => {
             </Card>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-              <Button
+              {/* <Button
                 disabled={activeStep === 0}
                 onClick={handleBack}
                 variant="outlined"
                 display="none"
               >
                 Back
-              </Button>
+              </Button> */}
               <Button
                 variant="contained"
                 onClick={handleNext}

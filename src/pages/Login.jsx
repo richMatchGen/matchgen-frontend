@@ -22,9 +22,9 @@ import {
   DialogActions,
   Alert,
   InputAdornment,
-  CircularProgress
+  CircularProgress,
+  Email
 } from "@mui/material";
-import { Email } from "@mui/icons-material";
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
@@ -32,7 +32,7 @@ import useAuth from "../hooks/useAuth";
 import AppTheme from '../themes/AppTheme';
 import ColorModeSelect from '../themes/colormodeselect';
 import Sitemark from '../components/Sitemarkicon';
-import matchgen from '../components/MatchGenLogo';
+import MatchGen from '../components/MatchGenLogo';
 
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
 
@@ -362,7 +362,7 @@ const Login = () => {
         <FormBox>
           <FormContainer>
             <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <matchgen />
+              <MatchGen />
               <Typography variant="h4" component="h1" sx={{ mt: 2, fontWeight: 'bold' }}>
                 Sign in
               </Typography>
@@ -426,6 +426,18 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isSubmitting}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </FormControl>
 
@@ -536,7 +548,7 @@ const Login = () => {
           
           <TextField
             fullWidth
-            label="Email Address"
+            // label="Email Address"
             type="email"
             value={forgotPasswordEmail}
             onChange={(e) => setForgotPasswordEmail(e.target.value)}
