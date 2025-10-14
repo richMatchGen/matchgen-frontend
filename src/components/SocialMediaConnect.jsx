@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box, Button, Stack } from '@mui/material';
+import { Card, CardContent, Typography, Box, Button, Stack, Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
