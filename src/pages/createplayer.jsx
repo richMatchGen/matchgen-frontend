@@ -275,7 +275,46 @@ const CreatePlayer = () => {
     if (newValue === 1 && players.length === 0) {
       fetchPlayers();
     }
+    // Reset edit mode when switching tabs
+    if (newValue === 0) {
+      setIsEditMode(false);
+      setEditingPlayer(null);
+    }
   }, [fetchPlayers, players.length]);
+
+  // Handle edit player
+  const handleEditPlayer = useCallback((player) => {
+    setEditingPlayer(player);
+    setIsEditMode(true);
+    setActiveTab(0); // Switch to create tab
+    
+    // Populate form with existing player data
+    setFormData({
+      name: player.name || "",
+      position: player.position || "",
+      squad_no: player.squad_no ? player.squad_no.toString() : "",
+      sponsor: player.sponsor || "",
+      player_pic: player.player_pic || "",
+    });
+    
+    // Set photo URLs if they exist
+    if (player.player_pic) {
+      setPlayerPicUrl(player.player_pic);
+      setUsePlayerPicUrl(true);
+    }
+    
+    // Reset other photo states
+    setPlayerPicFile(null);
+    setPlayerPicPreview(null);
+    setFormattedPicFile(null);
+    setFormattedPicPreview(null);
+    setFormattedPicUrl("");
+    setUseFormattedPicUrl(false);
+    
+    // Reset errors and step
+    setErrors({});
+    setActiveStep(0);
+  }, []);
 
   // Memoized values for performance
   const isFormValid = useMemo(() => {
@@ -546,27 +585,54 @@ const CreatePlayer = () => {
 
       console.log("Sending player data:", playerData);
 
-      const response = await axios.post(
-        "https://matchgen-backend-production.up.railway.app/api/content/players/",
-        playerData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      console.log("Player creation response:", response.data);
-
-      setSuccess("Player created successfully!");
-      setSnackbar({
-        open: true,
-        message: "Player created successfully!",
-        severity: "success"
-      });
+      let response;
+      if (isEditMode && editingPlayer) {
+        // Update existing player
+        response = await axios.put(
+          `https://matchgen-backend-production.up.railway.app/api/content/players/${editingPlayer.id}/`,
+          playerData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("Player update response:", response.data);
+        setSuccess("Player updated successfully!");
+        setSnackbar({
+          open: true,
+          message: "Player updated successfully!",
+          severity: "success"
+        });
+      } else {
+        // Create new player
+        response = await axios.post(
+          "https://matchgen-backend-production.up.railway.app/api/content/players/",
+          playerData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("Player creation response:", response.data);
+        setSuccess("Player created successfully!");
+        setSnackbar({
+          open: true,
+          message: "Player created successfully!",
+          severity: "success"
+        });
+      }
       
       // Enhanced form reset
+      if (isEditMode) {
+        // Reset edit mode
+        setIsEditMode(false);
+        setEditingPlayer(null);
+      }
+      
       setFormData({
         name: "",
         position: "",
@@ -748,7 +814,7 @@ const CreatePlayer = () => {
             >
               <Tab 
                 icon={<AddIcon />} 
-                label="Create Player" 
+                label={isEditMode ? "Edit Player" : "Create Player"} 
                 iconPosition="start"
                 sx={{ 
                   textTransform: 'none', 
@@ -1176,7 +1242,13 @@ const CreatePlayer = () => {
                   },
                 }}
               >
-                {loading ? "Creating Player..." : "Add Player"}
+                {loading ? (
+                  isEditMode ? "Updating Player..." : "Creating Player..."
+                ) : isEditMode ? (
+                  "Update Player"
+                ) : (
+                  "Add Player"
+                )}
               </Button>
             </Stack>
           </Box>
@@ -1283,10 +1355,7 @@ const CreatePlayer = () => {
                             <IconButton
                               size="small"
                               color="primary"
-                              onClick={() => {
-                                // TODO: Implement edit functionality
-                                console.log('Edit player:', player);
-                              }}
+                              onClick={() => handleEditPlayer(player)}
                               sx={{ 
                                 '&:hover': {
                                   backgroundColor: 'rgba(25, 118, 210, 0.04)'
