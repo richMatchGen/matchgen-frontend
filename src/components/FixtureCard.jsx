@@ -27,7 +27,12 @@ export default function FixtureCard() {
           },
         });
         console.log('FixtureCard - API response:', res.data);
-        setMatch(res.data);
+        // Check if the response indicates no matches found
+        if (res.data && res.data.detail && res.data.detail.includes('No upcoming matches found')) {
+          setMatch(null);
+        } else {
+          setMatch(res.data);
+        }
       } catch (err) {
         console.error('Failed to fetch upcoming fixtures', err);
         setMatch(null); // Explicitly set to null on error

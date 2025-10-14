@@ -25,7 +25,12 @@ export default function HighlightedCard() {
           },
         });
         console.log('ResultCard - API response:', res.data);
-        setMatch(res.data);
+        // Check if the response indicates no matches found
+        if (res.data && res.data.detail && res.data.detail.includes('No matches found')) {
+          setMatch(null);
+        } else {
+          setMatch(res.data);
+        }
 
       } catch (err) {
         console.error('Failed to fetch last match:', err);
