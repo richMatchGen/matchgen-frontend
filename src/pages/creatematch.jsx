@@ -670,13 +670,27 @@ const CreateMatch = ({ onFixtureAdded }) => {
                 icon={<AddIcon />} 
                 label="Create Fixture" 
                 iconPosition="start"
-                sx={{ textTransform: 'none', fontWeight: 600 }}
+                sx={{
+                  '& .MuiTab-root': {
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      color: 'inherit'
+                    }
+                  }
+                }}
               />
               <Tab 
                 icon={<ListIcon />} 
                 label={`Fixtures (${Array.isArray(fixtures) ? fixtures.length : 0})`} 
                 iconPosition="start"
-                sx={{ textTransform: 'none', fontWeight: 600 }}
+                sx={{
+                  '& .MuiTab-root': {
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      color: 'inherit'
+                    }
+                  }
+                }}
               />
             </Tabs>
           </Box>
@@ -723,14 +737,14 @@ const CreateMatch = ({ onFixtureAdded }) => {
                 )}
               </Collapse>
 
-          {/* Club Display (if available) */}
+          {/* Club Display (if available)
           {userClub && (
             <Box sx={{ mb: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1, border: 1, borderColor: 'divider' }}>
               <Typography variant="body2" color="text.secondary">
                 Creating match for: <strong>{userClub.name}</strong>
               </Typography>
             </Box>
-          )}
+          )} */}
 
           {/* Mobile: Stepper for better UX */}
           {isMobile && (
@@ -941,14 +955,14 @@ const CreateMatch = ({ onFixtureAdded }) => {
                       <Stack spacing={2}>
                         {/* Enhanced toggle between file upload and URL */}
                         <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                          <Button
+                          {/* <Button
                             variant={!useOpponentLogoUrl ? "contained" : "outlined"}
                             size="small"
                             onClick={() => setUseOpponentLogoUrl(false)}
                             startIcon={<CloudUploadIcon />}
                           >
                             Upload File
-                          </Button>
+                          </Button> */}
                           {/* <Button
                             variant={useOpponentLogoUrl ? "contained" : "outlined"}
                             size="small"

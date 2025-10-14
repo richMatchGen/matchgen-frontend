@@ -914,14 +914,14 @@ const CreatePlayer = () => {
                       <Stack spacing={2}>
                         {/* Enhanced toggle between file upload and URL */}
                         <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                          <Button
+                          {/* <Button
                             variant={!usePlayerPicUrl ? "contained" : "outlined"}
                             size="small"
                             onClick={() => setUsePlayerPicUrl(false)}
                             startIcon={<CloudUploadIcon />}
                           >
                             Upload File
-                          </Button>
+                          </Button> */}
                           {/* <Button
                             variant={usePlayerPicUrl ? "contained" : "outlined"}
                             size="small"
