@@ -665,32 +665,30 @@ const CreateMatch = ({ onFixtureAdded }) => {
 
           {/* Tabs */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-            <Tabs value={activeTab} onChange={handleTabChange} aria-label="fixtures tabs">
+            <Tabs 
+              value={activeTab} 
+              onChange={handleTabChange} 
+              aria-label="fixtures tabs"
+              sx={{
+                '& .MuiTab-root': {
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: 'inherit'
+                  }
+                }
+              }}
+            >
               <Tab 
                 icon={<AddIcon />} 
                 label="Create Fixture" 
                 iconPosition="start"
-                sx={{
-                  '& .MuiTab-root': {
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                      color: 'inherit'
-                    }
-                  }
-                }}
+                sx={{ textTransform: 'none', fontWeight: 500 }}
               />
               <Tab 
                 icon={<ListIcon />} 
                 label={`Fixtures (${Array.isArray(fixtures) ? fixtures.length : 0})`} 
                 iconPosition="start"
-                sx={{
-                  '& .MuiTab-root': {
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                      color: 'inherit'
-                    }
-                  }
-                }}
+                sx={{ textTransform: 'none', fontWeight: 500 }}
               />
             </Tabs>
           </Box>

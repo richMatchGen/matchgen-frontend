@@ -177,6 +177,8 @@ const CreatePlayer = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [players, setPlayers] = useState([]);
   const [playersLoading, setPlayersLoading] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Fetch user's club on component mount with retry logic
   useEffect(() => {
