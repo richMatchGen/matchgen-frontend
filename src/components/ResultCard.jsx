@@ -26,9 +26,19 @@ export default function HighlightedCard() {
         });
         console.log('ResultCard - API response:', res.data);
         // Check if the response indicates no matches found
-        if (res.data && res.data.detail && res.data.detail.includes('No matches found')) {
+        if (res.data && res.data.detail && (
+          res.data.detail.includes('No past matches found') ||
+          res.data.detail.includes('No matches found') ||
+          res.data.detail.includes('not found')
+        )) {
+          console.log('ResultCard - Setting match to null (no matches found)');
+          setMatch(null);
+        } else if (res.data && Object.keys(res.data).length === 1 && res.data.detail) {
+          // If response only has a detail field (error message), treat as no match
+          console.log('ResultCard - Setting match to null (only detail field present)');
           setMatch(null);
         } else {
+          console.log('ResultCard - Setting match to data:', res.data);
           setMatch(res.data);
         }
 
