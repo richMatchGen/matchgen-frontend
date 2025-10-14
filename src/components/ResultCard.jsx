@@ -24,10 +24,12 @@ export default function HighlightedCard() {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },
         });
+        console.log('ResultCard - API response:', res.data);
         setMatch(res.data);
 
       } catch (err) {
         console.error('Failed to fetch last match:', err);
+        setMatch(null); // Explicitly set to null on error
       }
     };
 
@@ -85,6 +87,7 @@ export default function HighlightedCard() {
             disabled={!match}
             component={RouterLink} 
             to={match ? `/gen/posts/${match.id}/fulltime` : "/gen/posts"}
+            onClick={() => console.log('ResultCard button clicked - match:', match, 'disabled:', !match)}
           >
             Generate Post
           </Button>

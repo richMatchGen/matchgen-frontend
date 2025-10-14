@@ -27,10 +27,12 @@ export default function MatchDayCard() {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },
         });
+        console.log('MatchdayCard - API response:', res.data);
         setMatch(res.data);
 
       } catch (err) {
         console.error('Failed to fetch Matchday:', err);
+        setMatch(null); // Explicitly set to null on error
       }
     };
 

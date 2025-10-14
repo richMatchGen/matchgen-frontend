@@ -65,8 +65,7 @@ const SocialMediaConnect = () => {
             color="primary" 
             variant="outlined"
             size="small"
-            sx={{ fontWeight: 'bold' }}
-            mb={2}
+            sx={{ fontWeight: 'bold', mb: 2 }}
           />
         <Stack spacing={1}>
           {socialPlatforms.map((platform) => (

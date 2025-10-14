@@ -26,9 +26,11 @@ export default function FixtureCard() {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Or however you store your JWT
           },
         });
+        console.log('FixtureCard - API response:', res.data);
         setMatch(res.data);
       } catch (err) {
         console.error('Failed to fetch upcoming fixtures', err);
+        setMatch(null); // Explicitly set to null on error
       }
     };
 
