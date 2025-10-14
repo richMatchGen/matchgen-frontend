@@ -94,7 +94,7 @@ const TodoList = () => {
       title: 'Create Club',
       description: 'Set up your club profile with name, sport, and branding',
       icon: <BusinessIcon />,
-      route: '/clubs/createclub',
+      route: '/club',
       isCompleted: () => club && club.id,
       severity: 'info'
     },

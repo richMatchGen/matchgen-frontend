@@ -56,6 +56,7 @@ import {
   Add as AddIcon,
   List as ListIcon,
   Refresh as RefreshIcon,
+  Edit as EditIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
@@ -719,29 +720,55 @@ const CreatePlayer = () => {
             )}
           </Collapse>
 
-          {/* Club Display (if available) */}
+          {/* Club Display (if available)
           {userClub && (
             <Box sx={{ mb: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1, border: 1, borderColor: 'divider' }}>
               <Typography variant="body2" color="text.secondary">
                 Adding player to: <strong>{userClub.name}</strong>
               </Typography>
             </Box>
-          )}
+          )} */}
 
           {/* Tabs */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-            <Tabs value={activeTab} onChange={handleTabChange} aria-label="player management tabs">
+            <Tabs 
+              value={activeTab} 
+              onChange={handleTabChange} 
+              aria-label="player management tabs"
+              sx={{
+                '& .MuiTab-root': {
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: 'inherit'
+                  }
+                }
+              }}
+            >
               <Tab 
                 icon={<AddIcon />} 
                 label="Create Player" 
                 iconPosition="start"
-                sx={{ textTransform: 'none', fontWeight: 500 }}
+                sx={{ 
+                  textTransform: 'none', 
+                  fontWeight: 500,
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: 'inherit'
+                  }
+                }}
               />
               <Tab 
                 icon={<ListIcon />} 
                 label={`Players (${Array.isArray(players) ? players.length : 0})`}
                 iconPosition="start"
-                sx={{ textTransform: 'none', fontWeight: 500 }}
+                sx={{ 
+                  textTransform: 'none', 
+                  fontWeight: 500,
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: 'inherit'
+                  }
+                }}
               />
             </Tabs>
           </Box>
@@ -895,14 +922,14 @@ const CreatePlayer = () => {
                           >
                             Upload File
                           </Button>
-                          <Button
+                          {/* <Button
                             variant={usePlayerPicUrl ? "contained" : "outlined"}
                             size="small"
                             onClick={() => setUsePlayerPicUrl(true)}
                             startIcon={<ImageIcon />}
                           >
                             Use URL
-                          </Button>
+                          </Button> */}
                         </Box>
 
                         {usePlayerPicUrl ? (
@@ -1251,16 +1278,21 @@ const CreatePlayer = () => {
                             )}
                           </TableCell>
                           <TableCell>
-                            <Button
+                            <IconButton
                               size="small"
-                              variant="outlined"
+                              color="primary"
                               onClick={() => {
                                 // TODO: Implement edit functionality
                                 console.log('Edit player:', player);
                               }}
+                              sx={{ 
+                                '&:hover': {
+                                  backgroundColor: 'rgba(25, 118, 210, 0.04)'
+                                }
+                              }}
                             >
-                              Edit
-                            </Button>
+                              <EditIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                       ))}

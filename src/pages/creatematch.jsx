@@ -139,8 +139,8 @@ const matchTypeOptions = [
 
 // Home/Away options
 const homeAwayOptions = [
-  { value: "HOME", label: "Home Fixture", icon: <HomeIcon />, color: "#1976d2" },
-  { value: "AWAY", label: "Away Fixture", icon: <AwayIcon />, color: "#f57c00" },
+  { value: "HOME", label: "Home Fixture", icon: <HomeIcon />, color: "black" },
+  { value: "AWAY", label: "Away Fixture", icon: <AwayIcon />, color: "black" },
 ];
 
 // Form steps for better UX
@@ -949,14 +949,14 @@ const CreateMatch = ({ onFixtureAdded }) => {
                           >
                             Upload File
                           </Button>
-                          <Button
+                          {/* <Button
                             variant={useOpponentLogoUrl ? "contained" : "outlined"}
                             size="small"
                             onClick={() => setUseOpponentLogoUrl(true)}
                             startIcon={<OpponentIcon />}
                           >
                             Use URL
-                          </Button>
+                          </Button> */}
                         </Box>
 
                         {useOpponentLogoUrl ? (
