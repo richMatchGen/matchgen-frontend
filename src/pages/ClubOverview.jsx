@@ -216,7 +216,12 @@ const ClubOverview = () => {
 
   // Enhanced input change handler
   const handleInputChange = useCallback((field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    console.log(`handleInputChange called: field=${field}, value=${value}, type=${typeof value}`);
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      console.log(`Updated formData for ${field}:`, newData);
+      return newData;
+    });
     
     // Clear field-specific error when user starts typing
     if (errors[field]) {
@@ -377,6 +382,8 @@ const ClubOverview = () => {
       });
 
       console.log("Sending club data:", clubData);
+      console.log("formData before processing:", formData);
+      console.log("formData.sport value:", formData.sport, "type:", typeof formData.sport);
 
       const response = await axios.put(
         `https://matchgen-backend-production.up.railway.app/api/users/club/${club.id}/`,
@@ -714,7 +721,7 @@ const ClubOverview = () => {
                               {sportOptions.map((option) => (
                                 <MenuItem key={option.value} value={option.value}>
                                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    <Box sx={{ color: option.color }}>
+                                    <Box sx={{ color: 'black' }}>
                                       {option.icon}
                                     </Box>
                                     {option.label}

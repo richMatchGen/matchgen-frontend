@@ -404,8 +404,7 @@ const EnhancedSignup2 = () => {
             </Typography>
             
             {success && (
-              <Alert severity="success" sx={{ mb: 2 ,backgroundColor: 'success.light',
-                color: 'success.contrastText'}}>
+              <Alert severity="success" sx={{ mb: 2 }}>
                 {success}
               </Alert>
             )}
