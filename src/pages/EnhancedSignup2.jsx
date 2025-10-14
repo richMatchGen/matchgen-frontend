@@ -592,7 +592,7 @@ const EnhancedSignup2 = () => {
               {renderStepContent(activeStep)}
             </Card>
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               {/* <Button
                 disabled={activeStep === 0}
                 onClick={handleBack}
