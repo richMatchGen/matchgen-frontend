@@ -159,17 +159,25 @@ const ClubOverview = () => {
   // Initialize form data when club data is available
   useEffect(() => {
     if (club) {
-      setFormData({
+      // console.log("🏢 Club data received in useEffect:", club);
+      // console.log("🏢 Club sport value:", club.sport, "type:", typeof club.sport);
+      const newFormData = {
         name: club.name || "",
         sport: club.sport || "",
         logo: club.logo || "",
-      });
+      };
+      // console.log("🏢 Setting formData to:", newFormData);
+      setFormData(newFormData);
       setLogoUrl(club.logo || "");
+    } else {
+      // console.log("🏢 No club data available yet");
     }
   }, [club]);
 
   // Memoized values for performance
   const isFormValid = useMemo(() => {
+    // console.log("🏢 Form validation check - formData:", formData);
+    // console.log("🏢 formData.sport:", formData.sport, "type:", typeof formData.sport);
     return formData.name.trim() && formData.sport && Object.keys(errors).length === 0;
   }, [formData.name, formData.sport, errors]);
 
@@ -216,10 +224,10 @@ const ClubOverview = () => {
 
   // Enhanced input change handler
   const handleInputChange = useCallback((field, value) => {
-    console.log(`handleInputChange called: field=${field}, value=${value}, type=${typeof value}`);
+
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
-      console.log(`Updated formData for ${field}:`, newData);
+
       return newData;
     });
     
@@ -381,9 +389,9 @@ const ClubOverview = () => {
         }
       });
 
-      console.log("Sending club data:", clubData);
-      console.log("formData before processing:", formData);
-      console.log("formData.sport value:", formData.sport, "type:", typeof formData.sport);
+      // console.log("Sending club data:", clubData);
+      // console.log("formData before processing:", formData);
+      // console.log("formData.sport value:", formData.sport, "type:", typeof formData.sport);
 
       const response = await axios.put(
         `https://matchgen-backend-production.up.railway.app/api/users/club/${club.id}/`,
@@ -396,7 +404,7 @@ const ClubOverview = () => {
         }
       );
 
-      console.log("Club update response:", response.data);
+      // console.log("Club update response:", response.data);
 
       // Refresh club data to get the updated information
       await refreshClub();
