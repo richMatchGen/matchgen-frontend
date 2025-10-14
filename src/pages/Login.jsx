@@ -23,8 +23,9 @@ import {
   Alert,
   InputAdornment,
   CircularProgress,
-  Email
+  IconButton
 } from "@mui/material";
+import { Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
@@ -105,6 +106,7 @@ const FormContainer = styled(Box)(({ theme }) => ({
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { auth, login, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -417,7 +419,7 @@ const Login = () => {
                   helperText={errors.password}
                   name="password"
                   placeholder="••••••"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   autoComplete="current-password"
                   required
