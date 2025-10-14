@@ -19,6 +19,12 @@ export default function MatchDayCard() {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [match, setMatch] = React.useState(null);
 
+  // Debug: Log whenever match state changes
+  React.useEffect(() => {
+    console.log('MatchdayCard - match state changed to:', match);
+    console.log('MatchdayCard - !match evaluates to:', !match);
+  }, [match]);
+
   React.useEffect(() => {
     const fetchMatchDay = async () => {
       try {
@@ -28,10 +34,23 @@ export default function MatchDayCard() {
           },
         });
         console.log('MatchdayCard - API response:', res.data);
+        console.log('MatchdayCard - res.data type:', typeof res.data);
+        console.log('MatchdayCard - res.data.detail:', res.data?.detail);
+        
         // Check if the response indicates no matches found
-        if (res.data && res.data.detail && res.data.detail.includes('No upcoming matches found')) {
+        if (res.data && res.data.detail && (
+          res.data.detail.includes('No upcoming matches found') ||
+          res.data.detail.includes('No matches found') ||
+          res.data.detail.includes('not found')
+        )) {
+          console.log('MatchdayCard - Setting match to null (no matches found)');
+          setMatch(null);
+        } else if (res.data && Object.keys(res.data).length === 1 && res.data.detail) {
+          // If response only has a detail field (error message), treat as no match
+          console.log('MatchdayCard - Setting match to null (only detail field present)');
           setMatch(null);
         } else {
+          console.log('MatchdayCard - Setting match to data:', res.data);
           setMatch(res.data);
         }
 
@@ -95,6 +114,11 @@ export default function MatchDayCard() {
         disabled={!match}
         component={RouterLink}
         to={match ? `/gen/posts/${match.id}/matchday` : "/gen/posts"}
+        onClick={() => {
+          console.log('MatchdayCard button clicked - match:', match);
+          console.log('MatchdayCard button clicked - !match:', !match);
+          console.log('MatchdayCard button clicked - disabled:', !match);
+        }}
       >
         Generate Post
       </Button>
