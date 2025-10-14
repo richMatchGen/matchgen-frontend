@@ -83,6 +83,7 @@ export default function FixtureCard() {
         color="primary"
         endIcon={<ChevronRightRoundedIcon />}
         fullWidth={isSmallScreen}
+        disabled={!match}
         component={RouterLink}
         to={match ? `/gen/posts/${match.id}/upcomingFixture` : "/gen/posts"}
       >

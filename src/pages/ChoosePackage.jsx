@@ -8,9 +8,11 @@ import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import useClubSingleton from '../hooks/useClubSingleton';
 
 export default function ChoosePackPage() {
   const navigate = useNavigate();
+  const { refreshClub } = useClubSingleton();
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
 
   const handleSelect = async (packId) => {
@@ -32,6 +34,9 @@ export default function ChoosePackPage() {
         message: "Template pack selected successfully!", 
         severity: "success" 
       });
+      
+      // Refresh club data to update the todo list
+      await refreshClub();
       
       // Navigate after a short delay to show the success message
       setTimeout(() => {

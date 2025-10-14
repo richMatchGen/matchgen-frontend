@@ -37,6 +37,7 @@ import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import AppTheme from '../themes/AppTheme';
 import { CssBaseline } from '@mui/material';
+import useClubSingleton from '../hooks/useClubSingleton';
 import { alpha } from '@mui/material/styles';
 
 // Template Preview Component
@@ -115,6 +116,7 @@ const TemplatePreview = ({ template, onSelect, onPreview }) => {
 export default function TemplateDetails() {
   const navigate = useNavigate();
   const { packId } = useParams();
+  const { refreshClub } = useClubSingleton();
   const [pack, setPack] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -205,6 +207,9 @@ export default function TemplateDetails() {
         message: "Template pack selected successfully!", 
         severity: "success" 
       });
+      
+      // Refresh club data to update the todo list
+      await refreshClub();
       
       setTimeout(() => {
         navigate("/dashboard");

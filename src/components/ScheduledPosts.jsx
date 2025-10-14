@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box, Paper } from '@mui/material';
+import { Card, CardContent, Typography, Box, Paper, Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
@@ -14,16 +14,22 @@ const ScheduledPosts = () => {
     <StyledCard>
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <CalendarTodayIcon sx={{ mr: 1, color: 'primary.main' }} />
+          <CalendarTodayIcon sx={{ mr: 1, color: 'black' }} />
           <Typography variant="h6">
             Scheduled Posts
           </Typography>
         </Box>
         
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        {/* <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           (Coming Soon)
-        </Typography>
-        
+        </Typography> */}
+            <Chip 
+            label="Coming Soon" 
+            color="primary" 
+            variant="outlined"
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center', 

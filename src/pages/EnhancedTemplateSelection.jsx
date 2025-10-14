@@ -33,6 +33,7 @@ import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
 import AppTheme from '../themes/AppTheme';
 import { CssBaseline } from '@mui/material';
+import useClubSingleton from '../hooks/useClubSingleton';
 
 // Enhanced Template Preview Component
 const TemplatePreview = ({ template, isSelected, onSelect, onPreview }) => {
@@ -245,6 +246,7 @@ const TemplatePackCard = ({ pack, isSelected, onSelect, onViewDetails }) => {
 // Main Enhanced Template Selection Component
 export default function EnhancedTemplateSelection() {
   const navigate = useNavigate();
+  const { refreshClub } = useClubSingleton();
   const [packs, setPacks] = useState([]);
   const [filteredPacks, setFilteredPacks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -395,6 +397,9 @@ export default function EnhancedTemplateSelection() {
         message: "Template pack selected successfully!", 
         severity: "success" 
       });
+      
+      // Refresh club data to update the todo list
+      await refreshClub();
       
       setTimeout(() => {
         navigate("/dashboard");

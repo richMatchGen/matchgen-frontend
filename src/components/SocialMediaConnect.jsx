@@ -58,9 +58,15 @@ const SocialMediaConnect = () => {
     <StyledCard>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Connect Social Media (Coming Soon)
+          Connect Social Media
         </Typography>
-        
+        <Chip 
+            label="Coming Soon" 
+            color="primary" 
+            variant="outlined"
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
         <Stack spacing={1}>
           {socialPlatforms.map((platform) => (
             <SocialButton
