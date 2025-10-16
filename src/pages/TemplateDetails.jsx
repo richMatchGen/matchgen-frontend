@@ -280,7 +280,7 @@ export default function TemplateDetails() {
         >
           <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Breadcrumbs */}
-        <Breadcrumbs sx={{ mb: 3 }}>
+        {/* <Breadcrumbs sx={{ mb: 3 }}>
           <Link
             component="button"
             variant="body1"
@@ -298,17 +298,17 @@ export default function TemplateDetails() {
             Template Packs
           </Link>
           <Typography color="text.primary">{pack?.name}</Typography>
-        </Breadcrumbs>
+        </Breadcrumbs> */}
 
         {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Button
+          {/* <Button
             startIcon={<ArrowBackIcon />}
             onClick={() => navigate('/gen/templates')}
             sx={{ mb: 2 }}
           >
             Back to Template Packs
-          </Button>
+          </Button> */}
           
           <Typography variant="h3" component="h1" color="text.primary" fontWeight="bold" gutterBottom>
             {pack?.name}
