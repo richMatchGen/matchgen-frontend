@@ -251,12 +251,12 @@ export default function TemplateDetails() {
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
         </Alert>
-        <Button
+        {/* <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate('/gen/templates')}
         >
           Back to Template Packs
-        </Button>
+        </Button> */}
       </Container>
     );
   }
@@ -266,7 +266,7 @@ export default function TemplateDetails() {
       <CssBaseline enableColorScheme />
       <Box sx={{ display: 'flex' }}>
         <SideMenu />
-        <AppNavbar />
+        {/* <AppNavbar /> */}
         {/* Main content */}
         <Box
           component="main"

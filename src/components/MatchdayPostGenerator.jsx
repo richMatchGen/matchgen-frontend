@@ -64,7 +64,7 @@ const POST_TYPES = [
     label: 'Matchday', 
     icon: <Event />, 
     description: 'Pre-match announcement with fixture details',
-    color: 'primary',
+    color: 'black',
     featureCode: 'post.matchday'
   },
   { 
@@ -72,7 +72,7 @@ const POST_TYPES = [
     label: 'Upcoming Fixture', 
     icon: <Schedule />, 
     description: 'Future fixture announcement',
-    color: 'info',
+    color: 'black',
     featureCode: 'post.upcoming'
   },
   { 
@@ -80,7 +80,7 @@ const POST_TYPES = [
     label: 'Starting XI', 
     icon: <Group />, 
     description: 'Team lineup announcement',
-    color: 'success',
+    color: 'black',
     featureCode: 'post.startingxi'
   },
   { 
@@ -88,7 +88,7 @@ const POST_TYPES = [
     label: 'Goal', 
     icon: <SportsSoccer />, 
     description: 'Goal celebration post',
-    color: 'warning',
+    color: 'black',
     featureCode: 'post.goal'
   },
   { 
@@ -96,7 +96,7 @@ const POST_TYPES = [
     label: 'Substitution', 
     icon: <SwapHoriz />, 
     description: 'Player substitution announcement',
-    color: 'secondary',
+    color: 'black',
     featureCode: 'post.substitution'
   },
   { 
@@ -104,7 +104,7 @@ const POST_TYPES = [
     label: 'Player of the Match', 
     icon: <EmojiEvents />, 
     description: 'Man of the match announcement',
-    color: 'warning',
+    color: 'black',
     featureCode: 'post.potm'
   },
   { 
@@ -112,7 +112,7 @@ const POST_TYPES = [
     label: 'Half Time', 
     icon: <Timer />, 
     description: 'Half-time score update',
-    color: 'info',
+    color: 'black',
     featureCode: 'post.halftime'
   },
   { 
@@ -120,7 +120,7 @@ const POST_TYPES = [
     label: 'Full Time',
     icon: <Flag />, 
     description: 'Final result announcement',
-    color: 'success',
+    color: 'black',
     featureCode: 'post.fulltime'
   }
 ];
@@ -552,20 +552,20 @@ const SocialMediaPostGenerator = () => {
       <Box sx={{ display: 'flex', overflow: 'hidden' }}>
         <SideMenu />
         <Box sx={{ flexGrow: 1, overflow: 'hidden', minWidth: 0 }}>
-          <AppNavbar />
+          {/* <AppNavbar /> */}
            <Header title="Social Media Post Generator" />
            
            <Container maxWidth="xl" sx={{ mt: 4, mb: 4, px: { xs: 1, sm: 2, md: 3 } }}>
-             <EmailVerificationBanner 
+             {/* <EmailVerificationBanner 
                user={user} 
                onVerificationComplete={() => {
                  // Refresh user data after verification
                  fetchUserData();
                }}
-             />
+             /> */}
             {/* Header */}
             <Box sx={{ mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              {/* <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 {fixtureId && (
                   <Button
                     startIcon={<ArrowBack />}
@@ -578,7 +578,7 @@ const SocialMediaPostGenerator = () => {
                 <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                   Social Media Post Generator
                 </Typography>
-              </Box>
+              </Box> */}
               
               <Typography variant="body1" color="text.secondary">
                 Generate professional social media posts for your club's matches and events.
@@ -655,6 +655,10 @@ const SocialMediaPostGenerator = () => {
                               },
                               '&.Mui-disabled': {
                                 opacity: 0.6
+                              },
+                              '&:hover': {
+                                backgroundColor: 'transparent',
+                                color: 'inherit'
                               }
                             }}
                           />

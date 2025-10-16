@@ -459,7 +459,7 @@ export default function EnhancedTemplateSelection() {
           <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Button
+          {/* <Button
             startIcon={<ArrowBackIcon />}
             onClick={() => navigate('/dashboard')}
             sx={{ 
@@ -467,7 +467,7 @@ export default function EnhancedTemplateSelection() {
             }}
           >
             Back to Dashboard
-          </Button>
+          </Button> */}
           
           <Typography variant="h3" component="h1" color="text.primary" fontWeight="bold" gutterBottom>
             Choose Your Template Pack
