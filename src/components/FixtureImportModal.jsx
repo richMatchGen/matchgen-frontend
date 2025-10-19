@@ -27,7 +27,8 @@ import {
   SportsCricket as CricketIcon,
   Close as CloseIcon,
   Info as InfoIcon,
-  Download as DownloadIcon
+  Download as DownloadIcon,
+  SmartToy as AIIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 
@@ -47,6 +48,10 @@ const FixtureImportModal = ({ open, onClose, onImportSuccess }) => {
 
   // Play Cricket state
   const [teamId, setTeamId] = useState('');
+
+  // AI Import state
+  const [fixtureText, setFixtureText] = useState('');
+  const [aiPreview, setAiPreview] = useState(null);
 
   useEffect(() => {
     if (open) {
@@ -201,12 +206,69 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
     }
   };
 
+  const handleAITest = async () => {
+    if (!fixtureText.trim()) {
+      setError('Please enter fixture text to test');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/content/fixtures/import/ai/test/`,
+        { fixture_text: fixtureText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setAiPreview(response.data.fixtures);
+      setSuccess(`AI found ${response.data.fixtures_found} fixtures`);
+    } catch (error) {
+      console.error('AI test error:', error);
+      setError(error.response?.data?.error || 'Failed to test AI fixture parsing');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAIImport = async () => {
+    if (!fixtureText.trim()) {
+      setError('Please enter fixture text to import');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/content/fixtures/import/ai/`,
+        { fixture_text: fixtureText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setSuccess(`Successfully imported ${response.data.created.length} fixtures using AI`);
+      onImportSuccess && onImportSuccess(response.data);
+      handleClose();
+    } catch (error) {
+      console.error('AI import error:', error);
+      setError(error.response?.data?.error || 'Failed to import fixtures using AI');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleClose = () => {
     setActiveTab(0);
     setCsvFile(null);
     setCsvPreview(null);
     setFaUrl('');
     setTeamId('');
+    setFixtureText('');
+    setAiPreview(null);
     setError(null);
     setSuccess(null);
     onClose();
@@ -395,6 +457,97 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
     </Box>
   );
 
+  const renderAITab = () => (
+    <Box>
+      <Typography variant="h6" gutterBottom>
+        AI-Powered Import
+      </Typography>
+      <Typography variant="body2" color="text.secondary" paragraph>
+        Use AI to automatically parse fixture data from natural language text. 
+        Simply paste or type your fixture information in any format.
+      </Typography>
+
+      <Card>
+        <CardContent>
+          <TextField
+            fullWidth
+            multiline
+            rows={6}
+            label="Fixture Text"
+            value={fixtureText}
+            onChange={(e) => setFixtureText(e.target.value)}
+            placeholder="Arsenal vs Chelsea on 15/03/2024 at 15:00, Manchester United vs Liverpool on 22/03/2024 at Old Trafford, Tottenham vs Brighton on 29/03/2024 at 14:00"
+            helperText="Enter fixture information in any format. AI will automatically extract dates, opponents, venues, and times."
+            sx={{ mb: 2 }}
+          />
+          
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <Typography variant="body2">
+              <strong>Examples of supported formats:</strong><br/>
+              • "Arsenal vs Chelsea on 15/03/2024 at 15:00"<br/>
+              • "Manchester United vs Liverpool, 22/03/2024, Old Trafford"<br/>
+              • "Tottenham vs Brighton, 29/03/2024, 14:00"<br/>
+              • "Home: Arsenal, Away: Chelsea, Date: 15/03/2024, Time: 15:00"
+            </Typography>
+          </Alert>
+
+          {aiPreview && (
+            <Box mt={2}>
+              <Typography variant="subtitle2" gutterBottom>
+                AI Preview ({aiPreview.length} fixtures found):
+              </Typography>
+              <Box
+                sx={{
+                  backgroundColor: 'grey.100',
+                  p: 2,
+                  borderRadius: 1,
+                  maxHeight: 200,
+                  overflow: 'auto'
+                }}
+              >
+                {aiPreview.map((fixture, index) => (
+                  <Box key={index} sx={{ mb: 1, p: 1, backgroundColor: 'white', borderRadius: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      {fixture.opponent} ({fixture.home_away})
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {fixture.date} at {fixture.time_start} - {fixture.venue}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
+
+          <Box display="flex" alignItems="center" gap={1} mt={2}>
+            <AIIcon color="primary" />
+            <Typography variant="body2" color="text.secondary">
+              Powered by OpenAI GPT-3.5 Turbo
+            </Typography>
+          </Box>
+        </CardContent>
+        <CardActions>
+          <Button
+            onClick={handleAITest}
+            disabled={!fixtureText.trim() || loading}
+            variant="outlined"
+            startIcon={loading ? <CircularProgress size={20} /> : <AIIcon />}
+          >
+            {loading ? 'Testing...' : 'Test AI Parsing'}
+          </Button>
+          <Button
+            onClick={handleAIImport}
+            disabled={!fixtureText.trim() || loading}
+            variant="contained"
+            startIcon={loading ? <CircularProgress size={20} /> : <AIIcon />}
+          >
+            {loading ? 'Importing...' : 'Import with AI'}
+          </Button>
+        </CardActions>
+      </Card>
+    </Box>
+  );
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>
@@ -436,12 +589,18 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
               icon={<CricketIcon />}
               iconPosition="start"
             />
+            <Tab
+              label="AI Import"
+              icon={<AIIcon />}
+              iconPosition="start"
+            />
           </Tabs>
         </Box>
 
         {activeTab === 0 && renderCsvTab()}
         {activeTab === 1 && renderFaTab()}
         {activeTab === 2 && renderCricketTab()}
+        {activeTab === 3 && renderAITab()}
       </DialogContent>
 
       <DialogActions>
