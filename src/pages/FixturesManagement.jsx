@@ -26,12 +26,14 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
-  Refresh as RefreshIcon
+  Refresh as RefreshIcon,
+  CloudUpload as CloudUploadIcon
 } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
 import axios from 'axios';
 import EditFixtureModal from '../components/EditFixtureModal';
 import AddFixtureModal from '../components/AddFixtureModal';
+import BulkFixtureImport from '../components/BulkFixtureImport';
 import AppTheme from '../themes/AppTheme';
 import SideMenu from '../components/SideMenu';
 import AppNavbar from '../components/AppNavBar';
@@ -45,6 +47,7 @@ const FixturesManagement = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [fixtureToDelete, setFixtureToDelete] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [bulkImportOpen, setBulkImportOpen] = useState(false);
 
   // Fetch fixtures on component mount
   useEffect(() => {
@@ -149,6 +152,24 @@ const FixturesManagement = () => {
     fetchFixtures();
   };
 
+  const handleBulkImport = () => {
+    setBulkImportOpen(true);
+  };
+
+  const handleBulkImportClose = () => {
+    setBulkImportOpen(false);
+  };
+
+  const handleBulkImportSuccess = () => {
+    fetchFixtures();
+    setBulkImportOpen(false);
+    setSnackbar({
+      open: true,
+      message: 'Fixtures imported successfully!',
+      severity: 'success'
+    });
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return 'Date TBC';
     const date = new Date(dateString);
@@ -206,13 +227,21 @@ const FixturesManagement = () => {
               <Typography variant="h4" component="h1">
                 Fixtures Management
               </Typography>
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   variant="outlined"
                   startIcon={<RefreshIcon />}
                   onClick={fetchFixtures}
                 >
                   Refresh
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<CloudUploadIcon />}
+                  onClick={handleBulkImport}
+                  color="secondary"
+                >
+                  Bulk Import
                 </Button>
                 <AddFixtureModal onFixtureAdded={handleAddFixture} />
               </Box>
@@ -327,6 +356,13 @@ const FixturesManagement = () => {
         onClose={handleEditClose}
         fixture={selectedFixture}
         onUpdate={handleEditUpdate}
+      />
+
+      {/* Bulk Import Modal */}
+      <BulkFixtureImport
+        open={bulkImportOpen}
+        onClose={handleBulkImportClose}
+        onFixturesImported={handleBulkImportSuccess}
       />
 
       {/* Delete Confirmation Dialog */}
