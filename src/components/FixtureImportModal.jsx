@@ -172,7 +172,39 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
       handleClose();
     } catch (error) {
       console.error('FA import error:', error);
-      setError(error.response?.data?.error || 'Failed to import fixtures from FA Fulltime');
+      const errorData = error.response?.data;
+      
+      if (errorData?.alternatives) {
+        // Show enhanced error with alternatives
+        setError(
+          <Box>
+            <Typography variant="body2" color="error" gutterBottom>
+              {errorData.error}
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {errorData.suggestion}
+            </Typography>
+            <Typography variant="subtitle2" gutterBottom>
+              Recommended Alternatives:
+            </Typography>
+            {errorData.alternatives.map((alt, index) => (
+              <Box key={index} sx={{ mb: 1, p: 1, backgroundColor: 'grey.100', borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  {alt.method}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {alt.description}
+                </Typography>
+                <Typography variant="caption" color="primary" display="block">
+                  {alt.benefits}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        );
+      } else {
+        setError(errorData?.error || 'Failed to import fixtures from FA Fulltime');
+      }
     } finally {
       setLoading(false);
     }
@@ -354,11 +386,18 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
   const renderFaTab = () => (
     <Box>
       <Typography variant="h6" gutterBottom>
-        FA Fulltime Scraper
+        FA Fulltime Scraper ⚠️
       </Typography>
       <Typography variant="body2" color="text.secondary" paragraph>
         Automatically import fixtures from your club's FA Fulltime page.
       </Typography>
+
+      <Alert severity="warning" sx={{ mb: 2 }}>
+        <Typography variant="body2">
+          <strong>⚠️ Currently Unreliable:</strong> FA Fulltime scraping is experiencing connectivity issues. 
+          We strongly recommend using <strong>AI Import</strong> instead for better reliability and faster results.
+        </Typography>
+      </Alert>
 
       <Card>
         <CardContent>
@@ -460,12 +499,19 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
   const renderAITab = () => (
     <Box>
       <Typography variant="h6" gutterBottom>
-        AI-Powered Import
+        AI-Powered Import ⭐ RECOMMENDED
       </Typography>
       <Typography variant="body2" color="text.secondary" paragraph>
         Use AI to automatically parse fixture data from natural language text. 
         Simply paste or type your fixture information in any format.
       </Typography>
+
+      <Alert severity="success" sx={{ mb: 2 }}>
+        <Typography variant="body2">
+          <strong>⭐ Recommended Method:</strong> AI Import is faster, more reliable, and works with any text format. 
+          No website access required - just paste your fixture data and let AI do the work!
+        </Typography>
+      </Alert>
 
       <Card>
         <CardContent>
