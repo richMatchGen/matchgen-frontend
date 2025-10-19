@@ -62,7 +62,42 @@ export default function FullTimeImport({ onImportSuccess, onClose }) {
       setSuccess(`Found ${response.data.length} fixtures`);
     } catch (error) {
       console.error('Preview error:', error);
-      setError(error.response?.data?.error || 'Failed to preview fixtures');
+      const errorData = error.response?.data;
+      
+      if (errorData?.alternatives) {
+        // Show enhanced error with alternatives
+        setError(
+          <Box>
+            <Typography variant="body2" color="error" gutterBottom>
+              {errorData.error}
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {errorData.message}
+            </Typography>
+            <Typography variant="subtitle2" gutterBottom>
+              Available Alternatives:
+            </Typography>
+            {errorData.alternatives.map((alt, index) => (
+              <Box key={index} sx={{ mb: 1, p: 1, backgroundColor: 'grey.100', borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  {alt.method}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {alt.description}
+                </Typography>
+                <Typography variant="caption" color="primary" display="block">
+                  {alt.benefits}
+                </Typography>
+              </Box>
+            ))}
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              {errorData.setup_required}
+            </Typography>
+          </Box>
+        );
+      } else {
+        setError(errorData?.error || 'Failed to preview fixtures');
+      }
     } finally {
       setLoading(false);
     }
@@ -103,7 +138,42 @@ export default function FullTimeImport({ onImportSuccess, onClose }) {
       setPreviewMode(false);
     } catch (error) {
       console.error('Import error:', error);
-      setError(error.response?.data?.error || 'Failed to import fixtures');
+      const errorData = error.response?.data;
+      
+      if (errorData?.alternatives) {
+        // Show enhanced error with alternatives
+        setError(
+          <Box>
+            <Typography variant="body2" color="error" gutterBottom>
+              {errorData.error}
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {errorData.message}
+            </Typography>
+            <Typography variant="subtitle2" gutterBottom>
+              Available Alternatives:
+            </Typography>
+            {errorData.alternatives.map((alt, index) => (
+              <Box key={index} sx={{ mb: 1, p: 1, backgroundColor: 'grey.100', borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  {alt.method}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {alt.description}
+                </Typography>
+                <Typography variant="caption" color="primary" display="block">
+                  {alt.benefits}
+                </Typography>
+              </Box>
+            ))}
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              {errorData.setup_required}
+            </Typography>
+          </Box>
+        );
+      } else {
+        setError(errorData?.error || 'Failed to import fixtures');
+      }
     } finally {
       setLoading(false);
     }

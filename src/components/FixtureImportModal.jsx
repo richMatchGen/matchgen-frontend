@@ -599,17 +599,24 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
   const renderProxyTab = () => (
     <Box>
       <Typography variant="h6" gutterBottom>
-        FA Fulltime Proxy Import ⭐ RECOMMENDED
+        FA Fulltime Proxy Import ⚠️ SETUP REQUIRED
       </Typography>
       <Typography variant="body2" color="text.secondary" paragraph>
         Use our reliable Cloudflare Worker proxy to import fixtures from FA Fulltime.
         This method includes caching, better error handling, and no timeout issues.
       </Typography>
 
-      <Alert severity="success" sx={{ mb: 2 }}>
+      <Alert severity="warning" sx={{ mb: 2 }}>
         <Typography variant="body2">
-          <strong>⭐ Recommended Method:</strong> The proxy method is more reliable than direct scraping,
-          includes 3-hour caching, and handles CORS properly for web requests.
+          <strong>⚠️ Setup Required:</strong> The Cloudflare Worker proxy needs to be deployed first.
+          Until then, we recommend using <strong>AI Import</strong> or <strong>CSV Upload</strong> instead.
+        </Typography>
+      </Alert>
+
+      <Alert severity="info" sx={{ mb: 2 }}>
+        <Typography variant="body2">
+          <strong>Setup Instructions:</strong> Follow the deployment guide in CLOUDFLARE_WORKER_DEPLOYMENT.md
+          to deploy the proxy worker, then update the PROXY_BASE URL in the backend settings.
         </Typography>
       </Alert>
 
