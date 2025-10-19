@@ -28,9 +28,11 @@ import {
   Close as CloseIcon,
   Info as InfoIcon,
   Download as DownloadIcon,
-  SmartToy as AIIcon
+  SmartToy as AIIcon,
+  CloudDone as ProxyIcon
 } from '@mui/icons-material';
 import axios from 'axios';
+import FullTimeImport from './FullTimeImport';
 
 const FixtureImportModal = ({ open, onClose, onImportSuccess }) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -594,6 +596,30 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
     </Box>
   );
 
+  const renderProxyTab = () => (
+    <Box>
+      <Typography variant="h6" gutterBottom>
+        FA Fulltime Proxy Import ⭐ RECOMMENDED
+      </Typography>
+      <Typography variant="body2" color="text.secondary" paragraph>
+        Use our reliable Cloudflare Worker proxy to import fixtures from FA Fulltime.
+        This method includes caching, better error handling, and no timeout issues.
+      </Typography>
+
+      <Alert severity="success" sx={{ mb: 2 }}>
+        <Typography variant="body2">
+          <strong>⭐ Recommended Method:</strong> The proxy method is more reliable than direct scraping,
+          includes 3-hour caching, and handles CORS properly for web requests.
+        </Typography>
+      </Alert>
+
+      <FullTimeImport 
+        onImportSuccess={onImportSuccess}
+        onClose={onClose}
+      />
+    </Box>
+  );
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>
@@ -640,6 +666,11 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
               icon={<AIIcon />}
               iconPosition="start"
             />
+            <Tab
+              label="FA Proxy"
+              icon={<ProxyIcon />}
+              iconPosition="start"
+            />
           </Tabs>
         </Box>
 
@@ -647,6 +678,7 @@ Manchester United,29/03/2024,Old Trafford,Away,14:00,League,AWAY`;
         {activeTab === 1 && renderFaTab()}
         {activeTab === 2 && renderCricketTab()}
         {activeTab === 3 && renderAITab()}
+        {activeTab === 4 && renderProxyTab()}
       </DialogContent>
 
       <DialogActions>
