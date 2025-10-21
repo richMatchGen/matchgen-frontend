@@ -139,9 +139,18 @@ const UploadGraphicPack = () => {
   const fetchGraphicPacks = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('graphicpack/packs/', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      let response;
+      if (isAdmin) {
+        // Admin users can see all packs including bespoke ones
+        response = await apiClient.get('graphicpack/packs/admin/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } else {
+        // Regular users see only public packs
+        response = await apiClient.get('graphicpack/packs/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
       
       // Handle both paginated and direct array responses
       const packs = response.data?.results || response.data || [];
@@ -642,6 +651,7 @@ const UploadGraphicPack = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Name</TableCell>
+                    <TableCell>Type</TableCell>
                     <TableCell>Sport</TableCell>
                     <TableCell>Tier</TableCell>
                     <TableCell>Club</TableCell>
@@ -660,6 +670,14 @@ const UploadGraphicPack = () => {
                         <Typography variant="body2" color="text.secondary">
                           {pack.description}
                         </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={pack.is_bespoke ? 'Bespoke' : 'Public'} 
+                          size="small" 
+                          color={pack.is_bespoke ? 'warning' : 'primary'}
+                          variant="outlined" 
+                        />
                       </TableCell>
                       <TableCell>
                         <Chip 
