@@ -57,6 +57,7 @@ const UploadGraphicPack = () => {
   const [packClub, setPackClub] = useState('');
   const [packPreviewImageUrl, setPackPreviewImageUrl] = useState('');
   const [packActive, setPackActive] = useState(true);
+  const [packBespoke, setPackBespoke] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -215,7 +216,8 @@ const UploadGraphicPack = () => {
         tier: packTier,
         assigned_club_id: packClub || null,
         preview_image_url: packPreviewImageUrl,
-        is_active: packActive
+        is_active: packActive,
+        is_bespoke: packBespoke
       };
 
       const response = await apiClient.post('graphicpack/packs/create/', data, {
@@ -234,6 +236,7 @@ const UploadGraphicPack = () => {
       setPackClub('');
       setPackPreviewImageUrl('');
       setPackActive(true);
+      setPackBespoke(false);
       setSelectedPreviewImage(null);
       fetchGraphicPacks();
     } catch (err) {
@@ -565,6 +568,18 @@ const UploadGraphicPack = () => {
                   />
                 }
                 label="Active"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={packBespoke}
+                    onChange={(e) => setPackBespoke(e.target.checked)}
+                    disabled={uploading}
+                  />
+                }
+                label="Bespoke Pack (Hidden from Templates)"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
