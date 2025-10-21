@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
 import useClubSingleton from "../hooks/useClubSingleton";
+import useAdmin from "../hooks/useAdmin";
 import apiClient from "../api/config";
+import AdminDashboard from "./AdminDashboard";
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -37,6 +39,7 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const { club } = useClubSingleton(); // Use singleton hook for club data
+  const { isAdmin } = useAdmin(); // Check for admin status
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -92,6 +95,12 @@ const Dashboard = () => {
     );
   }
   if (!user) return null; // user fetch failure already handled
+
+  // Check if user is admin and show admin dashboard
+  if (club?.isAdmin === true || isAdmin) {
+    console.log('🔑 Rendering admin dashboard for user:', user.email);
+    return <AdminDashboard />;
+  }
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />

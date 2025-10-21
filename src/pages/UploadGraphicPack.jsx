@@ -38,16 +38,20 @@ import {
   Edit as EditIcon
 } from '@mui/icons-material';
 import useAuth from '../hooks/useAuth';
+import useAdmin from '../hooks/useAdmin';
 import apiClient from '../api/config';
 
 const UploadGraphicPack = () => {
   const { auth, user } = useAuth();
+  const { isAdmin, fetchAllClubs } = useAdmin();
   const token = auth.token;
   const [graphicPacks, setGraphicPacks] = useState([]);
   const [selectedPreviewImage, setSelectedPreviewImage] = useState(null);
   const [packName, setPackName] = useState('');
   const [packDescription, setPackDescription] = useState('');
   const [packPrimaryColor, setPackPrimaryColor] = useState('black');
+  const [selectedClubId, setSelectedClubId] = useState('');
+  const [availableClubs, setAvailableClubs] = useState([]);
   const [packSport, setPackSport] = useState('');
   const [packTier, setPackTier] = useState('');
   const [packClub, setPackClub] = useState('');
@@ -152,14 +156,29 @@ const UploadGraphicPack = () => {
 
   const fetchClubs = async () => {
     try {
-      const response = await apiClient.get('users/clubs/', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      let response;
+      if (isAdmin) {
+        // Admin users can see all clubs
+        response = await apiClient.get('users/clubs/all/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } else {
+        // Regular users see only their clubs
+        response = await apiClient.get('users/clubs/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
       const clubs = response.data || [];
       setClubs(Array.isArray(clubs) ? clubs : []);
+      
+      // For admin users, also set available clubs for selection
+      if (isAdmin) {
+        setAvailableClubs(Array.isArray(clubs) ? clubs : []);
+      }
     } catch (err) {
       console.error('Error fetching clubs:', err);
       setClubs([]); // Ensure it's always an array
+      setAvailableClubs([]);
     }
   };
 
@@ -518,9 +537,9 @@ const UploadGraphicPack = () => {
                   label="Club (Optional)"
                 >
                   <MenuItem value="">Available to all clubs</MenuItem>
-                  {clubs && clubs.length > 0 && clubs.map((club) => (
+                  {(isAdmin ? availableClubs : clubs) && (isAdmin ? availableClubs : clubs).length > 0 && (isAdmin ? availableClubs : clubs).map((club) => (
                     <MenuItem key={club.id} value={club.id}>
-                      {club.name}
+                      {club.name} {isAdmin && `(${club.sport})`}
                     </MenuItem>
                   ))}
                 </Select>

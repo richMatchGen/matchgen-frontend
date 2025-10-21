@@ -49,10 +49,22 @@ const notifySubscribers = () => {
         console.log('🏢 API Result:', result);
         
         if (result.success) {
-          clubState.club = result.data;
-          clubState.error = null;
-          clubState.rateLimited = false;
-          console.log('🏢 Club data set successfully:', result.data);
+          // Check if this is an admin user response
+          if (result.data.is_admin === true) {
+            console.log('🔑 Admin user detected:', result.data);
+            clubState.club = {
+              isAdmin: true,
+              adminDashboardUrl: result.data.admin_dashboard_url,
+              message: result.data.message
+            };
+            clubState.error = null;
+            clubState.rateLimited = false;
+          } else {
+            clubState.club = result.data;
+            clubState.error = null;
+            clubState.rateLimited = false;
+            console.log('🏢 Club data set successfully:', result.data);
+          }
         } else {
           console.log('🏢 API call failed:', result.error);
           if (result.error.includes('Rate limited')) {
