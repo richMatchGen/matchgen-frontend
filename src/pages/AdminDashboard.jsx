@@ -30,7 +30,8 @@ import {
   Refresh as RefreshIcon,
   AdminPanelSettings as AdminIcon,
   Upload as UploadIcon,
-  Visibility as ViewIcon
+  Visibility as ViewIcon,
+  Edit as EditIcon
 } from '@mui/icons-material';
 import apiClient from '../api/config';
 import AppTheme from '../themes/AppTheme';
@@ -215,6 +216,99 @@ const AdminDashboard = () => {
           </Grid>
 
           <Grid container spacing={3}>
+            {/* Graphic Packs Management */}
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Graphic Packs Management
+                  </Typography>
+                  <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
+                    <Table stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Pack Name</TableCell>
+                          <TableCell>Type</TableCell>
+                          <TableCell>Assigned Club</TableCell>
+                          <TableCell>Sport</TableCell>
+                          <TableCell>Tier</TableCell>
+                          <TableCell>Status</TableCell>
+                          <TableCell>Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {dashboardData?.graphic_packs?.map((pack) => (
+                          <TableRow key={pack.id}>
+                            <TableCell>
+                              <Stack direction="row" alignItems="center" spacing={1}>
+                                <Box>
+                                  <Typography variant="body2" fontWeight="medium">
+                                    {pack.name}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    {pack.description || 'No description'}
+                                  </Typography>
+                                </Box>
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                size="small"
+                                label={pack.is_bespoke ? 'Bespoke' : 'Public'}
+                                color={pack.is_bespoke ? 'warning' : 'primary'}
+                                variant="outlined"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">
+                                {pack.assigned_club_name || 'All clubs'}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                size="small"
+                                label={pack.sport || 'N/A'}
+                                color="secondary"
+                                variant="outlined"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                size="small"
+                                label={pack.tier || 'N/A'}
+                                color="info"
+                                variant="outlined"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                size="small"
+                                label={pack.is_active ? 'Active' : 'Inactive'}
+                                color={pack.is_active ? 'success' : 'error'}
+                                variant="outlined"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Tooltip title="View Pack Details">
+                                <IconButton size="small">
+                                  <ViewIcon />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Edit Pack">
+                                <IconButton size="small">
+                                  <EditIcon />
+                                </IconButton>
+                              </Tooltip>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+
             {/* Clubs Management */}
             <Grid item xs={12} lg={8}>
               <Card>
