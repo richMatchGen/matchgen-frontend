@@ -121,14 +121,25 @@ const PSDProcessor = () => {
 
   const fetchGraphicPacks = async () => {
     try {
-      const response = await apiClient.get('graphicpack/packs/', {
+      // Use admin endpoint to get all packs including bespoke ones
+      const response = await apiClient.get('graphicpack/packs/admin/', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const packs = response.data?.results || response.data || [];
       setGraphicPacks(Array.isArray(packs) ? packs : []);
     } catch (err) {
       console.error('Error fetching graphic packs:', err);
-      setGraphicPacks([]);
+      // Fallback to regular endpoint if admin endpoint fails
+      try {
+        const fallbackResponse = await apiClient.get('graphicpack/packs/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const packs = fallbackResponse.data?.results || fallbackResponse.data || [];
+        setGraphicPacks(Array.isArray(packs) ? packs : []);
+      } catch (fallbackErr) {
+        console.error('Error fetching graphic packs (fallback):', fallbackErr);
+        setGraphicPacks([]);
+      }
     }
   };
 
