@@ -140,26 +140,29 @@ const UploadGraphicPack = () => {
   const fetchGraphicPacks = async () => {
     try {
       setLoading(true);
-      let response;
-      if (isAdmin) {
-        // Admin users can see all packs including bespoke ones
-        response = await apiClient.get('graphicpack/packs/admin/', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      } else {
-        // Regular users see only public packs
-        response = await apiClient.get('graphicpack/packs/', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      }
+      // Always use admin endpoint to show all packs including bespoke ones
+      // This endpoint returns all graphic packs regardless of is_bespoke flag
+      const response = await apiClient.get('graphicpack/packs/admin/', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       
       // Handle both paginated and direct array responses
       const packs = response.data?.results || response.data || [];
       setGraphicPacks(Array.isArray(packs) ? packs : []);
     } catch (err) {
-      setError('Failed to fetch graphic packs');
-      console.error('Error fetching graphic packs:', err);
-      setGraphicPacks([]); // Ensure it's always an array
+      // If admin endpoint fails, try regular endpoint as fallback
+      console.warn('Admin endpoint failed, trying regular endpoint:', err);
+      try {
+        const fallbackResponse = await apiClient.get('graphicpack/packs/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const packs = fallbackResponse.data?.results || fallbackResponse.data || [];
+        setGraphicPacks(Array.isArray(packs) ? packs : []);
+      } catch (fallbackErr) {
+        setError('Failed to fetch graphic packs');
+        console.error('Error fetching graphic packs:', fallbackErr);
+        setGraphicPacks([]); // Ensure it's always an array
+      }
     } finally {
       setLoading(false);
     }
