@@ -70,6 +70,7 @@ const UploadGraphicPack = () => {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplateFile, setSelectedTemplateFile] = useState(null);
   const [templateContentType, setTemplateContentType] = useState('');
+  const [templateIsAway, setTemplateIsAway] = useState(false);
 
 
   // Ensure arrays are properly initialized and can't be modified
@@ -313,6 +314,7 @@ const UploadGraphicPack = () => {
       formData.append('file', selectedTemplateFile);
       formData.append('content_type', templateContentType);
       formData.append('graphic_pack_id', selectedPack.id);
+      formData.append('homeoraway', templateIsAway ? 'Away' : 'Default');
 
       const response = await apiClient.post('graphicpack/templates/create/', formData, {
         headers: {
@@ -324,6 +326,7 @@ const UploadGraphicPack = () => {
       setSuccess('Template uploaded successfully!');
       setSelectedTemplateFile(null);
       setTemplateContentType('');
+      setTemplateIsAway(false);
       document.getElementById('template-file-input').value = '';
       fetchTemplates(selectedPack.id);
     } catch (err) {
@@ -1135,7 +1138,10 @@ const UploadGraphicPack = () => {
       {/* Template Upload Dialog */}
       <Dialog
         open={templateUploadOpen}
-        onClose={() => setTemplateUploadOpen(false)}
+        onClose={() => {
+          setTemplateUploadOpen(false);
+          setTemplateIsAway(false);
+        }}
         maxWidth="sm"
         fullWidth
         PaperProps={{
@@ -1194,11 +1200,29 @@ const UploadGraphicPack = () => {
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={templateIsAway}
+                      onChange={(e) => setTemplateIsAway(e.target.checked)}
+                      color="primary"
+                    />
+                  }
+                  label="Set as Away template"
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                  If unchecked, template will be set as Default (works for both Home and Away)
+                </Typography>
+              </Grid>
             </Grid>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setTemplateUploadOpen(false)}>
+          <Button onClick={() => {
+            setTemplateUploadOpen(false);
+            setTemplateIsAway(false);
+          }}>
             Cancel
           </Button>
           <Button 
