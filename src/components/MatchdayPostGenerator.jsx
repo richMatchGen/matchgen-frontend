@@ -178,6 +178,9 @@ const SocialMediaPostGenerator = () => {
   
   // User state for verification check
   const [user, setUser] = useState(null);
+  
+  // Club state for bespoke template check
+  const [clubData, setClubData] = useState(null);
 
   // Fetch matches and players on component mount
   useEffect(() => {
@@ -185,7 +188,15 @@ const SocialMediaPostGenerator = () => {
     fetchPlayers();
     checkFeatureAccess();
     fetchUserData();
+    fetchClubData();
   }, []);
+  
+  // Refetch match data when selectedMatch changes to get updated post URLs
+  useEffect(() => {
+    if (selectedMatch) {
+      fetchMatches();
+    }
+  }, [selectedMatch]);
 
   const fetchUserData = async () => {
     try {
@@ -199,6 +210,21 @@ const SocialMediaPostGenerator = () => {
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
+    }
+  };
+  
+  const fetchClubData = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        const response = await axios.get(
+          `${API_BASE_URL}users/my-club/`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setClubData(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching club data:', error);
     }
   };
 
@@ -463,6 +489,64 @@ const SocialMediaPostGenerator = () => {
         severity: 'error'
       });
     }
+  };
+  
+  const downloadBespokeGraphic = async (postUrl, postTypeName) => {
+    if (!postUrl) return;
+
+    try {
+      const response = await fetch(postUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const match = getSelectedMatchData();
+      const filename = `${postTypeName}-bespoke-${match?.opponent || 'match'}-${selectedMatch}.${blob.type.includes('png') ? 'png' : 'jpg'}`;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      setSnackbar({
+        open: true,
+        message: 'Bespoke graphic downloaded successfully!',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Error downloading bespoke graphic:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to download bespoke graphic',
+        severity: 'error'
+      });
+    }
+  };
+  
+  // Check if user has premium subscription with bespoke template
+  const hasBespokeAccess = () => {
+    if (!clubData) return false;
+    const packDetails = clubData.selected_pack_details || clubData.selected_pack;
+    return clubData.subscription_tier === 'prem' && 
+           clubData.subscription_active && 
+           (packDetails?.is_bespoke === true || (typeof packDetails === 'object' && packDetails?.is_bespoke === true));
+  };
+  
+  // Get the uploaded post URL for the current post type
+  const getBespokePostUrl = () => {
+    if (!selectedMatch || !hasBespokeAccess()) return null;
+    const match = getSelectedMatchData();
+    if (!match) return null;
+    
+    // Map post types to match fields
+    const postTypeToField = {
+      'matchday': 'matchday_post_url',
+      'upcomingFixture': 'upcoming_fixture_post_url',
+      'startingXI': 'starting_xi_post_url'
+    };
+    
+    const fieldName = postTypeToField[selectedPostType];
+    return fieldName ? match[fieldName] : null;
   };
 
   const getSelectedMatchData = () => {
@@ -1127,6 +1211,9 @@ const SocialMediaPostGenerator = () => {
                        const hasAccess = currentPostType ? featureAccess[currentPostType.featureCode] || false : true;
                        const isRestricted = !hasAccess;
                        const isUnverified = !user?.email_verified;
+                       const bespokePostUrl = getBespokePostUrl();
+                       const showBespokeDownload = hasBespokeAccess() && bespokePostUrl && 
+                                                   ['matchday', 'upcomingFixture', 'startingXI'].includes(selectedPostType);
                        
                        const buttonContent = (
                          <Button
@@ -1167,25 +1254,55 @@ const SocialMediaPostGenerator = () => {
                         );
                       }
 
-                      return isRestricted && currentPostType ? (
-                        <Tooltip
-                          title={getTooltipContent(currentPostType)}
-                          placement="top"
-                          arrow
-                          componentsProps={{
-                            tooltip: {
-                              sx: {
-                                maxWidth: 300,
-                                '& .MuiTooltip-arrow': {
-                                  color: 'primary.main',
+                      return (
+                        <Box>
+                          {isRestricted && currentPostType ? (
+                            <Tooltip
+                              title={getTooltipContent(currentPostType)}
+                              placement="top"
+                              arrow
+                              componentsProps={{
+                                tooltip: {
+                                  sx: {
+                                    maxWidth: 300,
+                                    '& .MuiTooltip-arrow': {
+                                      color: 'primary.main',
+                                    },
+                                  },
                                 },
-                              },
-                            },
-                          }}
-                        >
-                          <span>{buttonContent}</span>
-                        </Tooltip>
-                      ) : buttonContent;
+                              }}
+                            >
+                              <span>{buttonContent}</span>
+                            </Tooltip>
+                          ) : buttonContent}
+                          
+                          {/* Bespoke Graphic Download Button */}
+                          {showBespokeDownload && (
+                            <Button
+                              variant="outlined"
+                              fullWidth
+                              size="large"
+                              onClick={() => downloadBespokeGraphic(bespokePostUrl, currentPostType?.label)}
+                              startIcon={<Download />}
+                              sx={{ 
+                                mt: 2,
+                                py: 1.5,
+                                fontWeight: 'bold',
+                                fontSize: '1rem',
+                                borderColor: 'warning.main',
+                                color: 'warning.main',
+                                '&:hover': {
+                                  borderColor: 'warning.dark',
+                                  backgroundColor: 'warning.light',
+                                  color: 'warning.dark'
+                                }
+                              }}
+                            >
+                              Download Bespoke Graphic
+                            </Button>
+                          )}
+                        </Box>
+                      );
                     })()}
                   </CardContent>
                 </Card>
