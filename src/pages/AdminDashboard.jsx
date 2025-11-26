@@ -31,8 +31,19 @@ import {
   AdminPanelSettings as AdminIcon,
   Upload as UploadIcon,
   Visibility as ViewIcon,
-  Edit as EditIcon
+  Edit as EditIcon,
+  Event as EventIcon,
+  CheckCircle as CheckCircleIcon,
+  RadioButtonUnchecked as RadioButtonUncheckedIcon
 } from '@mui/icons-material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Snackbar
+} from '@mui/material';
 import apiClient from '../api/config';
 import AppTheme from '../themes/AppTheme';
 import SideMenu from '../components/SideMenu';
@@ -42,6 +53,14 @@ const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [fixtureTasks, setFixtureTasks] = useState([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [selectedFixture, setSelectedFixture] = useState(null);
+  const [selectedPostType, setSelectedPostType] = useState('');
+  const [postUrl, setPostUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const fetchAdminData = async () => {
     try {
@@ -58,9 +77,91 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchFixtureTasks = async () => {
+    try {
+      setLoadingTasks(true);
+      const response = await apiClient.get('/users/admin/fixture-tasks/');
+      setFixtureTasks(response.data.fixtures || []);
+    } catch (err) {
+      console.error('Error fetching fixture tasks:', err);
+      setSnackbar({
+        open: true,
+        message: 'Failed to load fixture tasks',
+        severity: 'error'
+      });
+    } finally {
+      setLoadingTasks(false);
+    }
+  };
+
   useEffect(() => {
     fetchAdminData();
+    fetchFixtureTasks();
   }, []);
+
+  const handleUploadClick = (fixture, postType) => {
+    setSelectedFixture(fixture);
+    setSelectedPostType(postType);
+    setPostUrl(fixture[`${postType}_post_url`] || '');
+    setUploadDialogOpen(true);
+  };
+
+  const handleUploadSubmit = async () => {
+    if (!postUrl.trim()) {
+      setSnackbar({
+        open: true,
+        message: 'Please enter a post URL',
+        severity: 'error'
+      });
+      return;
+    }
+
+    try {
+      setUploading(true);
+      await apiClient.post('/users/admin/upload-post/', {
+        fixture_id: selectedFixture.id,
+        post_type: selectedPostType,
+        post_url: postUrl.trim()
+      });
+      
+      setSnackbar({
+        open: true,
+        message: `${selectedPostType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} post uploaded successfully`,
+        severity: 'success'
+      });
+      
+      setUploadDialogOpen(false);
+      setPostUrl('');
+      fetchFixtureTasks(); // Refresh the task list
+    } catch (err) {
+      console.error('Error uploading post:', err);
+      setSnackbar({
+        open: true,
+        message: err.response?.data?.error || 'Failed to upload post',
+        severity: 'error'
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'TBD';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getPostStatus = (fixture, postType) => {
+    const url = fixture[`${postType}_post_url`];
+    return url ? 'completed' : 'pending';
+  };
 
   if (loading) {
     return (
@@ -210,6 +311,166 @@ const AdminDashboard = () => {
                       </Typography>
                     </Box>
                   </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Fixture Tasks Section */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <EventIcon sx={{ color: 'primary.main' }} />
+                      <Typography variant="h6">
+                        Upcoming Fixtures - Premium Bespoke Clubs
+                      </Typography>
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<RefreshIcon />}
+                      onClick={fetchFixtureTasks}
+                      disabled={loadingTasks}
+                    >
+                      Refresh Tasks
+                    </Button>
+                  </Box>
+                  
+                  {loadingTasks ? (
+                    <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                      <CircularProgress />
+                    </Box>
+                  ) : fixtureTasks.length === 0 ? (
+                    <Alert severity="info">
+                      No upcoming fixtures found for Premium clubs with Bespoke template packages.
+                    </Alert>
+                  ) : (
+                    <TableContainer component={Paper}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Club</TableCell>
+                            <TableCell>Opponent</TableCell>
+                            <TableCell>Date & Time</TableCell>
+                            <TableCell>Venue</TableCell>
+                            <TableCell>Graphic Pack</TableCell>
+                            <TableCell>Matchday</TableCell>
+                            <TableCell>Upcoming Fixture</TableCell>
+                            <TableCell>Starting XI</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {fixtureTasks.map((fixture) => (
+                            <TableRow key={fixture.id}>
+                              <TableCell>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  {fixture.club_logo && (
+                                    <Avatar
+                                      src={fixture.club_logo}
+                                      sx={{ width: 32, height: 32 }}
+                                    />
+                                  )}
+                                  <Typography variant="body2" fontWeight="medium">
+                                    {fixture.club_name}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  {fixture.opponent_logo && (
+                                    <Avatar
+                                      src={fixture.opponent_logo}
+                                      sx={{ width: 24, height: 24 }}
+                                    />
+                                  )}
+                                  <Typography variant="body2">
+                                    {fixture.opponent}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant="body2">
+                                  {formatDate(fixture.date)}
+                                </Typography>
+                                {fixture.time_start && (
+                                  <Typography variant="caption" color="text.secondary">
+                                    {fixture.time_start}
+                                  </Typography>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant="body2">
+                                  {fixture.venue || 'TBD'}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Chip
+                                  size="small"
+                                  label={fixture.graphic_pack_name || 'N/A'}
+                                  color="warning"
+                                  variant="outlined"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  {getPostStatus(fixture, 'matchday') === 'completed' ? (
+                                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                                  ) : (
+                                    <RadioButtonUncheckedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  )}
+                                  <Button
+                                    size="small"
+                                    variant={getPostStatus(fixture, 'matchday') === 'completed' ? 'outlined' : 'contained'}
+                                    startIcon={<UploadIcon />}
+                                    onClick={() => handleUploadClick(fixture, 'matchday')}
+                                  >
+                                    {getPostStatus(fixture, 'matchday') === 'completed' ? 'Update' : 'Upload'}
+                                  </Button>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  {getPostStatus(fixture, 'upcoming_fixture') === 'completed' ? (
+                                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                                  ) : (
+                                    <RadioButtonUncheckedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  )}
+                                  <Button
+                                    size="small"
+                                    variant={getPostStatus(fixture, 'upcoming_fixture') === 'completed' ? 'outlined' : 'contained'}
+                                    startIcon={<UploadIcon />}
+                                    onClick={() => handleUploadClick(fixture, 'upcoming_fixture')}
+                                  >
+                                    {getPostStatus(fixture, 'upcoming_fixture') === 'completed' ? 'Update' : 'Upload'}
+                                  </Button>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  {getPostStatus(fixture, 'starting_xi') === 'completed' ? (
+                                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                                  ) : (
+                                    <RadioButtonUncheckedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  )}
+                                  <Button
+                                    size="small"
+                                    variant={getPostStatus(fixture, 'starting_xi') === 'completed' ? 'outlined' : 'contained'}
+                                    startIcon={<UploadIcon />}
+                                    onClick={() => handleUploadClick(fixture, 'starting_xi')}
+                                  >
+                                    {getPostStatus(fixture, 'starting_xi') === 'completed' ? 'Update' : 'Upload'}
+                                  </Button>
+                                </Stack>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
                 </CardContent>
               </Card>
             </Grid>
@@ -434,6 +695,63 @@ const AdminDashboard = () => {
               </Card>
             </Grid>
           </Grid>
+
+          {/* Upload Dialog */}
+          <Dialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} maxWidth="sm" fullWidth>
+            <DialogTitle>
+              Upload {selectedPostType?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Post
+            </DialogTitle>
+            <DialogContent>
+              {selectedFixture && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Club: {selectedFixture.club_name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Fixture: vs {selectedFixture.opponent} on {formatDate(selectedFixture.date)}
+                  </Typography>
+                </Box>
+              )}
+              <TextField
+                fullWidth
+                label="Post URL"
+                value={postUrl}
+                onChange={(e) => setPostUrl(e.target.value)}
+                placeholder="https://example.com/post-image.jpg"
+                margin="normal"
+                required
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setUploadDialogOpen(false)} disabled={uploading}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUploadSubmit}
+                variant="contained"
+                disabled={uploading || !postUrl.trim()}
+                startIcon={uploading ? <CircularProgress size={20} /> : <UploadIcon />}
+              >
+                {uploading ? 'Uploading...' : 'Upload'}
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* Snackbar for notifications */}
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={6000}
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
+              severity={snackbar.severity}
+              sx={{ width: '100%' }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
         </Box>
       </Box>
     </AppTheme>
