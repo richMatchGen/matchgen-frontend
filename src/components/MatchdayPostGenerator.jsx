@@ -538,6 +538,17 @@ const SocialMediaPostGenerator = () => {
     const match = getSelectedMatchData();
     if (!match) return null;
     
+    // For goal posts, get the player's highlight URL based on home/away
+    if (selectedPostType === 'goal' && goalScorer) {
+      const player = players.find(p => p.name === goalScorer);
+      if (player) {
+        // Check if match is home or away
+        const isAway = (match.home_away || '').toUpperCase() === 'AWAY';
+        return isAway ? player.highlight_away_url : player.highlight_home_url;
+      }
+      return null;
+    }
+    
     // Map post types to match fields
     const postTypeToField = {
       'matchday': 'matchday_post_url',
@@ -1213,7 +1224,7 @@ const SocialMediaPostGenerator = () => {
                        const isUnverified = !user?.email_verified;
                        const bespokePostUrl = getBespokePostUrl();
                        const showBespokeDownload = hasBespokeAccess() && bespokePostUrl && 
-                                                   ['matchday', 'upcomingFixture', 'startingXI'].includes(selectedPostType);
+                                                   ['matchday', 'upcomingFixture', 'startingXI', 'goal'].includes(selectedPostType);
                        
                        const buttonContent = (
                          <Button
