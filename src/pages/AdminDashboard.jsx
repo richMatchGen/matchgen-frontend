@@ -30,6 +30,7 @@ import {
   Refresh as RefreshIcon,
   AdminPanelSettings as AdminIcon,
   Upload as UploadIcon,
+  Delete as DeleteIcon,
   Visibility as ViewIcon,
   Edit as EditIcon,
   Event as EventIcon,
