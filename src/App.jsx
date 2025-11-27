@@ -45,6 +45,7 @@ const PSDProcessor = lazy(() => import("./pages/PSDProcessor"));
 const UploadGraphicPack = lazy(() => import("./pages/UploadGraphicPack"));
 const MediaManager = lazy(() => import("./pages/MediaManager"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminPlayerManagement = lazy(() => import("./pages/AdminPlayerManagement"));
 const About = lazy(() => import("./pages/About"));
 const Feedback = lazy(() => import("./pages/Feedback"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
@@ -157,6 +158,7 @@ function App() {
           
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
+          <Route path="/admin/players" element={<PrivateRoute><AdminPlayerManagement /></PrivateRoute>} />
           <Route path="/upload-graphic-pack" element={<PrivateRoute><UploadGraphicPack /></PrivateRoute>} />
           
           {/* Media Management */}
