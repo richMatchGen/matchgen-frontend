@@ -380,11 +380,12 @@ const AdminDashboard = () => {
                             <TableCell>Club</TableCell>
                             <TableCell>Opponent</TableCell>
                             <TableCell>Date & Time</TableCell>
-                            <TableCell>Venue</TableCell>
                             <TableCell>Graphic Pack</TableCell>
                             <TableCell>Matchday</TableCell>
                             <TableCell>Upcoming Fixture</TableCell>
                             <TableCell>Starting XI</TableCell>
+                            <TableCell>Halftime</TableCell>
+                            <TableCell>Fulltime</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -425,11 +426,6 @@ const AdminDashboard = () => {
                                     {fixture.time_start}
                                   </Typography>
                                 )}
-                              </TableCell>
-                              <TableCell>
-                                <Typography variant="body2">
-                                  {fixture.venue || 'TBD'}
-                                </Typography>
                               </TableCell>
                               <TableCell>
                                 <Chip
@@ -487,6 +483,40 @@ const AdminDashboard = () => {
                                     onClick={() => handleUploadClick(fixture, 'starting_xi')}
                                   >
                                     {getPostStatus(fixture, 'starting_xi') === 'completed' ? 'Update' : 'Upload'}
+                                  </Button>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  {getPostStatus(fixture, 'halftime') === 'completed' ? (
+                                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                                  ) : (
+                                    <RadioButtonUncheckedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  )}
+                                  <Button
+                                    size="small"
+                                    variant={getPostStatus(fixture, 'halftime') === 'completed' ? 'outlined' : 'contained'}
+                                    startIcon={<UploadIcon />}
+                                    onClick={() => handleUploadClick(fixture, 'halftime')}
+                                  >
+                                    {getPostStatus(fixture, 'halftime') === 'completed' ? 'Update' : 'Upload'}
+                                  </Button>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  {getPostStatus(fixture, 'fulltime') === 'completed' ? (
+                                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                                  ) : (
+                                    <RadioButtonUncheckedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  )}
+                                  <Button
+                                    size="small"
+                                    variant={getPostStatus(fixture, 'fulltime') === 'completed' ? 'outlined' : 'contained'}
+                                    startIcon={<UploadIcon />}
+                                    onClick={() => handleUploadClick(fixture, 'fulltime')}
+                                  >
+                                    {getPostStatus(fixture, 'fulltime') === 'completed' ? 'Update' : 'Upload'}
                                   </Button>
                                 </Stack>
                               </TableCell>
