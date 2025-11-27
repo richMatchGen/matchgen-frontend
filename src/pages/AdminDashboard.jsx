@@ -59,6 +59,7 @@ const AdminDashboard = () => {
   const [selectedFixture, setSelectedFixture] = useState(null);
   const [selectedPostType, setSelectedPostType] = useState('');
   const [postUrl, setPostUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
@@ -103,14 +104,15 @@ const AdminDashboard = () => {
     setSelectedFixture(fixture);
     setSelectedPostType(postType);
     setPostUrl(fixture[`${postType}_post_url`] || '');
+    setSelectedFile(null);
     setUploadDialogOpen(true);
   };
 
   const handleUploadSubmit = async () => {
-    if (!postUrl.trim()) {
+    if (!postUrl.trim() && !selectedFile) {
       setSnackbar({
         open: true,
-        message: 'Please enter a post URL',
+        message: 'Please provide a post URL or upload an image file',
         severity: 'error'
       });
       return;
@@ -118,11 +120,24 @@ const AdminDashboard = () => {
 
     try {
       setUploading(true);
-      await apiClient.post('/users/admin/upload-post/', {
-        fixture_id: selectedFixture.id,
-        post_type: selectedPostType,
-        post_url: postUrl.trim()
-      });
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('fixture_id', selectedFixture.id);
+        formData.append('post_type', selectedPostType);
+        formData.append('file', selectedFile);
+        if (postUrl.trim()) {
+          formData.append('post_url', postUrl.trim());
+        }
+        await apiClient.post('/users/admin/upload-post/', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        await apiClient.post('/users/admin/upload-post/', {
+          fixture_id: selectedFixture.id,
+          post_type: selectedPostType,
+          post_url: postUrl.trim()
+        });
+      }
       
       setSnackbar({
         open: true,
@@ -132,6 +147,7 @@ const AdminDashboard = () => {
       
       setUploadDialogOpen(false);
       setPostUrl('');
+      setSelectedFile(null);
       fetchFixtureTasks(); // Refresh the task list
     } catch (err) {
       console.error('Error uploading post:', err);
@@ -142,6 +158,14 @@ const AdminDashboard = () => {
       });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    setSelectedFile(file || null);
+    if (file) {
+      setPostUrl('');
     }
   };
 
@@ -719,8 +743,37 @@ const AdminDashboard = () => {
                 onChange={(e) => setPostUrl(e.target.value)}
                 placeholder="https://example.com/post-image.jpg"
                 margin="normal"
-                required
+                disabled={Boolean(selectedFile)}
               />
+              <Typography variant="caption" color="text.secondary">
+                Paste an existing URL or upload an image file below.
+              </Typography>
+              <Box sx={{ mt: 3 }}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  startIcon={<UploadIcon />}
+                  disabled={uploading}
+                >
+                  {selectedFile ? 'Change Image' : 'Upload Image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={handleFileChange}
+                  />
+                </Button>
+                {selectedFile && (
+                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
+                    <Typography variant="body2">
+                      Selected: {selectedFile.name}
+                    </Typography>
+                    <IconButton size="small" onClick={() => setSelectedFile(null)} disabled={uploading}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                )}
+              </Box>
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setUploadDialogOpen(false)} disabled={uploading}>
@@ -729,7 +782,7 @@ const AdminDashboard = () => {
               <Button
                 onClick={handleUploadSubmit}
                 variant="contained"
-                disabled={uploading || !postUrl.trim()}
+                disabled={uploading || (!postUrl.trim() && !selectedFile)}
                 startIcon={uploading ? <CircularProgress size={20} /> : <UploadIcon />}
               >
                 {uploading ? 'Uploading...' : 'Upload'}
