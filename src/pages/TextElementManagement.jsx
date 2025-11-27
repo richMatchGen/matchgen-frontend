@@ -341,12 +341,23 @@ const TextElementManagement = () => {
       setTextElements(textElementsData);
       setPagination(paginationData);
 
-       // Fetch graphic packs
+       // Fetch graphic packs - use admin endpoint to get all packs including bespoke ones
        console.log('Fetching graphic packs...');
-       const packsResponse = await axios.get(
-         'https://matchgen-backend-production.up.railway.app/api/graphicpack/packs/',
-         { headers: { Authorization: `Bearer ${token}` } }
-       );
+       let packsResponse;
+       try {
+         // Try admin endpoint first (includes all packs including bespoke)
+         packsResponse = await axios.get(
+           'https://matchgen-backend-production.up.railway.app/api/graphicpack/packs/admin/',
+           { headers: { Authorization: `Bearer ${token}` } }
+         );
+       } catch (adminErr) {
+         // Fallback to regular endpoint if admin endpoint fails
+         console.warn('Admin endpoint failed, trying regular endpoint:', adminErr);
+         packsResponse = await axios.get(
+           'https://matchgen-backend-production.up.railway.app/api/graphicpack/packs/',
+           { headers: { Authorization: `Bearer ${token}` } }
+         );
+       }
        console.log('Graphic packs response:', packsResponse.data);
        console.log('Graphic packs type:', typeof packsResponse.data);
        
